@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>電腦視覺 CV — iPAS AI應用規劃師中級考試</title>
+<style>
+* { font-family: 'Calibri', 'Microsoft JhengHei', '微軟正黑體', sans-serif; }
+code, .formula, .tp-formula { font-family: 'JetBrains Mono', 'Consolas', monospace !important; }
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+:root{
+  --bg:#0F1117;--panel:#1A1D27;--panel2:#21253A;
+  --border:#2E3250;--text:#E8EAF6;--muted:#8892B0;
+  --accent:#FF6B9D;--accent2:#00FFB2;--accent3:#7C6FFF;
+  --blue:#00D4FF;--purple:#9B5DE5;--yellow:#FFD166;--orange:#FF9B42;--pink:#FF6B9D;
+  --r:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Calibri','Microsoft JhengHei','微軟正黑體',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.7;}
+
+.nav{position:sticky;top:0;z-index:200;background:rgba(15,17,23,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:12px 24px;}
+.nav a{color:var(--accent);text-decoration:none;font-weight:700;font-size:.9rem;padding:5px 14px;border-radius:999px;border:1.5px solid var(--accent);transition:all .18s;}
+.nav a:hover{background:var(--accent);color:#fff;}
+.nav-title{font-size:1.05rem;}
+.nav-tag{margin-left:auto;background:linear-gradient(135deg,var(--accent),var(--accent3));padding:4px 14px;border-radius:999px;font-size:.78rem;font-weight:900;color:#fff;}
+
+.hero{padding:60px 20px 40px;background:linear-gradient(160deg,#0F1117,#1a0f13,#0F1117);text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(255,107,157,.12),transparent);}
+.hero-badge{display:inline-block;margin-bottom:16px;padding:5px 18px;border-radius:999px;background:rgba(255,107,157,.12);border:1px solid var(--accent);font-size:.8rem;font-weight:900;color:var(--accent);letter-spacing:1px;}
+.hero-title{font-size:clamp(1.8rem,5vw,3.2rem);background:linear-gradient(135deg,var(--accent),var(--accent3),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px;}
+.hero-sub{color:var(--muted);font-size:1rem;max-width:600px;margin:0 auto 24px;}
+.tag-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.tag{padding:4px 12px;border-radius:999px;font-size:.75rem;font-weight:900;border:1px solid;}
+
+.wrap{max-width:980px;margin:0 auto;padding:16px 20px 80px;}
+
+.sec-title{font-size:1.5rem;color:var(--text);margin:44px 0 16px;display:flex;align-items:center;gap:10px;}
+.sec-title::before{content:'';display:inline-block;width:4px;height:24px;border-radius:2px;background:linear-gradient(var(--accent),var(--yellow));}
+
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:20px;}
+.panel-title{font-weight:900;font-size:1rem;color:var(--accent2);margin-bottom:12px;}
+
+.formula{background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin:12px 0;font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--accent2);line-height:2;overflow-x:auto;}
+.formula .cm{color:var(--muted);font-style:italic;}
+.formula .hl{color:var(--yellow);}
+.formula .fn{color:var(--blue);}
+.formula .vr{color:var(--pink);}
+
+.arch-wrap{background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:12px;margin:12px 0;overflow-x:auto;}
+.arch-wrap svg{display:block;margin:0 auto;}
+
+.tbl-wrap{overflow-x:auto;margin:12px 0;}
+table{width:100%;border-collapse:collapse;font-size:.88rem;}
+th{background:var(--panel2);padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);color:var(--accent2);font-weight:900;}
+td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--muted);}
+td:first-child{color:var(--text);font-weight:700;}
+tr:hover td{background:rgba(255,107,157,.04);}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.72rem;font-weight:900;}
+
+.kp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:12px 0;}
+.kp-card{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:16px;border-left:3px solid var(--accent);transition:transform .18s,border-color .18s;}
+.kp-card:hover{transform:translateY(-4px);border-left-color:var(--accent2);}
+.kp-card .kp-title{font-weight:900;font-size:.95rem;color:var(--text);margin-bottom:6px;}
+.kp-card .kp-body{font-size:.83rem;color:var(--muted);line-height:1.6;}
+.kp-card .kp-tag{font-size:.7rem;font-weight:900;color:var(--accent);margin-top:8px;}
+
+.warn-box{background:rgba(255,209,102,.07);border:1px solid var(--yellow);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--yellow);margin:10px 0;}
+.info-box{background:rgba(255,107,157,.07);border:1px solid var(--accent);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--accent);margin:10px 0;}
+
+/* seg tabs */
+.seg-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.seg-tab{padding:7px 16px;border-radius:999px;border:1.5px solid var(--border);font-size:.83rem;font-weight:900;cursor:pointer;color:var(--muted);background:transparent;transition:all .18s;}
+.seg-tab.active{border-color:var(--accent);color:var(--accent);background:rgba(255,107,157,.1);}
+.seg-box{background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:16px;font-size:.88rem;line-height:1.8;color:var(--muted);}
+.seg-box .hl{color:var(--accent);}
+.seg-box .hl2{color:var(--yellow);}
+.seg-box .hl3{color:var(--accent2);}
+
+/* 3D canvas */
+.c3d-wrap{background:#0a0c14;border:1px solid var(--border);border-radius:var(--r);position:relative;overflow:hidden;margin:12px 0;}
+.c3d{display:block;width:100%;height:380px;cursor:grab;}
+.c3d:active{cursor:grabbing;}
+.c3d-lbl{position:absolute;top:10px;left:12px;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);padding:4px 12px;border-radius:999px;font-size:.72rem;font-weight:900;color:var(--accent);border:1px solid rgba(255,107,157,.4);}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;padding:10px 12px;background:rgba(0,0,0,.3);}
+.ctrl button{padding:5px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.18);font-size:.72rem;font-weight:900;color:rgba(255,255,255,.6);background:transparent;cursor:pointer;transition:all .18s;}
+.ctrl button:hover,.ctrl button.on{border-color:var(--accent);color:var(--accent);background:rgba(255,107,157,.15);}
+
+/* quiz */
+.progress-bar{height:6px;background:var(--border);border-radius:3px;margin-bottom:20px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--yellow));transition:width .5s;}
+.q-item{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;}
+.q-num{font-size:.75rem;font-weight:900;color:var(--accent);margin-bottom:6px;}
+.q-stem{font-weight:700;color:var(--text);font-size:.95rem;margin-bottom:12px;line-height:1.6;}
+.q-opts{display:flex;flex-direction:column;gap:7px;}
+.q-opt{padding:10px 14px;border-radius:8px;cursor:pointer;border:1px solid var(--border);font-size:.88rem;color:var(--muted);transition:all .18s;display:flex;align-items:flex-start;gap:8px;}
+.q-opt:hover{border-color:var(--accent);color:var(--text);background:rgba(255,107,157,.07);}
+.q-opt.correct{border-color:var(--accent2);background:rgba(0,255,178,.07);color:var(--accent2);}
+.q-opt.wrong{border-color:var(--pink);background:rgba(255,107,157,.07);color:var(--pink);}
+.q-opt .opt-label{font-weight:900;min-width:18px;}
+.q-explain{margin-top:12px;padding:10px 14px;background:rgba(255,107,157,.06);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;font-size:.84rem;color:var(--accent);display:none;line-height:1.65;}
+.q-explain.show{display:block;}
+
+#score-banner{position:fixed;bottom:20px;right:20px;z-index:300;background:var(--panel);border:1px solid var(--accent);border-radius:12px;padding:10px 18px;font-weight:900;font-size:.9rem;color:var(--accent);box-shadow:0 4px 20px rgba(255,107,157,.3);}
+
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .5s ease,transform .5s ease;}
+.reveal.vis{opacity:1;transform:translateY(0);}
+
+footer{text-align:center;padding:28px;font-size:.75rem;color:rgba(232,234,246,.2);}
+</style>
+</head>
+<body>
+
+<div id="score-banner">⭐ 答題得分：<span id="score">0</span> / <span id="total">0</span></div>
+
+<nav class="nav">
+  <a href="index.html">← 返回</a>
+  <span class="nav-title">電腦視覺（Computer Vision）</span>
+  <span class="nav-tag">iPAS 中級 · 科目一 L21102</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">CV · L21102 · AI 相關技術應用</div>
+  <div class="hero-title">電腦視覺（Computer Vision）</div>
+  <div class="hero-sub">CNN→ResNet→YOLO架構演進、3D特徵圖視覺化、語義/實例分割、Vision Transformer(ViT)、遷移學習，對應 iPAS 中級科目一高頻考點</div>
+  <div class="tag-row">
+    <span class="tag" style="color:var(--accent);border-color:var(--accent)">CNN 3D</span>
+    <span class="tag" style="color:var(--accent3);border-color:var(--accent3)">ResNet</span>
+    <span class="tag" style="color:var(--yellow);border-color:var(--yellow)">YOLO</span>
+    <span class="tag" style="color:var(--accent2);border-color:var(--accent2)">ViT</span>
+    <span class="tag" style="color:var(--blue);border-color:var(--blue)">遷移學習</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ══ 1. CNN 卷積架構演進 ══ -->
+<div class="sec-title reveal">🏗️ CNN 架構演進（LeNet → AlexNet → VGG → ResNet）</div>
+<div class="panel reveal">
+  <div class="panel-title">從5層到152層：深度學習如何征服影像辨識</div>
+  <p style="color:var(--muted);font-size:.9rem;margin-bottom:14px;">
+    卷積神經網路（CNN）的核心優勢：透過卷積核（Filter）自動提取局部特徵（邊緣→紋理→物件），並藉由參數共享大幅減少參數量。ImageNet 大賽（ILSVRC）推動了四代里程碑架構。
+  </p>
+  <div class="arch-wrap">
+    <svg width="700" height="200" viewBox="0 0 700 200">
+      <defs>
+        <marker id="arr" markerWidth="7" markerHeight="5" refX="7" refY="2.5" orient="auto">
+          <polygon points="0 0,7 2.5,0 5" fill="#FF6B9D"/>
+        </marker>
+      </defs>
+      <!-- LeNet -->
+      <rect x="10" y="40" width="130" height="120" rx="10" fill="#21253A" stroke="#8892B0" stroke-width="1.5"/>
+      <text x="75" y="64" text-anchor="middle" fill="#8892B0" font-size="12" font-weight="700" font-family="Calibri,'Microsoft JhengHei',sans-serif">LeNet (1998)</text>
+      <text x="75" y="82" text-anchor="middle" fill="#555" font-size="9" font-family="Calibri,'Microsoft JhengHei',sans-serif">5 層</text>
+      <text x="75" y="98" text-anchor="middle" fill="#555" font-size="9" font-family="Calibri,'Microsoft JhengHei',sans-serif">手寫數字辨識</text>
+      <text x="75" y="114" text-anchor="middle" fill="#555" font-size="9" font-family="Calibri,'Microsoft JhengHei',sans-serif">32×32 輸入</text>
+      <text x="75" y="148" text-anchor="middle" fill="#8892B0" font-size="10" font-weight="700" font-family="Calibri,'Microsoft JhengHei',sans-serif">錯誤率: ~1%</text>
+      <line x1="141" y1="100" x2="162" y2="100" stroke="#FF6B9D" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- AlexNet -->
+      <rect x="163" y="30" width="140" height="140" rx="10" fill="#21253A" stroke="#FFD166" stroke-width="1.5"/>
+      <text x="233" y="56" text-anchor="middle" fill="#FFD166" font-size="12" font-weight="700" font-family="Calibri,'Microsoft JhengHei',sans-serif">AlexNet (2012)</text>
+      <text x="233" y="74" text-anchor="middle" fill="#8892B0" font-size="9" font-family="Calibri,'Microsoft JhengHei',sans-serif">8 層 · GPU 訓練</text>
+      <text x="233" y="90" text-anchor="middle" fill="#8892B0" font-size="9" font-family="Calibri,'Microsoft JhengHei',sans-serif">ReLU + Dropout</text>
+      <text x="233" y="106" text-anchor="middle" fill="#8892B0" font-size="9" font-family="Calibri,'Microsoft JhengHei',sans-serif">ImageNet 首冠</text>
+      <text x="233" y="122" text-anchor="middle" fill="#8892B0" font-size="9" font-family="Calibri,'Microsoft JhengHei',sans-serif">60M 參數</text>
+      <text x="233" y="154" text-anchor="middle" fill="#FFD166" font-size="10" font-weight="700" font-family="Calibri,'Microsoft JhengHei',sans-serif">錯誤率: 15.3%</text>
+      <line x1="304" y1="100" x2="325" y2="100" stroke="#FF6B9D" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- VGG -->
+      <rect x="326" y="20" width="140" height="160" rx="10" fill="#21253A" stroke="#7C6FFF" stroke-width="1.5"/>
+      <text x="396" y="46" text-anchor="middle" fill="#7C6FFF" font-size="12" font-weight="700" font-family="Calibri,'Microsoft JhengHei',sans-serif">VGG (2014)</text>
+      <text x="396" y="64" text-anchor="middle" fill="#8892B0" font-size="9" font-family="Calibri,'Microsoft JhengHei',sans-serif">16-19 層</text>
+      <text x="396" y="80" text-anchor="middle" fill="#8892B0" font-size="9" font-family="Calibri,'Microsoft JhengHei',sans-serif">全用 3×3 卷積核</text>
+      <text x="396" y="96" text-anchor="middle" fill="#8892B0" font-size="9" font-family="Calibri,'Microsoft JhengHei',sans-serif">簡單統一設計</text>
+      <text x="396" y="112" text-anchor="middle" fill="#8892B0" font-size="9" font-family="Calibri,'Microsoft JhengHei',sans-serif">138M 參數</text>
+      <text x="396" y="128" text-anchor="middle" fill="#8892B0" font-size="9" font-family="Calibri,'Microsoft JhengHei',sans-serif">遷移學習基礎</text>
+      <text x="396" y="164" text-anchor="middle" fill="#7C6FFF" font-size="10" font-weight="700" font-family="Calibri,'Microsoft JhengHei',sans-serif">錯誤率: 7.3%</text>
+      <line x1="467" y1="100" x2="488" y2="100" stroke="#FF6B9D" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- ResNet -->
+      <rect x="489" y="10" width="200" height="180" rx="10" fill="#21253A" stroke="#FF6B9D" stroke-width="2.5"/>
+      <text x="589" y="38" text-anchor="middle" fill="#FF6B9D" font-size="13" font-weight="700" font-family="Calibri,'Microsoft JhengHei',sans-serif">ResNet (2015)</text>
+      <text x="589" y="58" text-anchor="middle" fill="#8892B0" font-size="9" font-family="Calibri,'Microsoft JhengHei',sans-serif">50/101/152 層</text>
+      <text x="589" y="74" text-anchor="middle" fill="#8892B0" font-size="9" font-family="Calibri,'Microsoft JhengHei',sans-serif">殘差連結（Skip Connection）</text>
+      <text x="589" y="90" text-anchor="middle" fill="#8892B0" font-size="9" font-family="Calibri,'Microsoft JhengHei',sans-serif">解決梯度消失問題</text>
+      <text x="589" y="106" text-anchor="middle" fill="#8892B0" font-size="9" font-family="Calibri,'Microsoft JhengHei',sans-serif">F(x) + x 直接相加</text>
+      <text x="589" y="122" text-anchor="middle" fill="#8892B0" font-size="9" font-family="Calibri,'Microsoft JhengHei',sans-serif">25M 參數（更少更強）</text>
+      <text x="589" y="138" text-anchor="middle" fill="#00FFB2" font-size="9" font-family="Calibri,'Microsoft JhengHei',sans-serif">◀ 超越人類辨識率</text>
+      <text x="589" y="172" text-anchor="middle" fill="#FF6B9D" font-size="10" font-weight="700" font-family="Calibri,'Microsoft JhengHei',sans-serif">錯誤率: 3.57% (人類: 5%)</text>
+    </svg>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:#8892B0">
+      <div class="kp-title">卷積運算（Convolution）</div>
+      <div class="kp-body">卷積核（Filter）在輸入影像上滑動，計算點積，提取局部特徵。一個 3×3 卷積核只有9個參數，但可以掃描整張影像，實現<strong>參數共享</strong>。池化層（Max Pooling）降低維度、增加平移不變性。</div>
+      <div class="kp-tag">▶ 考點：卷積核 / 參數共享 / 平移不變性</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">AlexNet 的突破</div>
+      <div class="kp-body">2012年 ImageNet 競賽，AlexNet 以 15.3% 錯誤率大幅領先亞軍（26%），開啟深度學習時代。關鍵創新：GPU 平行訓練、ReLU 激活函數（取代 sigmoid）、Dropout 防過擬合、資料增強。</div>
+      <div class="kp-tag">▶ 考點：ReLU 取代 Sigmoid / GPU 加速</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">ResNet 殘差連結（核心考點）</div>
+      <div class="kp-body">深層網路訓練時梯度逐層衰減（梯度消失）。ResNet 引入<strong>跳躍連結（Skip Connection）</strong>：F(x) + x，讓梯度可以直接回傳，解決了訓練100層以上網路的難題。</div>
+      <div class="kp-tag">▶ 考點：ResNet 解決梯度消失 / F(x)+x</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 考試高頻：</strong>ResNet 的殘差連結（Skip Connection）解決<strong>梯度消失問題</strong>，公式為 H(x) = F(x) + x。VGG 全用 3×3 卷積核，AlexNet 首次使用 GPU 訓練。</div>
+</div>
+
+<!-- ══ 2. 卷積操作動畫 Canvas ══ -->
+<div class="sec-title reveal">🎬 卷積運算互動展示</div>
+<div class="panel reveal">
+  <div class="panel-title">3×3 卷積核滑動計算過程（點擊「下一步」逐步觀看）</div>
+  <canvas id="convCanvas" width="640" height="260" style="display:block;width:100%;max-width:640px;margin:0 auto;border-radius:10px;background:#0a0c14;cursor:pointer;"></canvas>
+  <div style="display:flex;gap:10px;flex-wrap:wrap;padding:10px 0;justify-content:center;">
+    <button onclick="convStep()" style="padding:7px 20px;border-radius:999px;border:1.5px solid var(--accent);background:rgba(255,107,157,.12);color:var(--accent);font-weight:900;cursor:pointer;font-size:.85rem;">▶ 下一步</button>
+    <button onclick="convReset()" style="padding:7px 20px;border-radius:999px;border:1.5px solid var(--border);background:transparent;color:var(--muted);font-weight:900;cursor:pointer;font-size:.85rem;">↺ 重置</button>
+  </div>
+  <div id="conv-explain" style="background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:12px 16px;font-size:.85rem;color:var(--muted);margin-top:8px;">
+    📷 輸入矩陣（6×6，模擬灰階影像像素值）和 3×3 卷積核（邊緣偵測 filter）準備就緒。點擊「下一步」開始卷積運算。
+  </div>
+</div>
+
+<!-- ══ 3. YOLO 物件偵測 ══ -->
+<div class="sec-title reveal">🎯 YOLO 物件偵測</div>
+<div class="panel reveal">
+  <div class="panel-title">一次前向傳播同時偵測多個物件（You Only Look Once）</div>
+  <p style="color:var(--muted);font-size:.9rem;margin-bottom:14px;">
+    傳統兩階段偵測（R-CNN系列）：先生成候選區域再分類（慢）。YOLO 將偵測視為單一迴歸問題：將影像分割成 S×S 格子，每格預測 B 個邊框（Bounding Box）和類別概率，一次性輸出所有結果。
+  </p>
+  <div class="formula">
+    <span class="cm">// YOLO 輸出格式（每個格子預測）</span><br>
+    <span class="fn">Grid Cell</span> → [x, y, w, h, <span class="hl">confidence</span>] × B + <span class="vr">class_probabilities</span><br><br>
+    <span class="cm">// confidence = P(物件存在) × IoU(預測框, 真實框)</span><br>
+    <span class="hl">IoU</span> = 交集面積 / 聯集面積  <span class="cm">// Intersection over Union</span><br><br>
+    <span class="cm">// 非極大值抑制（NMS）：過濾重複框</span><br>
+    <span class="vr">NMS</span>: 保留 confidence 最高的框，抑制 IoU > 閾值的其他框
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">YOLO vs R-CNN 比較</div>
+      <div class="kp-body"><strong>YOLO：</strong>單階段偵測，一次前向傳播完成，速度達 45fps（實時）。<br><strong>R-CNN：</strong>兩階段，先提取候選區（Region Proposal）再分類，精度高但慢（~47秒/張）。<br><strong>Faster R-CNN：</strong>引入 RPN 加速候選區提取。</div>
+      <div class="kp-tag">▶ 考點：YOLO一次前向傳播 / 實時偵測</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">IoU（交並比）</div>
+      <div class="kp-body">衡量預測邊界框與真實框的重疊程度。IoU = 交集面積 / 聯集面積。<br>IoU = 1：完美重疊；IoU = 0：無重疊。<br>通常 IoU > 0.5 視為正確偵測（True Positive）。</div>
+      <div class="kp-tag">▶ 考點：IoU = 交集/聯集 / 評估偵測準確度</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--accent2)">
+      <div class="kp-title">NMS（非極大值抑制）</div>
+      <div class="kp-body">YOLO 對同一物件可能生成多個重疊框。NMS 解決方法：選最高信心分數的框 → 計算其與其他框的 IoU → 抑制 IoU 超過閾值的重複框 → 重複直到無重疊框。</div>
+      <div class="kp-tag">▶ 考點：NMS 消除重複偵測框</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 4. 語義分割 vs 實例分割 ══ -->
+<div class="sec-title reveal">🖼️ 影像分割：語義分割 vs 實例分割</div>
+<div class="panel reveal">
+  <div class="panel-title">從分類到像素級理解的三個層次</div>
+  <div class="seg-tabs">
+    <button class="seg-tab active" onclick="showSeg(this,'cls')">影像分類</button>
+    <button class="seg-tab" onclick="showSeg(this,'det')">物件偵測</button>
+    <button class="seg-tab" onclick="showSeg(this,'sem')">語義分割</button>
+    <button class="seg-tab" onclick="showSeg(this,'ins')">實例分割</button>
+  </div>
+  <div class="seg-box" id="seg-display"></div>
+  <div class="tbl-wrap" style="margin-top:14px;">
+    <table>
+      <thead><tr><th>任務類型</th><th>輸出粒度</th><th>能區分個體？</th><th>代表模型</th><th>應用場景</th></tr></thead>
+      <tbody>
+        <tr><td>影像分類</td><td>全圖標籤</td><td>❌</td><td>ResNet、VGG</td><td>貓/狗分類</td></tr>
+        <tr><td>物件偵測</td><td>邊界框（BBox）</td><td>✅</td><td>YOLO、Faster R-CNN</td><td>行人偵測、車牌識別</td></tr>
+        <tr><td>語義分割</td><td>像素級類別標籤</td><td>❌（同類視為一體）</td><td>FCN、U-Net、DeepLab</td><td>醫療影像邊界、自駕道路分割</td></tr>
+        <tr><td>實例分割</td><td>像素級 + 個體區分</td><td>✅（每個個體分開）</td><td>Mask R-CNN</td><td>工廠計件、細胞計數</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="info-box">🏥 <strong>iPAS 情境題：</strong>「醫療影像需要精確標示腫瘤邊界」→ <strong>語義分割</strong>（像素級分類）。「工廠流水線需統計每個瑕疵零件的數量」→ <strong>實例分割</strong>（區分個體）。</div>
+</div>
+
+<!-- ══ 5. Three.js 3D CNN 特徵圖 ══ -->
+<div class="sec-title reveal">🔮 3D 卷積層特徵圖視覺化</div>
+<div class="panel reveal">
+  <div class="panel-title">CNN 前向傳播：輸入→卷積層→池化層→特徵圖堆疊（可拖曳旋轉）</div>
+  <div class="c3d-wrap">
+    <canvas id="c3d" class="c3d"></canvas>
+    <div class="c3d-lbl">🔮 CNN 特徵圖 3D 視覺化 · 拖曳旋轉</div>
+    <div class="ctrl">
+      <button id="btnAuto" class="on" onclick="toggleAuto()">⟳ 自動旋轉</button>
+      <button onclick="resetView()">↺ 重置視角</button>
+      <button onclick="highlightLayer(0)">📷 輸入層</button>
+      <button onclick="highlightLayer(1)">🔵 Conv1 特徵</button>
+      <button onclick="highlightLayer(2)">🟡 Conv2 特徵</button>
+      <button onclick="highlightLayer(3)">🟣 全連接層</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 6. Vision Transformer (ViT) ══ -->
+<div class="sec-title reveal">🤖 Vision Transformer（ViT）</div>
+<div class="panel reveal">
+  <div class="panel-title">將圖片切成 Patch，用 Transformer 處理影像任務</div>
+  <p style="color:var(--muted);font-size:.9rem;margin-bottom:14px;">
+    ViT（2020）突破性地將 NLP 的 Transformer 架構直接應用於影像：將影像切割成固定大小的 Patch（如 16×16），展平後加上位置編碼（Position Embedding），送入 Transformer Encoder。
+  </p>
+  <div class="formula">
+    <span class="cm">// ViT 處理流程</span><br>
+    <span class="hl">Image</span> (224×224×3)<br>
+    → <span class="fn">Patch Split</span>: 196 個 16×16 patches<br>
+    → <span class="vr">Linear Projection</span>: 每個 patch → 768 維向量<br>
+    → <span class="fn">+ Position Embedding</span>: 加入位置資訊<br>
+    → <span class="hl">Transformer Encoder</span>: Multi-Head Self-Attention<br>
+    → <span class="vr">[CLS] Token</span> → 分類輸出<br><br>
+    <span class="cm">// 注意：ViT 需要大量資料預訓練（如 JFT-300M）</span><br>
+    <span class="cm">// 資料量不足時，CNN 仍優於 ViT</span>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">ViT vs CNN 核心差異</div>
+      <div class="kp-body"><strong>CNN：</strong>局部感受野，透過層疊卷積逐漸擴大感知範圍，具備平移不變性，小資料效果好。<br><strong>ViT：</strong>全局 Self-Attention，第一層就能感知全圖關係，需要大量資料。</div>
+      <div class="kp-tag">▶ 考點：ViT 用 Patch+Position Embedding</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">Patch + Position Embedding</div>
+      <div class="kp-body">224×224 影像以 16×16 patch 切割 → 196 個 patch。每個 patch 展平後線性投影為向量。由於 Transformer 無位置感知，必須額外加入 Position Embedding（可學習或固定）表示 patch 在圖中的位置。</div>
+      <div class="kp-tag">▶ 考點：196 patches / Position Embedding</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--accent2)">
+      <div class="kp-title">遷移學習（Transfer Learning）</div>
+      <div class="kp-body">在大型資料集（ImageNet）預訓練的模型已學到通用視覺特徵（邊緣、紋理、形狀）。針對特定任務（如醫療X光）只需微調（Fine-tuning）最後幾層，用少量資料即可達到高效果。</div>
+      <div class="kp-tag">▶ 考點：遷移學習節省訓練成本 / Fine-tuning</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 7. 資料增強 ══ -->
+<div class="sec-title reveal">🎲 資料增強（Data Augmentation）</div>
+<div class="panel reveal">
+  <div class="panel-title">透過人工變換擴充訓練資料，提升模型泛化能力</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>增強技術</th><th>操作方式</th><th>防止過擬合原因</th><th>適用場景</th></tr></thead>
+      <tbody>
+        <tr><td>水平翻轉</td><td>左右鏡像</td><td>讓模型對左右朝向不敏感</td><td>通用影像分類</td></tr>
+        <tr><td>隨機裁剪</td><td>隨機選取部分區域</td><td>模型學習不同尺度局部特徵</td><td>物件偵測</td></tr>
+        <tr><td>顏色抖動</td><td>調整亮度/對比度/飽和度</td><td>對光照條件不敏感</td><td>戶外場景辨識</td></tr>
+        <tr><td>旋轉/仿射</td><td>隨機旋轉角度</td><td>對方向不敏感（但某些任務不適用）</td><td>醫療影像、衛星圖</td></tr>
+        <tr><td>Mixup</td><td>兩張圖線性插值混合</td><td>增加決策邊界平滑度</td><td>分類精度提升</td></tr>
+        <tr><td>CutOut/CutMix</td><td>遮蓋或置換部分區域</td><td>迫使模型學習全局特徵</td><td>增強魯棒性</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="warn-box">⚠️ <strong>注意：</strong>資料增強要符合任務語意。如醫療X光「不可水平翻轉」（左右肺有別義）；文字辨識「不可旋轉180度」（上下顛倒影響語意）。</div>
+</div>
+
+<!-- ══ 8. 程式碼考點 ══ -->
+<div class="sec-title reveal">💻 程式碼考點（PyTorch · torchvision · OpenCV）</div>
+
+<div class="panel reveal">
+  <div class="panel-title">📦 torchvision — CNN 模型載入與遷移學習</div>
+  <div class="formula">
+    <span class="cm"># 載入預訓練 ResNet50（遷移學習）</span><br>
+    <span class="fn">import</span> <span class="hl">torchvision.models</span> as models<br>
+    <span class="fn">import</span> torch.nn as nn<br><br>
+    <span class="cm"># 載入 ImageNet 預訓練權重</span><br>
+    <span class="vr">model</span> = models.<span class="fn">resnet50</span>(pretrained=<span class="hl">True</span>)<br><br>
+    <span class="cm"># 凍結所有層（只訓練最後分類頭）</span><br>
+    <span class="fn">for</span> <span class="vr">param</span> in model.parameters():<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="vr">param</span>.requires_grad = <span class="hl">False</span><br><br>
+    <span class="cm"># 替換最後全連接層（適應新任務類別數）</span><br>
+    <span class="vr">num_classes</span> = <span class="hl">10</span><br>
+    model.<span class="vr">fc</span> = nn.<span class="fn">Linear</span>(model.fc.in_features, <span class="vr">num_classes</span>)<br><br>
+    <span class="cm"># 只有 fc 層的參數會被訓練</span><br>
+    <span class="vr">optimizer</span> = torch.optim.<span class="fn">Adam</span>(model.fc.parameters(), lr=<span class="hl">1e-3</span>)
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card">
+      <div class="kp-title">pretrained=True</div>
+      <div class="kp-body">載入在 ImageNet（1.2M 張、1000類）預訓練的權重。模型已學到通用視覺特徵，可直接用於遷移學習。</div>
+      <div class="kp-tag">▶ 考點：預訓練模型節省訓練成本</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">requires_grad = False</div>
+      <div class="kp-body">凍結特徵提取層的梯度更新，只允許最後分類頭學習。適用於目標資料集與預訓練資料集相似的情況。</div>
+      <div class="kp-tag">▶ 考點：凍結層 / 只訓練分類頭</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">in_features 替換</div>
+      <div class="kp-body">ResNet50 的 fc 層原為 2048→1000（ImageNet 1000類）。替換為 2048→N 以適應新任務類別數。輸入特徵維度 in_features 保持不變。</div>
+      <div class="kp-tag">▶ 考點：替換分類頭不改特徵提取</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel reveal">
+  <div class="panel-title">🔧 torchvision.transforms — 資料增強管道</div>
+  <div class="formula">
+    <span class="fn">from</span> torchvision <span class="fn">import</span> <span class="hl">transforms</span><br><br>
+    <span class="cm"># 訓練集增強（強）</span><br>
+    <span class="vr">train_transform</span> = transforms.<span class="fn">Compose</span>([<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;transforms.<span class="fn">RandomResizedCrop</span>(<span class="hl">224</span>),<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;transforms.<span class="fn">RandomHorizontalFlip</span>(),&nbsp;&nbsp;&nbsp;&nbsp;<span class="cm"># 50% 機率翻轉</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;transforms.<span class="fn">ColorJitter</span>(brightness=<span class="hl">0.2</span>, contrast=<span class="hl">0.2</span>),<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;transforms.<span class="fn">ToTensor</span>(),<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;transforms.<span class="fn">Normalize</span>(mean=[<span class="hl">0.485</span>, <span class="hl">0.456</span>, <span class="hl">0.406</span>],<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;std=[<span class="vr">0.229</span>, <span class="vr">0.224</span>, <span class="vr">0.225</span>])  <span class="cm"># ImageNet 均值/標準差</span><br>
+    ])<br><br>
+    <span class="cm"># 驗證集（不增強，只標準化）</span><br>
+    <span class="vr">val_transform</span> = transforms.<span class="fn">Compose</span>([<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;transforms.<span class="fn">Resize</span>(<span class="hl">256</span>), transforms.<span class="fn">CenterCrop</span>(<span class="hl">224</span>),<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;transforms.<span class="fn">ToTensor</span>(), transforms.<span class="fn">Normalize</span>(...)<br>
+    ])
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card">
+      <div class="kp-title">Compose 管道</div>
+      <div class="kp-body">將多個轉換操作串聯，按順序依次執行。訓練集用隨機增強提升泛化；驗證集只做確定性預處理（不可隨機，否則評估不穩定）。</div>
+      <div class="kp-tag">▶ 考點：訓練增強/驗證不增強</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">Normalize 標準化</div>
+      <div class="kp-body">ToTensor() 後像素值為 [0,1]。Normalize 用 ImageNet 的均值(0.485,0.456,0.406)和標準差(0.229,0.224,0.225) 標準化，使輸入分佈穩定，加速收斂。</div>
+      <div class="kp-tag">▶ 考點：ImageNet 均值標準化</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">RandomHorizontalFlip</div>
+      <div class="kp-body">以 50% 機率水平翻轉圖片。是最常用且安全的增強方式（對多數任務語意不變）。注意：醫療影像或文字圖片需謹慎使用。</div>
+      <div class="kp-tag">▶ 考點：增強需符合任務語意</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel reveal">
+  <div class="panel-title">🔍 評估指標：mAP（Mean Average Precision）物件偵測</div>
+  <div class="formula">
+    <span class="fn">from</span> torchmetrics.detection <span class="fn">import</span> <span class="hl">MeanAveragePrecision</span><br><br>
+    <span class="vr">metric</span> = <span class="fn">MeanAveragePrecision</span>(iou_thresholds=[<span class="hl">0.5</span>])  <span class="cm"># mAP@0.5</span><br><br>
+    <span class="cm"># 更新預測結果</span><br>
+    <span class="vr">metric</span>.<span class="fn">update</span>(preds=[{<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="hl">'boxes'</span>: predicted_boxes,&nbsp;&nbsp;&nbsp;<span class="cm"># [N, 4] 邊界框</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="hl">'scores'</span>: confidence_scores,&nbsp;<span class="cm"># [N] 信心分數</span><br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="hl">'labels'</span>: predicted_labels&nbsp;&nbsp;<span class="cm"># [N] 類別標籤</span><br>
+    }], target=[{<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="hl">'boxes'</span>: ground_truth_boxes,<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="hl">'labels'</span>: true_labels<br>
+    }])<br><br>
+    <span class="cm"># mAP 計算：所有類別的 AP 平均值</span><br>
+    <span class="vr">result</span> = metric.<span class="fn">compute</span>()  <span class="cm"># {'map': tensor(0.85), 'map_50': ...}</span>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card">
+      <div class="kp-title">AP（Average Precision）</div>
+      <div class="kp-body">對不同信心閾值下的 Precision-Recall 曲線積分。AP = AUC（PR曲線）。mAP 是所有類別 AP 的平均。物件偵測的主要評估指標。</div>
+      <div class="kp-tag">▶ 考點：mAP = 多類別 AP 平均</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">IoU 閾值</div>
+      <div class="kp-body">mAP@0.5：預測框與真實框 IoU ≥ 0.5 才算 True Positive（PASCAL VOC 標準）。mAP@0.5:0.95：COCO 標準，更嚴格。</div>
+      <div class="kp-tag">▶ 考點：IoU閾值判斷TP/FP</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">Precision vs Recall 取捨</div>
+      <div class="kp-body">降低信心閾值 → Recall ↑（偵測更多物件）但 Precision ↓（誤報增加）。安防場景需高 Recall（不漏偵）；醫療篩檢需高 Precision（減少誤診）。</div>
+      <div class="kp-tag">▶ 考點：任務決定 Precision/Recall 優先</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel reveal" style="border-left:3px solid var(--yellow)">
+  <div class="panel-title">🧪 歷屆考題程式題型</div>
+  <p style="color:var(--muted);font-size:.88rem;margin-bottom:14px;">以下為常見的 iPAS 程式概念考題：</p>
+
+  <div style="background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:12px;">
+    <div style="font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:8px;">Q1. 以下 PyTorch 程式碼中，<code style="color:var(--accent)">param.requires_grad = False</code> 的目的是？</div>
+    <div style="font-size:.84rem;color:var(--muted);line-height:2;">
+      A. 增加模型參數數量<br>
+      <span style="color:var(--accent2)">B. 凍結該層參數，使其在訓練時不更新（遷移學習中保留預訓練知識）✓</span><br>
+      C. 將參數轉換為 float32<br>
+      D. 啟用 GPU 加速計算
+    </div>
+  </div>
+
+  <div style="background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:14px;">
+    <div style="font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:8px;">Q2. 使用 <code style="color:var(--accent)">transforms.Normalize(mean, std)</code> 的主要目的是？</div>
+    <div style="font-size:.84rem;color:var(--muted);line-height:2;">
+      A. 將影像轉換為黑白<br>
+      B. 隨機翻轉影像以增強資料<br>
+      <span style="color:var(--accent2)">C. 使輸入像素值分佈穩定（均值≈0、標準差≈1），加速模型收斂 ✓</span><br>
+      D. 調整影像解析度至統一大小
+    </div>
+  </div>
+</div>
+
+<!-- ══ 9. 仿真考題 ══ -->
+<div class="sec-title reveal">🎯 仿真考題（8 題）</div>
+<div class="progress-bar"><div class="progress-fill" id="pbar" style="width:0%"></div></div>
+<div id="quiz"></div>
+
+<footer>iPAS AI 應用規劃師中級考試學習站 · 電腦視覺（CV）· 內容依據官方評鑑範圍整理</footer>
+
+</div><!-- /wrap -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ── Reveal Observer ──
+const obs=new IntersectionObserver(e=>e.forEach(x=>x.isIntersecting&&x.target.classList.add('vis')),{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// ── Score ──
+let score=0;const answered=new Set();const TOTAL=8;
+document.getElementById('total').textContent=TOTAL;
+function addScore(qIdx,correct){
+  if(answered.has(qIdx))return;
+  answered.add(qIdx);
+  if(correct)score++;
+  document.getElementById('score').textContent=score;
+  document.getElementById('pbar').style.width=(answered.size/TOTAL*100)+'%';
+}
+
+// ── Segmentation Tabs ──
+const segContent={
+  cls:`<span class="hl">影像分類（Image Classification）</span><br><br>
+    輸入：一張影像 → 輸出：<span class="hl2">一個類別標籤</span>（如「貓」）<br>
+    粒度：整張圖片（無法定位物件位置）<br><br>
+    代表模型：ResNet、VGG、AlexNet<br>
+    應用：產品品質分類、皮膚病診斷（整體判斷）<br><br>
+    限制：只能說「圖中有貓」，但不知道貓在哪裡、有幾隻。`,
+  det:`<span class="hl">物件偵測（Object Detection）</span><br><br>
+    輸入：一張影像 → 輸出：<span class="hl2">邊界框（Bounding Box）+ 類別 + 信心分數</span><br>
+    粒度：矩形框定位（能定位位置，但框為矩形）<br><br>
+    代表模型：YOLO、Faster R-CNN、SSD<br>
+    應用：行人偵測、車輛追蹤、安全帽偵測<br><br>
+    關鍵指標：mAP（Mean Average Precision）、IoU`,
+  sem:`<span class="hl">語義分割（Semantic Segmentation）</span><br><br>
+    輸入：一張影像 → 輸出：<span class="hl2">每個像素的類別標籤</span><br>
+    粒度：像素級（最細緻），但同類別物件視為一體<br><br>
+    代表模型：FCN（全卷積網路）、U-Net、DeepLab<br>
+    應用：<span class="hl3">醫療影像腫瘤邊界標示</span>、自駕車道路/行人/建築分割<br><br>
+    <span class="hl2">注意：</span>若圖中有三個人，語義分割將三個人都標為「人」類，無法區分個體。`,
+  ins:`<span class="hl">實例分割（Instance Segmentation）</span><br><br>
+    輸入：一張影像 → 輸出：<span class="hl2">每個像素的類別 + 個體 ID</span><br>
+    粒度：像素級 + 個體區分（最強，最複雜）<br><br>
+    代表模型：Mask R-CNN（在 Faster R-CNN 基礎上增加 Mask 分支）<br>
+    應用：<span class="hl3">工廠計件（每個零件單獨標記）</span>、細胞計數、人群分析<br><br>
+    <span class="hl2">與語義分割的差異：</span>三個人 → Person_1, Person_2, Person_3（各自獨立遮罩）`
+};
+function showSeg(btn,key){
+  document.querySelectorAll('.seg-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('seg-display').innerHTML=segContent[key];
+}
+showSeg(document.querySelector('.seg-tab'),  'cls');
+
+// ── Convolution Canvas ──
+const cctx=document.getElementById('convCanvas').getContext('2d');
+const INPUT=[
+  [1,2,3,0,1,2],
+  [0,1,2,3,0,1],
+  [3,0,1,2,3,0],
+  [2,3,0,1,2,3],
+  [1,2,3,0,1,2],
+  [0,1,2,3,0,1]
+];
+const FILTER=[
+  [1,0,-1],
+  [2,0,-2],
+  [1,0,-1]
+];
+let convPos=0;
+const POSITIONS=[];
+for(let r=0;r<4;r++)for(let c=0;c<4;c++)POSITIONS.push([r,c]);
+
+function drawConv(highlightR=-1,highlightC=-1,result=null){
+  const cs=document.getElementById('convCanvas');
+  const W=cs.offsetWidth||640;
+  cs.width=W;cs.height=Math.min(260,W*0.4);
+  const ctx=cctx;
+  ctx.clearRect(0,0,cs.width,cs.height);
+  const sz=Math.min(32,cs.height/8);
+  const pad=10;
+  // Input grid
+  ctx.font=`bold ${sz*0.4}px JetBrains Mono,monospace`;
+  for(let r=0;r<6;r++){
+    for(let c=0;c<6;c++){
+      const x=pad+c*sz,y=pad+r*sz;
+      const isHL=(highlightR>=0&&r>=highlightR&&r<highlightR+3&&c>=highlightC&&c<highlightC+3);
+      ctx.fillStyle=isHL?'rgba(255,107,157,.25)':'#21253A';
+      ctx.beginPath();ctx.roundRect(x,y,sz-2,sz-2,3);ctx.fill();
+      ctx.strokeStyle=isHL?'#FF6B9D':'#2E3250';ctx.lineWidth=isHL?2:1;
+      ctx.stroke();
+      ctx.fillStyle=isHL?'#FF6B9D':'#8892B0';
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(INPUT[r][c],x+sz/2,y+sz/2);
+    }
+  }
+  ctx.fillStyle='#8892B0';ctx.font=`${sz*0.38}px Calibri,'Microsoft JhengHei',sans-serif`;
+  ctx.textAlign='center';
+  ctx.fillText('輸入 6×6',pad+3*sz,pad+6*sz+sz*0.6);
+
+  // Filter
+  const fx=pad+7*sz;
+  ctx.fillStyle='#00D4FF';ctx.font=`bold ${sz*0.42}px Calibri,'Microsoft JhengHei',sans-serif`;
+  ctx.fillText('Filter 3×3',fx+1.5*sz,pad-sz*0.3);
+  for(let r=0;r<3;r++){
+    for(let c=0;c<3;c++){
+      const x=fx+c*sz,y=pad+r*sz+sz;
+      ctx.fillStyle='rgba(0,212,255,.18)';
+      ctx.beginPath();ctx.roundRect(x,y,sz-2,sz-2,3);ctx.fill();
+      ctx.strokeStyle='#00D4FF';ctx.lineWidth=1.5;ctx.stroke();
+      ctx.fillStyle='#00D4FF';ctx.font=`bold ${sz*0.4}px JetBrains Mono,monospace`;
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(FILTER[r][c],x+sz/2,y+sz/2);
+    }
+  }
+
+  // Arrow
+  const ax=fx+3*sz+pad;
+  ctx.strokeStyle='#FF6B9D';ctx.lineWidth=2;
+  ctx.beginPath();ctx.moveTo(ax,pad+4*sz);ctx.lineTo(ax+sz*1.5,pad+4*sz);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(ax+sz*1.5,pad+4*sz-sz*0.3);ctx.lineTo(ax+sz*1.8,pad+4*sz);ctx.lineTo(ax+sz*1.5,pad+4*sz+sz*0.3);ctx.fill();
+
+  // Result grid
+  const rx=ax+sz*2+pad;
+  ctx.fillStyle='#8892B0';ctx.font=`${sz*0.38}px Calibri,'Microsoft JhengHei',sans-serif`;
+  ctx.fillText('輸出 4×4',rx+2*sz,pad-sz*0.3);
+  const computedResult=[];
+  for(let r=0;r<4;r++){
+    computedResult.push([]);
+    for(let c=0;c<4;c++){
+      let v=0;
+      for(let fr=0;fr<3;fr++)for(let fc=0;fc<3;fc++)v+=INPUT[r+fr][c+fc]*FILTER[fr][fc];
+      computedResult[r].push(v);
+    }
+  }
+  for(let r=0;r<4;r++){
+    for(let c=0;c<4;c++){
+      const x=rx+c*sz,y=pad+r*sz;
+      const isDone=(highlightR>=0&&(r<highlightR||(r===highlightR&&c<highlightC)));
+      const isCurrent=(r===highlightR&&c===highlightC);
+      ctx.fillStyle=isCurrent?'rgba(0,255,178,.25)':isDone?'rgba(0,255,178,.08)':'#21253A';
+      ctx.beginPath();ctx.roundRect(x,y,sz-2,sz-2,3);ctx.fill();
+      ctx.strokeStyle=isCurrent?'#00FFB2':'#2E3250';ctx.lineWidth=isCurrent?2:1;ctx.stroke();
+      if(isDone||isCurrent){
+        ctx.fillStyle=isCurrent?'#00FFB2':'#8892B0';
+        ctx.font=`bold ${sz*0.38}px JetBrains Mono,monospace`;
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText(computedResult[r][c],x+sz/2,y+sz/2);
+      }
+    }
+  }
+}
+
+function convStep(){
+  if(convPos>=POSITIONS.length){convPos=0;}
+  const[r,c]=POSITIONS[convPos];
+  let v=0;
+  for(let fr=0;fr<3;fr++)for(let fc=0;fc<3;fc++)v+=INPUT[r+fr][c+fc]*FILTER[fr][fc];
+  document.getElementById('conv-explain').innerHTML=
+    `🔵 位置 (${r},${c})：卷積核與輸入對應元素相乘後求和 = <strong style="color:#00FFB2">${v}</strong>。<br>計算：${FILTER.map((row,fr)=>row.map((f,fc)=>`${f}×${INPUT[r+fr][c+fc]}`).join('+')).join(' + ')} = ${v}`;
+  drawConv(r,c,v);
+  convPos++;
+}
+function convReset(){convPos=0;drawConv();document.getElementById('conv-explain').innerHTML='📷 輸入矩陣（6×6）和 3×3 卷積核（邊緣偵測 filter）準備就緒。點擊「下一步」開始卷積運算。';}
+drawConv();
+window.addEventListener('resize',()=>{drawConv();});
+
+// ── Three.js CNN Feature Map ──
+(function(){
+  const canvas=document.getElementById('c3d');
+  const renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  function resize(){
+    const w=canvas.parentElement.clientWidth;
+    renderer.setSize(w,380);
+    camera.aspect=w/380;camera.updateProjectionMatrix();
+  }
+  const scene=new THREE.Scene();
+  const camera=new THREE.PerspectiveCamera(50,1,0.1,200);
+  const rot={x:.4,y:.6};
+  let autoRot=true;
+  let hlLayer=-1;
+
+  // Layers config: [x_offset, cols, rows, depth, color]
+  const layerDefs=[
+    {x:-8, cols:8, rows:8, d:1, color:0xFF6B9D, label:'Input'},
+    {x:-3, cols:6, rows:6, d:4, color:0x00D4FF, label:'Conv1'},
+    {x: 3, cols:4, rows:4, d:8, color:0xFFD166, label:'Conv2'},
+    {x: 8, cols:2, rows:2, d:16, color:0x7C6FFF, label:'FC'},
+  ];
+  const layerGroups=[];
+  const allBoxes=[];
+
+  layerDefs.forEach((l,li)=>{
+    const group=new THREE.Group();
+    const bw=0.7,bh=0.7,bd=0.35;
+    for(let d=0;d<l.d;d++){
+      for(let r=0;r<l.rows;r++){
+        for(let c=0;c<l.cols;c++){
+          const v=Math.random();
+          const geo=new THREE.BoxGeometry(bw,bh,bd);
+          const mat=new THREE.MeshPhongMaterial({
+            color:new THREE.Color(l.color),
+            transparent:true,
+            opacity:0.15+v*0.45,
+            wireframe:false
+          });
+          const mesh=new THREE.Mesh(geo,mat);
+          mesh.position.set(
+            (c-(l.cols-1)/2)*(bw+0.05),
+            (r-(l.rows-1)/2)*(bh+0.05),
+            (d-(l.d-1)/2)*(bd+0.1)
+          );
+          mesh.userData={li,origColor:new THREE.Color(l.color)};
+          group.add(mesh);
+          allBoxes.push(mesh);
+        }
+      }
+    }
+    group.position.x=l.x;
+    scene.add(group);
+    layerGroups.push(group);
+  });
+
+  // Lights
+  scene.add(new THREE.AmbientLight(0xffffff,0.7));
+  const dir=new THREE.DirectionalLight(0xffffff,0.8);dir.position.set(5,10,8);scene.add(dir);
+
+  function camPos(){
+    const r=22;
+    camera.position.x=r*Math.sin(rot.y)*Math.cos(rot.x);
+    camera.position.y=r*Math.sin(rot.x);
+    camera.position.z=r*Math.cos(rot.y)*Math.cos(rot.x);
+    camera.lookAt(0,0,0);
+  }
+
+  // Drag
+  let drag=false,lastX=0,lastY=0;
+  canvas.addEventListener('mousedown',e=>{drag=true;lastX=e.clientX;lastY=e.clientY;});
+  window.addEventListener('mouseup',()=>drag=false);
+  window.addEventListener('mousemove',e=>{
+    if(!drag)return;
+    rot.y+=(e.clientX-lastX)*0.01;rot.x+=(e.clientY-lastY)*0.01;
+    rot.x=Math.max(-1.2,Math.min(1.2,rot.x));
+    lastX=e.clientX;lastY=e.clientY;
+  });
+  canvas.addEventListener('touchstart',e=>{drag=true;lastX=e.touches[0].clientX;lastY=e.touches[0].clientY;},{passive:true});
+  window.addEventListener('touchend',()=>drag=false);
+  window.addEventListener('touchmove',e=>{
+    if(!drag)return;
+    rot.y+=(e.touches[0].clientX-lastX)*0.012;rot.x+=(e.touches[0].clientY-lastY)*0.012;
+    lastX=e.touches[0].clientX;lastY=e.touches[0].clientY;
+  },{passive:true});
+
+  resize();window.addEventListener('resize',resize);
+
+  let t=0;
+  function animate(){
+    requestAnimationFrame(animate);
+    t+=0.01;
+    if(autoRot&&!drag)rot.y+=0.005;
+    // Pulse activated layer
+    allBoxes.forEach(m=>{
+      const li=m.userData.li;
+      if(hlLayer>=0&&li===hlLayer){
+        m.material.opacity=0.5+0.3*Math.sin(t*3);
+        m.material.emissive=m.userData.origColor;
+        m.material.emissiveIntensity=0.3+0.2*Math.sin(t*3);
+      } else if(hlLayer>=0){
+        m.material.opacity=0.08;
+        m.material.emissiveIntensity=0;
+      } else {
+        m.material.opacity=0.2+Math.random()*0.001;
+        m.material.emissiveIntensity=0;
+      }
+    });
+    camPos();
+    renderer.render(scene,camera);
+  }
+  animate();
+
+  window.toggleAuto=function(){
+    autoRot=!autoRot;
+    document.getElementById('btnAuto').classList.toggle('on',autoRot);
+  };
+  window.resetView=function(){rot.x=.4;rot.y=.6;hlLayer=-1;};
+  window.highlightLayer=function(l){hlLayer=(hlLayer===l?-1:l);};
+})();
+
+// ── Quiz ──
+const QS=[
+  {s:'ResNet 引入「殘差連結（Skip Connection）」，主要是為了解決什麼問題？',
+   o:['避免過擬合（Overfitting）','解決梯度消失（Vanishing Gradient）問題，讓深層網路能有效訓練','增加模型的參數數量，提升容量','降低計算量，加快推論速度'],
+   a:1,e:'ResNet 的核心創新是 H(x) = F(x) + x 的殘差學習。直接相加的跳躍連結讓梯度可以直接回傳，解決了深層網路訓練時梯度逐層衰減（梯度消失）的問題，使訓練 100+ 層的網路成為可能。'},
+  {s:'YOLO 物件偵測演算法的最大特點是？',
+   o:['先生成候選區域，再進行分類（兩階段）','使用注意力機制對全圖建模','一次前向傳播同時預測所有物件的邊界框和類別（單階段）','對每個像素進行類別預測（語義分割）'],
+   a:2,e:'YOLO（You Only Look Once）是單階段偵測器，將影像分成 S×S 格子，每格預測邊界框和類別，一次前向傳播完成所有預測。因此速度極快（可達 45fps），適合實時應用，但精度略低於兩階段方法（如 Faster R-CNN）。'},
+  {s:'語義分割（Semantic Segmentation）與實例分割（Instance Segmentation）的關鍵差異是？',
+   o:['語義分割輸出邊界框，實例分割輸出像素遮罩','語義分割只能處理一個類別，實例分割可處理多類別','語義分割無法區分同類別的不同個體，實例分割可以區分','語義分割速度較慢，實例分割速度較快'],
+   a:2,e:'語義分割對每個像素分配類別標籤，但同類別物件被視為整體（如圖中三個人都標「人」）。實例分割在此基礎上進一步區分個體（Person_1、Person_2、Person_3 分開），適合需要計數的場景（工廠計件、細胞計數）。'},
+  {s:'Vision Transformer（ViT）處理影像的第一步是？',
+   o:['用卷積核提取局部特徵圖','將影像切割成固定大小的 Patch，展平後線性投影為向量序列','對影像像素直接應用自注意力機制','用池化層對影像降維'],
+   a:1,e:'ViT 將輸入影像（如 224×224）切成 16×16 的 Patch（共 196 個），每個 Patch 展平後通過線性層投影為向量，加入位置編碼（Position Embedding）後送入 Transformer Encoder。這是 ViT 與 CNN 的根本架構差異。'},
+  {s:'在遷移學習中，「微調（Fine-tuning）」通常是指？',
+   o:['從頭訓練整個模型，不使用任何預訓練權重','凍結所有層，只替換輸入層','保留預訓練權重作為初始化，然後對目標資料集進行繼續訓練（通常解凍部分或全部層）','僅更改最後一層的節點數量，其他層完全不更新'],
+   a:2,e:'微調是遷移學習的核心技術：以預訓練權重初始化，然後用目標資料集繼續訓練。通常凍結淺層（通用特徵）、訓練深層（任務特定特徵）。資料量少時只訓練最後分類頭；資料量多時可解凍更多層甚至全部層。'},
+  {s:'IoU（Intersection over Union）的計算公式是？',
+   o:['(預測框面積 - 真實框面積) / 預測框面積','預測框面積 × 真實框面積','預測框與真實框的交集面積 / 兩者聯集面積','預測框面積 / 真實框面積'],
+   a:2,e:'IoU = 交集面積 / 聯集面積。IoU = 1 表示完美預測；IoU = 0 表示完全不重疊。在物件偵測中，通常 IoU ≥ 0.5 才算 True Positive。mAP 計算時以不同 IoU 閾值評估模型精度。'},
+  {s:'下列哪個模型最適合「醫療 MRI 影像腫瘤邊界精確標記」的應用場景？',
+   o:['ResNet（影像分類）','YOLO（物件偵測）','U-Net（語義分割，為醫療影像而設計）','ViT（影像分類 Transformer）'],
+   a:2,e:'U-Net 是專為醫療影像語義分割設計的架構，採用 Encoder-Decoder 結構和跳躍連結，能精確輸出像素級邊界。語義分割適合「精確邊界標示」需求。YOLO 只輸出邊界框（不夠精確），ResNet/ViT 只做整圖分類。'},
+  {s:'卷積神經網路（CNN）能有效處理影像的主要原因之一是「參數共享（Parameter Sharing）」，其含義是？',
+   o:['不同卷積層之間共享相同的參數（權重）','同一個卷積核在影像不同位置滑動時，使用相同的一組權重','每個神經元只與輸入的一個像素連接','多個 GPU 共享模型參數進行分散式訓練'],
+   a:1,e:'CNN 的卷積核（如 3×3）在整張影像上滑動時，每個位置使用同一組權重計算，這就是參數共享。相比全連接層，卷積層參數量大幅減少（一個 3×3 卷積核只有 9 個參數），且具備平移不變性（物件移動後仍能被偵測）。'}
+];
+
+const quiz=document.getElementById('quiz');
+QS.forEach((q,i)=>{
+  const div=document.createElement('div');div.className='q-item';
+  div.innerHTML=`<div class="q-num">題目 ${i+1} / ${TOTAL}</div>
+    <div class="q-stem">${q.s}</div>
+    <div class="q-opts">${q.o.map((o,j)=>`<div class="q-opt" onclick="answer(${i},${j},${q.a},this)">
+      <span class="opt-label">${'ABCD'[j]}.</span><span>${o}</span></div>`).join('')}
+    </div>
+    <div class="q-explain" id="exp${i}">${q.e}</div>`;
+  quiz.appendChild(div);
+});
+
+function answer(qi,chosen,correct,el){
+  const item=el.closest('.q-item');
+  if(item.dataset.done)return;
+  item.dataset.done=1;
+  item.querySelectorAll('.q-opt').forEach((o,j)=>{
+    if(j===correct)o.classList.add('correct');
+    else if(j===chosen&&chosen!==correct)o.classList.add('wrong');
+    o.style.pointerEvents='none';
+  });
+  document.getElementById('exp'+qi).classList.add('show');
+  addScore(qi,chosen===correct);
+}
+</script>
+</body>
+</html>
