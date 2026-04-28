@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 導入評估規劃與風險管理 — iPAS AI應用規劃師中級考試</title>
+<style>
+* { font-family: 'Calibri', 'Microsoft JhengHei', '微軟正黑體', sans-serif; }
+code, .formula, .tp-formula { font-family: 'JetBrains Mono', 'Consolas', monospace !important; }
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
+:root{
+  --bg:#0F1117;--panel:#1A1D27;--panel2:#21253A;
+  --border:#2E3250;--text:#E8EAF6;--muted:#8892B0;
+  --accent:#FFD166;--accent2:#00FFB2;--accent3:#7C6FFF;
+  --blue:#00D4FF;--purple:#9B5DE5;--yellow:#FFD166;--orange:#FF9B42;--pink:#FF6B9D;
+  --r:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Calibri','Microsoft JhengHei','微軟正黑體',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.7;}
+
+.nav{position:sticky;top:0;z-index:200;background:rgba(15,17,23,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:12px 24px;}
+.nav a{color:var(--accent);text-decoration:none;font-weight:700;font-size:.9rem;padding:5px 14px;border-radius:999px;border:1.5px solid var(--accent);transition:all .18s;}
+.nav a:hover{background:var(--accent);color:#000;}
+.nav-title{font-size:1.05rem;}
+.nav-tag{margin-left:auto;background:linear-gradient(135deg,var(--accent),var(--accent3));padding:4px 14px;border-radius:999px;font-size:.78rem;font-weight:900;color:#000;}
+
+.hero{padding:60px 20px 40px;background:linear-gradient(160deg,#0F1117,#1a1508,#0F1117);text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(255,209,102,.12),transparent);}
+.hero-badge{display:inline-block;margin-bottom:16px;padding:5px 18px;border-radius:999px;background:rgba(255,209,102,.12);border:1px solid var(--accent);font-size:.8rem;font-weight:900;color:var(--accent);letter-spacing:1px;}
+.hero-title{font-size:clamp(1.8rem,5vw,3.2rem);background:linear-gradient(135deg,var(--accent),var(--orange),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px;}
+.hero-sub{color:var(--muted);font-size:1rem;max-width:600px;margin:0 auto 24px;}
+.tag-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.tag{padding:4px 12px;border-radius:999px;font-size:.75rem;font-weight:900;border:1px solid;}
+
+.wrap{max-width:980px;margin:0 auto;padding:16px 20px 80px;}
+
+.sec-title{font-size:1.5rem;color:var(--text);margin:44px 0 16px;display:flex;align-items:center;gap:10px;}
+.sec-title::before{content:'';display:inline-block;width:4px;height:24px;border-radius:2px;background:linear-gradient(var(--accent),var(--yellow));}
+
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:20px;}
+.panel-title{font-weight:900;font-size:1rem;color:var(--accent2);margin-bottom:12px;}
+
+.formula{background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin:12px 0;font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--accent2);line-height:2;overflow-x:auto;}
+.formula .cm{color:var(--muted);font-style:italic;}
+.formula .hl{color:var(--yellow);}
+.formula .fn{color:var(--blue);}
+.formula .vr{color:var(--pink);}
+
+.arch-wrap{background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:12px;margin:12px 0;overflow-x:auto;}
+.arch-wrap svg{display:block;margin:0 auto;}
+
+.tbl-wrap{overflow-x:auto;margin:12px 0;}
+table{width:100%;border-collapse:collapse;font-size:.88rem;}
+th{background:var(--panel2);padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);color:var(--accent2);font-weight:900;}
+td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--muted);}
+td:first-child{color:var(--text);font-weight:700;}
+tr:hover td{background:rgba(255,209,102,.04);}
+.pill{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.72rem;font-weight:900;}
+
+.kp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:12px 0;}
+.kp-card{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:16px;border-left:3px solid var(--accent);transition:transform .18s,border-color .18s;}
+.kp-card:hover{transform:translateY(-4px);border-left-color:var(--accent2);}
+.kp-card .kp-title{font-weight:900;font-size:.95rem;color:var(--text);margin-bottom:6px;}
+.kp-card .kp-body{font-size:.83rem;color:var(--muted);line-height:1.6;}
+.kp-card .kp-tag{font-size:.7rem;font-weight:900;color:var(--accent);margin-top:8px;}
+
+.warn-box{background:rgba(255,209,102,.07);border:1px solid var(--yellow);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--yellow);margin:10px 0;}
+.info-box{background:rgba(0,255,178,.07);border:1px solid var(--accent2);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--accent2);margin:10px 0;}
+
+.stage-flow{display:flex;flex-wrap:wrap;gap:0;margin:14px 0;align-items:stretch;}
+.stage{flex:1;min-width:140px;background:var(--panel2);border:1px solid var(--border);padding:16px 14px;position:relative;text-align:center;}
+.stage:first-child{border-radius:12px 0 0 12px;}
+.stage:last-child{border-radius:0 12px 12px 0;}
+.stage-num{font-size:.7rem;font-weight:900;color:var(--muted);margin-bottom:4px;}
+.stage-name{font-weight:900;font-size:.95rem;margin-bottom:6px;}
+.stage-desc{font-size:.75rem;color:var(--muted);line-height:1.5;}
+.stage-arrow{display:flex;align-items:center;padding:0 4px;color:var(--accent);font-size:1.2rem;font-weight:900;}
+
+.seg-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.seg-tab{padding:7px 16px;border-radius:999px;border:1.5px solid var(--border);font-size:.83rem;font-weight:900;cursor:pointer;color:var(--muted);background:transparent;transition:all .18s;}
+.seg-tab.active{border-color:var(--accent);color:var(--accent);background:rgba(255,209,102,.1);}
+.seg-box{background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:16px;font-size:.88rem;line-height:1.8;color:var(--muted);}
+.seg-box .hl{color:var(--accent);}
+.seg-box .hl2{color:var(--yellow);}
+.seg-box .hl3{color:var(--accent2);}
+
+.c3d-wrap{background:#0a0c14;border:1px solid var(--border);border-radius:var(--r);position:relative;overflow:hidden;margin:12px 0;}
+.c3d{display:block;width:100%;height:380px;cursor:grab;}
+.c3d:active{cursor:grabbing;}
+.c3d-lbl{position:absolute;top:10px;left:12px;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);padding:4px 12px;border-radius:999px;font-size:.72rem;font-weight:900;color:var(--accent);border:1px solid rgba(255,209,102,.4);}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;padding:10px 12px;background:rgba(0,0,0,.3);}
+.ctrl button{padding:5px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.18);font-size:.72rem;font-weight:900;color:rgba(255,255,255,.6);background:transparent;cursor:pointer;transition:all .18s;}
+.ctrl button:hover,.ctrl button.on{border-color:var(--accent);color:var(--accent);background:rgba(255,209,102,.15);}
+
+.progress-bar{height:6px;background:var(--border);border-radius:3px;margin-bottom:20px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--orange));transition:width .5s;}
+.q-item{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;}
+.q-num{font-size:.75rem;font-weight:900;color:var(--accent);margin-bottom:6px;}
+.q-stem{font-weight:700;color:var(--text);font-size:.95rem;margin-bottom:12px;line-height:1.6;}
+.q-opts{display:flex;flex-direction:column;gap:7px;}
+.q-opt{padding:10px 14px;border-radius:8px;cursor:pointer;border:1px solid var(--border);font-size:.88rem;color:var(--muted);transition:all .18s;display:flex;align-items:flex-start;gap:8px;}
+.q-opt:hover{border-color:var(--accent);color:var(--text);background:rgba(255,209,102,.07);}
+.q-opt.correct{border-color:var(--accent2);background:rgba(0,255,178,.07);color:var(--accent2);}
+.q-opt.wrong{border-color:var(--pink);background:rgba(255,107,157,.07);color:var(--pink);}
+.q-opt .opt-label{font-weight:900;min-width:18px;}
+.q-explain{margin-top:12px;padding:10px 14px;background:rgba(255,209,102,.06);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;font-size:.84rem;color:var(--accent);display:none;line-height:1.65;}
+.q-explain.show{display:block;}
+
+#score-banner{position:fixed;bottom:20px;right:20px;z-index:300;background:var(--panel);border:1px solid var(--accent);border-radius:12px;padding:10px 18px;font-weight:900;font-size:.9rem;color:var(--accent);box-shadow:0 4px 20px rgba(255,209,102,.3);}
+
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .5s ease,transform .5s ease;}
+.reveal.vis{opacity:1;transform:translateY(0);}
+
+footer{text-align:center;padding:28px;font-size:.75rem;color:rgba(232,234,246,.2);}
+</style>
+</head>
+<body>
+
+<div id="score-banner">⭐ 答題得分：<span id="score">0</span> / <span id="total">0</span></div>
+
+<nav class="nav">
+  <a href="index.html">← 返回</a>
+  <span class="nav-title">AI 導入評估規劃與風險管理</span>
+  <span class="nav-tag">iPAS 中級 · 科目一 L21201/202/203</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">L21201/202/203 · AI 導入評估規劃</div>
+  <div class="hero-title">AI 導入評估規劃與風險管理</div>
+  <div class="hero-sub">AI導入四階段流程、數位成熟度評估、AI專案角色分工、風險矩陣3D視覺化、AI偏見三類型、GDPR/台灣個資法合規</div>
+  <div class="tag-row">
+    <span class="tag" style="color:var(--accent);border-color:var(--accent)">AI 導入四階段</span>
+    <span class="tag" style="color:var(--orange);border-color:var(--orange)">風險矩陣 3D</span>
+    <span class="tag" style="color:var(--accent2);border-color:var(--accent2)">GDPR</span>
+    <span class="tag" style="color:var(--blue);border-color:var(--blue)">POC 驗證</span>
+    <span class="tag" style="color:var(--pink);border-color:var(--pink)">AI 偏見</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ══ 1. AI 導入四階段流程 ══ -->
+<div class="sec-title reveal">🚀 AI 導入四階段流程</div>
+<div class="panel reveal">
+  <div class="panel-title">企業 AI 轉型的標準路徑：評估 → 規劃 → POC → 部署優化</div>
+  <p style="color:var(--muted);font-size:.9rem;margin-bottom:16px;">
+    AI 導入不是一蹴而就，需要系統性地分四個階段推進。每個階段都有明確的目標與可交付成果，確保 AI 專案能夠落地並持續創造價值。
+  </p>
+  <div class="stage-flow">
+    <div class="stage" style="border-left:3px solid var(--accent)">
+      <div class="stage-num">第一階段</div>
+      <div class="stage-name" style="color:var(--accent)">🔍 評估</div>
+      <div class="stage-desc">分析業務需求、評估數位成熟度、確認資料可用性、建立ROI預估</div>
+    </div>
+    <div class="stage-arrow">→</div>
+    <div class="stage" style="border-left:3px solid var(--blue)">
+      <div class="stage-num">第二階段</div>
+      <div class="stage-name" style="color:var(--blue)">📋 規劃</div>
+      <div class="stage-desc">制定AI策略路圖、組建跨功能團隊、規劃預算與時程、選擇技術架構</div>
+    </div>
+    <div class="stage-arrow">→</div>
+    <div class="stage" style="border-left:3px solid var(--orange)">
+      <div class="stage-num">第三階段</div>
+      <div class="stage-name" style="color:var(--orange)">🧪 POC</div>
+      <div class="stage-desc">小規模概念驗證、驗證技術可行性、收集利害關係人回饋、決定是否擴大</div>
+    </div>
+    <div class="stage-arrow">→</div>
+    <div class="stage" style="border-left:3px solid var(--accent2)">
+      <div class="stage-num">第四階段</div>
+      <div class="stage-name" style="color:var(--accent2)">🚀 部署優化</div>
+      <div class="stage-desc">全面部署上線、持續監控效能、迭代改善模型、建立維護機制</div>
+    </div>
+  </div>
+  <div class="kp-grid" style="margin-top:16px;">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">數位成熟度評估（DMM）</div>
+      <div class="kp-body">評估企業是否「準備好」導入 AI 的框架，涵蓋：<strong>資料成熟度</strong>（資料品質、整合程度）、<strong>技術基礎</strong>（IT 架構、雲端能力）、<strong>組織能力</strong>（人才、流程）、<strong>文化準備度</strong>（決策層支持）。</div>
+      <div class="kp-tag">▶ 考點：DMM 評估四面向 / 優先補足弱項</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--orange)">
+      <div class="kp-title">POC（概念驗證）— 核心考點</div>
+      <div class="kp-body"><strong>POC = Proof of Concept</strong>，在正式投資前進行小規模驗證實驗。目的：確認技術可行性、評估資料品質、估算開發成本。POC 失敗是有價值的——它防止企業在錯誤方向上投入大量資源。</div>
+      <div class="kp-tag">▶ 考點：POC = 小規模驗證 / 降低投資風險</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--accent2)">
+      <div class="kp-title">ROI 評估框架</div>
+      <div class="kp-body">AI 投資回報需從多維度衡量：<strong>直接效益</strong>（自動化節省人力成本）、<strong>間接效益</strong>（決策品質提升、客戶滿意度）、<strong>成本項目</strong>（資料清洗、模型訓練、部署維護）、<strong>回收期</strong>（通常 12-36 個月）。</div>
+      <div class="kp-tag">▶ 考點：ROI = 效益 / 成本 / 時間</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 考試高頻：</strong>POC（概念驗證）= 在大規模投資前進行的<strong>小規模測試</strong>，用來驗證技術可行性。第一階段的「評估」重點是確認企業的<strong>數位成熟度</strong>與<strong>資料可用性</strong>。</div>
+</div>
+
+<!-- ══ 2. AI 專案角色分工 ══ -->
+<div class="sec-title reveal">👥 AI 專案角色分工</div>
+<div class="panel reveal">
+  <div class="panel-title">跨功能 AI 團隊的職責劃分</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>角色</th><th>主要職責</th><th>核心技能</th><th>考試考點</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>AI 專案經理（PM）</td>
+          <td>統籌專案時程、協調跨部門資源、風險管理</td>
+          <td>專案管理、溝通協調、業務理解</td>
+          <td>負責 POC 可行性決策</td>
+        </tr>
+        <tr>
+          <td>資料工程師</td>
+          <td>資料蒐集清洗、ETL 流水線建置、資料倉儲管理</td>
+          <td>SQL、Spark、資料管線設計</td>
+          <td>確保訓練資料品質</td>
+        </tr>
+        <tr>
+          <td>機器學習工程師 / 資料科學家</td>
+          <td>模型設計訓練、特徵工程、模型評估與調校</td>
+          <td>Python、sklearn、PyTorch/TensorFlow</td>
+          <td>負責選擇演算法與調校超參數</td>
+        </tr>
+        <tr>
+          <td>MLOps 工程師</td>
+          <td>模型部署、CI/CD 流水線、監控與再訓練</td>
+          <td>Docker、Kubernetes、雲端平台</td>
+          <td>負責模型上線與維運</td>
+        </tr>
+        <tr>
+          <td>AI 架構師</td>
+          <td>整體技術架構設計、技術選型、安全性規劃</td>
+          <td>系統設計、雲端架構、安全合規</td>
+          <td>評估技術可行性與擴展性</td>
+        </tr>
+        <tr>
+          <td>業務分析師（BA）</td>
+          <td>轉譯業務需求、定義成功指標（KPI）、驗收測試</td>
+          <td>業務理解、需求分析、KPI設計</td>
+          <td>定義 AI 的商業目標</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="info-box">💡 <strong>考試情境：</strong>「需要確保模型部署後的效能監控並自動觸發再訓練」→ <strong>MLOps 工程師</strong>。「需要評估現有系統是否能支撐 AI 服務的高並發請求」→ <strong>AI 架構師</strong>。</div>
+</div>
+
+<!-- ══ 3. 風險矩陣 3D（Three.js）══ -->
+<div class="sec-title reveal">⚠️ 3D 風險矩陣視覺化</div>
+<div class="panel reveal">
+  <div class="panel-title">AI 導入風險 = 發生機率 × 影響程度（可拖曳旋轉）</div>
+  <div class="c3d-wrap">
+    <canvas id="c3d" class="c3d"></canvas>
+    <div class="c3d-lbl">⚠️ 風險矩陣 3D 視覺化 · 拖曳旋轉</div>
+    <div class="ctrl">
+      <button id="btnAuto" class="on" onclick="toggleAuto()">⟳ 自動旋轉</button>
+      <button onclick="resetView()">↺ 重置視角</button>
+      <button onclick="highlightRisk('high')">🔴 高風險</button>
+      <button onclick="highlightRisk('mid')">🟡 中風險</button>
+      <button onclick="highlightRisk('low')">🟢 低風險</button>
+    </div>
+  </div>
+  <div class="formula">
+    <span class="cm">// 風險等級計算公式</span><br>
+    <span class="hl">風險等級</span> = <span class="fn">發生機率</span> × <span class="vr">影響程度</span><br><br>
+    <span class="cm">// 風險矩陣分類（5×5 矩陣）</span><br>
+    <span class="fn">高風險</span>（紅色）: 機率 × 影響 ≥ <span class="hl">15</span>  <span class="cm">// 需立即採取行動</span><br>
+    <span class="vr">中風險</span>（橙色）: 機率 × 影響 = <span class="hl">5~14</span>  <span class="cm">// 需監控與減緩</span><br>
+    <span class="fn">低風險</span>（綠色）: 機率 × 影響 ≤ <span class="hl">4</span>  <span class="cm">// 接受或定期複查</span>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:#FF4444">
+      <div class="kp-title">高風險（Red Zone）</div>
+      <div class="kp-body">機率高 × 影響大。AI 導入常見高風險：<strong>資料洩露</strong>（GDPR罰款）、<strong>模型偏見</strong>（法律訴訟）、<strong>系統中斷</strong>（業務損失）。應對策略：<strong>風險轉移</strong>（購買保險）或<strong>風險迴避</strong>（不執行）。</div>
+      <div class="kp-tag">▶ 考點：高風險 = 立即行動 / 不可接受</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--orange)">
+      <div class="kp-title">風險應對四策略</div>
+      <div class="kp-body"><strong>迴避（Avoid）</strong>：不執行高風險活動。<strong>轉移（Transfer）</strong>：保險或外包。<strong>減緩（Mitigate）</strong>：降低機率或影響（如加密、備份）。<strong>接受（Accept）</strong>：低風險時有意識承擔。</div>
+      <div class="kp-tag">▶ 考點：四種風險應對策略</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--accent2)">
+      <div class="kp-title">AI 專案特有風險</div>
+      <div class="kp-body"><strong>資料風險</strong>：資料品質差導致模型偏差。<strong>模型漂移</strong>：現實資料分布改變使模型失效。<strong>演算法黑箱</strong>：模型決策不透明難以解釋。<strong>合規風險</strong>：違反個資法或產業法規。</div>
+      <div class="kp-tag">▶ 考點：AI 四大專有風險</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 4. AI 偏見三類型 ══ -->
+<div class="sec-title reveal">⚖️ AI 偏見三類型（核心考點）</div>
+<div class="panel reveal">
+  <div class="panel-title">偏見如何進入 AI 系統 — 來源、表現與修正方法</div>
+  <div class="seg-tabs">
+    <button class="seg-tab active" onclick="showBias(this,'hist')">歷史偏見</button>
+    <button class="seg-tab" onclick="showBias(this,'label')">標註偏見</button>
+    <button class="seg-tab" onclick="showBias(this,'algo')">演算法偏見</button>
+  </div>
+  <div class="seg-box" id="bias-display"></div>
+  <div class="kp-grid" style="margin-top:14px;">
+    <div class="kp-card" style="border-left-color:var(--pink)">
+      <div class="kp-title">歷史偏見（Historical Bias）</div>
+      <div class="kp-body">訓練資料反映了<strong>歷史上存在的歧視或不公平</strong>。例：若歷史上女性工程師比例低，訓練出的 AI 招聘模型會偏好男性應徵者。問題來源在資料收集前就已存在，是最根本的偏見類型。</div>
+      <div class="kp-tag">▶ 考點：歷史偏見 = 訓練資料反映過去歧視</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">標註偏見（Labeling Bias）</div>
+      <div class="kp-body">人工標注資料時，<strong>標註者的主觀判斷</strong>引入偏見。例：不同標註者對「侵略性語言」的認定標準不一致。解決方法：多標註者交叉驗證、制定明確標註準則、計算標註者間一致性（Inter-Annotator Agreement）。</div>
+      <div class="kp-tag">▶ 考點：標註偏見 = 標註者主觀判斷引入</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">演算法偏見（Algorithmic Bias）</div>
+      <div class="kp-body">模型的<strong>優化目標或架構設計</strong>在最大化整體準確率時，犧牲了特定群體的預測準確性。例：用整體準確率作為損失函數，少數族裔資料少，模型對其預測更差。修正：使用公平性約束或公平性感知損失函數。</div>
+      <div class="kp-tag">▶ 考點：演算法偏見 = 優化目標犧牲特定群體</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>考試關鍵區分：</strong><strong>歷史偏見</strong>來自資料收集前（社會結構）→ <strong>標註偏見</strong>來自資料標注時（人的主觀）→ <strong>演算法偏見</strong>來自模型訓練時（目標函數設計）。三者對應 AI 生命週期的不同階段。</div>
+</div>
+
+<!-- ══ 5. GDPR 與台灣個資法 ══ -->
+<div class="sec-title reveal">🔒 GDPR 與台灣個人資料保護法</div>
+<div class="panel reveal">
+  <div class="panel-title">AI 系統的法規遵循義務</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>法規</th><th>適用範圍</th><th>核心原則</th><th>重要罰則</th><th>AI 特別要求</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>GDPR（歐盟）</td>
+          <td>處理歐盟居民個資的所有組織（不限地區）</td>
+          <td>目的限制、資料最小化、儲存期限限制、準確性</td>
+          <td>最高罰款：全球年營業額 <strong>4%</strong> 或 <strong>2000萬歐元</strong>，取較高者</td>
+          <td>自動化決策須提供人工審查機制、被遺忘權</td>
+        </tr>
+        <tr>
+          <td>台灣個資法</td>
+          <td>公務與非公務機關收集使用個人資料</td>
+          <td>特定目的、當事人同意、安全維護義務</td>
+          <td>民事賠償最高 <strong>2 億元</strong>；刑事責任最高 <strong>2 年有期徒刑</strong></td>
+          <td>資料主體有查詢、更正、刪除、停止處理的權利</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">GDPR 個資主體八大權利</div>
+      <div class="kp-body">
+        1. <strong>知情權</strong>：知道個資被如何使用<br>
+        2. <strong>存取權</strong>：取得個資副本<br>
+        3. <strong>更正權</strong>：更正不正確資料<br>
+        4. <strong>被遺忘權</strong>：要求刪除個資<br>
+        5. <strong>資料可攜性</strong>：轉移至其他平台<br>
+        6. <strong>反對權</strong>：反對特定處理方式<br>
+        7. <strong>限制處理權</strong>：限制使用範圍<br>
+        8. <strong>拒絕自動決策</strong>：要求人工審查
+      </div>
+      <div class="kp-tag">▶ 考點：被遺忘權 / 拒絕自動決策</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">資料最小化原則（Data Minimization）</div>
+      <div class="kp-body">只收集<strong>完成特定目的所必要的最少量個資</strong>。AI 開發中的應用：訓練模型時只使用必要欄位（如預測信用評等不需收集宗教信仰）、部署後定期刪除不再需要的訓練資料。</div>
+      <div class="kp-tag">▶ 考點：最小化 = 只用必要欄位</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--pink)">
+      <div class="kp-title">隱私設計（Privacy by Design）</div>
+      <div class="kp-body">將隱私保護<strong>融入系統設計初期</strong>，而非事後補救。七大原則：事前主動保護、預設隱私保護、設計嵌入隱私、全功能實現、端對端安全、可見透明、尊重使用者隱私。</div>
+      <div class="kp-tag">▶ 考點：Privacy by Design = 設計階段就考慮</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 必記：</strong>GDPR 最高罰款為全球年營業額 <strong>4%</strong> 或 <strong>2000萬歐元</strong>，取<strong>較高者</strong>。適用範圍包括所有處理歐盟居民個資的組織，<strong>不限於歐盟境內企業</strong>（具有域外效力）。</div>
+</div>
+
+<!-- ══ 6. AI 倫理原則 ══ -->
+<div class="sec-title reveal">🌐 AI 倫理框架與原則</div>
+<div class="panel reveal">
+  <div class="panel-title">負責任 AI 的核心倫理原則</div>
+  <div class="arch-wrap">
+    <svg width="700" height="220" viewBox="0 0 700 220">
+      <defs>
+        <radialGradient id="ethGrad" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="rgba(255,209,102,0.15)"/>
+          <stop offset="100%" stop-color="rgba(255,209,102,0)"/>
+        </radialGradient>
+      </defs>
+      <!-- Center circle -->
+      <circle cx="350" cy="110" r="45" fill="url(#ethGrad)" stroke="#FFD166" stroke-width="2"/>
+      <text x="350" y="105" text-anchor="middle" fill="#FFD166" font-size="11" font-weight="900" font-family="Calibri,'Microsoft JhengHei',sans-serif">負責任</text>
+      <text x="350" y="120" text-anchor="middle" fill="#FFD166" font-size="11" font-weight="900" font-family="Calibri,'Microsoft JhengHei',sans-serif">AI</text>
+      <!-- Transparency -->
+      <circle cx="160" cy="55" r="38" fill="#21253A" stroke="#00D4FF" stroke-width="1.5"/>
+      <text x="160" y="50" text-anchor="middle" fill="#00D4FF" font-size="10" font-weight="900" font-family="Calibri,'Microsoft JhengHei',sans-serif">透明度</text>
+      <text x="160" y="65" text-anchor="middle" fill="#8892B0" font-size="8.5" font-family="Calibri,'Microsoft JhengHei',sans-serif">Transparency</text>
+      <line x1="194" y1="65" x2="315" y2="95" stroke="#00D4FF" stroke-width="1" stroke-dasharray="4"/>
+      <!-- Fairness -->
+      <circle cx="540" cy="55" r="38" fill="#21253A" stroke="#FF6B9D" stroke-width="1.5"/>
+      <text x="540" y="50" text-anchor="middle" fill="#FF6B9D" font-size="10" font-weight="900" font-family="Calibri,'Microsoft JhengHei',sans-serif">公平性</text>
+      <text x="540" y="65" text-anchor="middle" fill="#8892B0" font-size="8.5" font-family="Calibri,'Microsoft JhengHei',sans-serif">Fairness</text>
+      <line x1="506" y1="65" x2="385" y2="95" stroke="#FF6B9D" stroke-width="1" stroke-dasharray="4"/>
+      <!-- Accountability -->
+      <circle cx="160" cy="170" r="38" fill="#21253A" stroke="#FF9B42" stroke-width="1.5"/>
+      <text x="160" y="165" text-anchor="middle" fill="#FF9B42" font-size="10" font-weight="900" font-family="Calibri,'Microsoft JhengHei',sans-serif">問責性</text>
+      <text x="160" y="180" text-anchor="middle" fill="#8892B0" font-size="8.5" font-family="Calibri,'Microsoft JhengHei',sans-serif">Accountability</text>
+      <line x1="194" y1="158" x2="315" y2="125" stroke="#FF9B42" stroke-width="1" stroke-dasharray="4"/>
+      <!-- Privacy -->
+      <circle cx="540" cy="170" r="38" fill="#21253A" stroke="#7C6FFF" stroke-width="1.5"/>
+      <text x="540" y="165" text-anchor="middle" fill="#7C6FFF" font-size="10" font-weight="900" font-family="Calibri,'Microsoft JhengHei',sans-serif">隱私保護</text>
+      <text x="540" y="180" text-anchor="middle" fill="#8892B0" font-size="8.5" font-family="Calibri,'Microsoft JhengHei',sans-serif">Privacy</text>
+      <line x1="506" y1="158" x2="385" y2="125" stroke="#7C6FFF" stroke-width="1" stroke-dasharray="4"/>
+      <!-- Safety -->
+      <circle cx="350" cy="205" r="0"/>
+      <ellipse cx="350" cy="200" rx="40" ry="15" fill="#21253A" stroke="#00FFB2" stroke-width="1.5"/>
+      <text x="350" y="204" text-anchor="middle" fill="#00FFB2" font-size="9.5" font-weight="900" font-family="Calibri,'Microsoft JhengHei',sans-serif">安全性 Safety</text>
+      <line x1="350" y1="186" x2="350" y2="157" stroke="#00FFB2" stroke-width="1" stroke-dasharray="4"/>
+    </svg>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">透明度（Transparency）</div>
+      <div class="kp-body">AI 系統的決策過程和邏輯應<strong>可解釋、可理解</strong>。方法：使用 SHAP/LIME 解釋模型預測、提供決策依據、記錄模型訓練過程與資料來源。黑箱模型在高風險領域（醫療、金融）應特別注意。</div>
+      <div class="kp-tag">▶ 考點：透明度 = 決策可解釋</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--orange)">
+      <div class="kp-title">問責性（Accountability）</div>
+      <div class="kp-body">當 AI 系統造成損害時，<strong>誰應該負責</strong>？需建立明確的責任鏈：開發者（模型設計）、部署者（應用場景）、使用者（操作行為）各有對應責任。應保留完整的審計日誌（Audit Log）。</div>
+      <div class="kp-tag">▶ 考點：問責性 = 明確責任歸屬</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--pink)">
+      <div class="kp-title">公平性（Fairness）</div>
+      <div class="kp-body">AI 系統不應對不同群體（性別、種族、年齡等）產生<strong>系統性差異對待</strong>。衡量指標：<strong>Demographic Parity</strong>（各群體正向預測率相等）、<strong>Equal Opportunity</strong>（各群體 True Positive Rate 相等）、<strong>Disparate Impact</strong>（影響比例差異 &lt;80% 構成歧視）。</div>
+      <div class="kp-tag">▶ 考點：Disparate Impact 80% 規則</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 7. 程式碼考點 ══ -->
+<div class="sec-title reveal">💻 程式碼考點（AI 導入評估相關 Python 工具）</div>
+
+<div class="panel reveal">
+  <div class="panel-title">風險矩陣計算與視覺化（NumPy + Matplotlib）</div>
+  <div class="formula">
+<span class="cm"># 風險矩陣：機率 × 影響程度</span><br>
+<span class="fn">import</span> <span class="vr">numpy</span> <span class="fn">as</span> <span class="vr">np</span><br>
+<span class="fn">import</span> <span class="vr">pandas</span> <span class="fn">as</span> <span class="vr">pd</span><br><br>
+<span class="cm"># 定義風險項目</span><br>
+<span class="vr">risks</span> = <span class="fn">pd.DataFrame</span>({<br>
+&nbsp;&nbsp;<span class="hl">'風險項目'</span>: [<span class="hl">'資料洩露'</span>, <span class="hl">'模型偏見'</span>, <span class="hl">'系統中斷'</span>, <span class="hl">'需求變更'</span>],<br>
+&nbsp;&nbsp;<span class="hl">'機率'</span>: [<span class="vr">2</span>, <span class="vr">3</span>, <span class="vr">4</span>, <span class="vr">5</span>],  <span class="cm"># 1=極低, 5=極高</span><br>
+&nbsp;&nbsp;<span class="hl">'影響'</span>: [<span class="vr">5</span>, <span class="vr">4</span>, <span class="vr">3</span>, <span class="vr">2</span>],  <span class="cm"># 1=極低, 5=極高</span><br>
+})<br><br>
+<span class="cm"># 計算風險等級</span><br>
+<span class="vr">risks</span>[<span class="hl">'風險等級'</span>] = <span class="vr">risks</span>[<span class="hl">'機率'</span>] * <span class="vr">risks</span>[<span class="hl">'影響'</span>]<br>
+<span class="vr">risks</span>[<span class="hl">'等級分類'</span>] = <span class="vr">risks</span>[<span class="hl">'風險等級'</span>].<span class="fn">apply</span>(<br>
+&nbsp;&nbsp;<span class="fn">lambda</span> <span class="vr">x</span>: <span class="hl">'高'</span> <span class="fn">if</span> <span class="vr">x</span> >= <span class="vr">15</span> <span class="fn">else</span> (<span class="hl">'中'</span> <span class="fn">if</span> <span class="vr">x</span> >= <span class="vr">5</span> <span class="fn">else</span> <span class="hl">'低'</span>)<br>
+)<br>
+<span class="fn">print</span>(<span class="vr">risks</span>.<span class="fn">sort_values</span>(<span class="hl">'風險等級'</span>, <span class="vr">ascending</span>=<span class="fn">False</span>))
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card">
+      <div class="kp-title">pd.DataFrame()</div>
+      <div class="kp-body">建立表格式資料結構，AI 導入評估常用於整理風險清單、角色分工表。<code>sort_values()</code> 依風險等級排序，快速識別高優先風險。</div>
+      <div class="kp-tag">▶ 風險清單管理</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">lambda 函數應用</div>
+      <div class="kp-body">單行匿名函數，常用於 <code>apply()</code> 對欄位進行條件轉換。考試常考：如何用一行程式碼將數值風險等級映射為文字分類（高/中/低）。</div>
+      <div class="kp-tag">▶ 條件分類映射</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">numpy 矩陣運算</div>
+      <div class="kp-body"><code>np.outer(prob, impact)</code> 可一次產生完整的風險矩陣（5×5）。<code>np.argmax()</code> 找到最高風險項目的索引，<code>np.where()</code> 進行條件過濾。</div>
+      <div class="kp-tag">▶ 批量風險計算</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel reveal">
+  <div class="panel-title">AI 偏見檢測（Fairness 指標計算）</div>
+  <div class="formula">
+<span class="cm"># 檢測 AI 模型的公平性指標</span><br>
+<span class="fn">from</span> <span class="vr">sklearn.metrics</span> <span class="fn">import</span> <span class="vr">confusion_matrix</span><br>
+<span class="fn">import</span> <span class="vr">numpy</span> <span class="fn">as</span> <span class="vr">np</span><br><br>
+<span class="cm"># 假設：招聘 AI 的預測結果</span><br>
+<span class="vr">y_pred_male</span>   = [<span class="vr">1</span>, <span class="vr">1</span>, <span class="vr">0</span>, <span class="vr">1</span>, <span class="vr">1</span>]  <span class="cm"># 男性應徵者預測（1=錄取）</span><br>
+<span class="vr">y_pred_female</span> = [<span class="vr">1</span>, <span class="vr">0</span>, <span class="vr">0</span>, <span class="vr">1</span>, <span class="vr">0</span>]  <span class="cm"># 女性應徵者預測</span><br><br>
+<span class="cm"># Demographic Parity（人口統計均等）</span><br>
+<span class="vr">rate_male</span>   = <span class="fn">np.mean</span>(<span class="vr">y_pred_male</span>)    <span class="cm"># = 0.8（80%）</span><br>
+<span class="vr">rate_female</span> = <span class="fn">np.mean</span>(<span class="vr">y_pred_female</span>)  <span class="cm"># = 0.4（40%）</span><br><br>
+<span class="cm"># Disparate Impact（差異衝擊比）</span><br>
+<span class="vr">disparate_impact</span> = <span class="vr">rate_female</span> / <span class="vr">rate_male</span><br>
+<span class="fn">print</span>(<span class="hl">f"Disparate Impact: {disparate_impact:.2f}"</span>)  <span class="cm"># = 0.50</span><br>
+<span class="cm"># 0.50 < 0.80 → 構成間接歧視（80% 原則）</span>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card">
+      <div class="kp-title">Demographic Parity（人口統計均等）</div>
+      <div class="kp-body">各群體獲得正向預測的比率應相等。計算方式：<code>np.mean(y_pred)</code> 對各群體分別計算正向率。若男性 80% 錄取、女性 40% 錄取，說明模型存在性別偏見。</div>
+      <div class="kp-tag">▶ 各群體正向預測率相等</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">Disparate Impact 80% 原則</div>
+      <div class="kp-body">弱勢群體的正向預測率 ÷ 優勢群體的正向預測率 &lt; <strong>0.8（80%）</strong>即構成<strong>間接歧視</strong>（美國 EEOC 標準）。上例：0.4/0.8 = 0.5 &lt; 0.8 → 違法。iPAS 高頻考點！</div>
+      <div class="kp-tag">▶ 考點：比值 &lt; 80% = 歧視</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">confusion_matrix 公平性分析</div>
+      <div class="kp-body"><code>sklearn.metrics.confusion_matrix</code> 分別對各群體計算混淆矩陣，比較各群體的 <strong>TPR（True Positive Rate）</strong>是否相等（Equal Opportunity 指標）。TPR差異大 → 模型對不同群體的準確性不同。</div>
+      <div class="kp-tag">▶ Equal Opportunity = TPR相等</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel reveal">
+  <div class="panel-title">ROI 計算與 AI 投資評估</div>
+  <div class="formula">
+<span class="cm"># AI 專案 ROI 計算模型</span><br>
+<span class="fn">def</span> <span class="vr">calculate_ai_roi</span>(<span class="vr">annual_savings</span>, <span class="vr">implementation_cost</span>,<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="vr">annual_maintenance</span>, <span class="vr">years</span>=<span class="vr">3</span>):<br>
+&nbsp;&nbsp;<span class="cm"># 總效益 = 年節省成本 × 年數</span><br>
+&nbsp;&nbsp;<span class="vr">total_benefit</span> = <span class="vr">annual_savings</span> * <span class="vr">years</span><br>
+&nbsp;&nbsp;<span class="cm"># 總成本 = 導入成本 + 年維護成本 × 年數</span><br>
+&nbsp;&nbsp;<span class="vr">total_cost</span> = <span class="vr">implementation_cost</span> + <span class="vr">annual_maintenance</span> * <span class="vr">years</span><br>
+&nbsp;&nbsp;<span class="cm"># ROI = (效益 - 成本) / 成本 × 100%</span><br>
+&nbsp;&nbsp;<span class="vr">roi</span> = (<span class="vr">total_benefit</span> - <span class="vr">total_cost</span>) / <span class="vr">total_cost</span> * <span class="vr">100</span><br>
+&nbsp;&nbsp;<span class="cm"># 回收期（月）</span><br>
+&nbsp;&nbsp;<span class="vr">payback_months</span> = <span class="vr">implementation_cost</span> / (<span class="vr">annual_savings</span> / <span class="vr">12</span>)<br>
+&nbsp;&nbsp;<span class="fn">return</span> {<span class="hl">'roi_pct'</span>: <span class="vr">roi</span>, <span class="hl">'payback_months'</span>: <span class="vr">payback_months</span>}<br><br>
+<span class="fn">print</span>(<span class="vr">calculate_ai_roi</span>(<span class="vr">500000</span>, <span class="vr">800000</span>, <span class="vr">100000</span>))<br>
+<span class="cm"># ROI = 47.4%, 回收期 = 19.2 個月</span>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card">
+      <div class="kp-title">ROI 公式</div>
+      <div class="kp-body"><strong>ROI = (總效益 - 總成本) / 總成本 × 100%</strong>。AI 專案 ROI &gt; 0 才值得投資。考試常見陷阱：別忘記加入<strong>年維護成本</strong>，不能只看一次性導入成本。</div>
+      <div class="kp-tag">▶ 考點：ROI = 淨效益/成本</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">回收期計算</div>
+      <div class="kp-body"><strong>回收期（Payback Period）= 導入成本 / 月均節省成本</strong>。AI 專案平均回收期 12-36 個月。回收期越短 = 投資風險越低。企業通常要求回收期在 2 年以內才批准 AI 專案預算。</div>
+      <div class="kp-tag">▶ 考點：回收期 = 成本/月均效益</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">敏感度分析</div>
+      <div class="kp-body">使用 <code>np.arange()</code> 或 <code>list comprehension</code> 批量計算不同假設下的 ROI（如年節省成本浮動 ±20%），評估 ROI 對關鍵變數的敏感程度，辨識最關鍵的風險驅動因素。</div>
+      <div class="kp-tag">▶ 敏感度分析識別關鍵變數</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel reveal" style="border-left:3px solid var(--yellow)">
+  <div class="panel-title">🧪 歷屆考題程式題型</div>
+  <div style="margin-bottom:14px;">
+    <div style="font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:8px;">
+      Q1：下列程式碼計算 Disparate Impact，若輸出結果為 0.65，代表什麼？
+    </div>
+    <div style="font-size:.85rem;color:var(--muted);margin-bottom:8px;background:#0a0c14;padding:10px;border-radius:8px;">
+      <code>di = rate_minority / rate_majority</code>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;font-size:.85rem;">
+      <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);color:var(--muted);">A. 模型完全公平，可放心部署</div>
+      <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--accent2);color:var(--accent2);background:rgba(0,255,178,.06);">B. ✓ 構成間接歧視，違反 80% 原則（0.65 &lt; 0.80）</div>
+      <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);color:var(--muted);">C. 少數群體比多數群體更有優勢</div>
+      <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);color:var(--muted);">D. 結果無意義，需更多資料</div>
+    </div>
+  </div>
+  <div>
+    <div style="font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:8px;">
+      Q2：以下哪個 Python 操作最適合「計算各群體的正向預測率以評估人口統計均等」？
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;font-size:.85rem;">
+      <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);color:var(--muted);">A. <code>confusion_matrix(y_true, y_pred)</code></div>
+      <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--accent2);color:var(--accent2);background:rgba(0,255,178,.06);">B. ✓ <code>np.mean(y_pred_group)</code> — 計算各群體預測為正的比率</div>
+      <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);color:var(--muted);">C. <code>accuracy_score(y_true, y_pred)</code></div>
+      <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);color:var(--muted);">D. <code>roc_auc_score(y_true, y_pred)</code></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 8. 仿真考題 ══ -->
+<div class="sec-title reveal">🎯 仿真考題（8 題）</div>
+<div class="progress-bar"><div class="progress-fill" id="pbar" style="width:0%"></div></div>
+<div id="quiz"></div>
+
+<footer>iPAS AI 應用規劃師中級考試學習站 · 內容依據官方評鑑範圍整理 · 實際考試以 iPAS 官網公告為準</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ── Reveal ──
+const obs = new IntersectionObserver(e => e.forEach(x => x.isIntersecting && x.target.classList.add('vis')), {threshold:.08});
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// ── Score ──
+let score = 0;
+const answered = new Set();
+const TOTAL = 8;
+function addScore(correct, qIdx) {
+  if (!answered.has(qIdx)) {
+    answered.add(qIdx);
+    if (correct) score++;
+    document.getElementById('score').textContent = score;
+    document.getElementById('total').textContent = answered.size;
+    document.getElementById('pbar').style.width = (answered.size / TOTAL * 100) + '%';
+  }
+}
+
+// ── Bias Tabs ──
+const biasData = {
+  hist: `<span class="hl">歷史偏見（Historical Bias）</span> — 訓練資料反映社會歷史上的不公平<br><br>
+📍 <span class="hl2">來源：</span>資料收集前就已存在的社會歧視<br>
+📍 <span class="hl2">範例：</span>歷史上女性擔任 CEO 比例低 → AI 認為 CEO 應由男性擔任<br>
+📍 <span class="hl2">影響：</span>AI 強化並放大現有的社會不平等<br>
+📍 <span class="hl2">解決：</span>多樣化訓練資料、重新平衡資料集、引入反事實資料<br>
+📍 <span class="hl3">考試關鍵詞：</span>「訓練資料反映過去歧視」「社會結構性偏見」`,
+  label: `<span class="hl">標註偏見（Labeling Bias）</span> — 人工標注時標註者的主觀判斷引入偏見<br><br>
+📍 <span class="hl2">來源：</span>資料標注階段，標註者的主觀性或文化背景差異<br>
+📍 <span class="hl2">範例：</span>仇恨言論偵測中，不同種族背景的標註者對「攻擊性」認定不同<br>
+📍 <span class="hl2">影響：</span>同一句話由不同標註者給出不同標籤，模型學到矛盾的規則<br>
+📍 <span class="hl2">解決：</span>多標註者交叉驗證（3人以上）、計算 Fleiss' Kappa 一致性分數<br>
+📍 <span class="hl3">考試關鍵詞：</span>「標註者主觀」「人工標注不一致」`,
+  algo: `<span class="hl">演算法偏見（Algorithmic Bias）</span> — 模型設計和優化目標造成對特定群體的不公平<br><br>
+📍 <span class="hl2">來源：</span>模型訓練時使用的損失函數或優化目標本身<br>
+📍 <span class="hl2">範例：</span>最大化整體 Accuracy → 模型對少數群體的預測準確率遠低於多數群體<br>
+📍 <span class="hl2">影響：</span>在整體指標看起來不錯，但對特定群體極不公平<br>
+📍 <span class="hl2">解決：</span>使用公平性約束的損失函數、Adversarial Debiasing、Reweighting<br>
+📍 <span class="hl3">考試關鍵詞：</span>「優化目標犧牲少數群體」「整體準確率掩蓋群體差異」`
+};
+function showBias(btn, key) {
+  document.querySelectorAll('.seg-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('bias-display').innerHTML = biasData[key];
+}
+showBias(document.querySelector('.seg-tab'), 'hist');
+
+// ── Three.js Risk Matrix 3D ──
+(function() {
+  const canvas = document.getElementById('c3d');
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setClearColor(0x0a0c14, 1);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / 380, 0.1, 200);
+
+  // Grid lines
+  const gridMat = new THREE.LineBasicMaterial({color:0x2E3250});
+  for (let i = 0; i <= 5; i++) {
+    const geoH = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(-2.5 + i, 0, -2.5), new THREE.Vector3(-2.5 + i, 0, 2.5)
+    ]);
+    scene.add(new THREE.Line(geoH, gridMat));
+    const geoV = new THREE.BufferGeometry().setFromPoints([
+      new THREE.Vector3(-2.5, 0, -2.5 + i), new THREE.Vector3(2.5, 0, -2.5 + i)
+    ]);
+    scene.add(new THREE.Line(geoV, gridMat));
+  }
+
+  // Risk bars: probability 1-5 (X axis) × impact 1-5 (Z axis) → height = prob × impact
+  const risks = [];
+  const riskColors = { high: 0xFF4444, mid: 0xFF9B42, low: 0x00FFB2 };
+  for (let p = 1; p <= 5; p++) {
+    for (let i = 1; i <= 5; i++) {
+      const riskScore = p * i;
+      const color = riskScore >= 15 ? riskColors.high : riskScore >= 5 ? riskColors.mid : riskColors.low;
+      const h = riskScore * 0.06;
+      const geo = new THREE.BoxGeometry(0.7, h, 0.7);
+      const mat = new THREE.MeshPhongMaterial({color, transparent:true, opacity:0.9});
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(-2.5 + p - 0.5, h / 2, -2.5 + i - 0.5);
+      mesh.userData = {riskScore, color, p, i};
+      scene.add(mesh);
+      risks.push(mesh);
+    }
+  }
+
+  // Labels (axis)
+  const lGeo = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(-2.5, 0, 0), new THREE.Vector3(2.5, 0, 0)
+  ]);
+  scene.add(new THREE.Line(lGeo, new THREE.LineBasicMaterial({color: 0xFFD166})));
+  const lGeo2 = new THREE.BufferGeometry().setFromPoints([
+    new THREE.Vector3(0, 0, -2.5), new THREE.Vector3(0, 0, 2.5)
+  ]);
+  scene.add(new THREE.Line(lGeo2, new THREE.LineBasicMaterial({color: 0x00D4FF})));
+
+  // Lighting
+  scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+  const dLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  dLight.position.set(5, 10, 5);
+  scene.add(dLight);
+
+  let rot = {x: 0.4, y: 0.6};
+  let autoRotate = true;
+  const R = 14;
+
+  function camPos() {
+    camera.position.x = R * Math.sin(rot.y) * Math.cos(rot.x);
+    camera.position.y = R * Math.sin(rot.x);
+    camera.position.z = R * Math.cos(rot.y) * Math.cos(rot.x);
+    camera.lookAt(0, 0, 0);
+  }
+
+  // Drag
+  let drag = false, lx = 0, ly = 0;
+  canvas.addEventListener('mousedown', e => { drag = true; lx = e.clientX; ly = e.clientY; autoRotate = false; document.getElementById('btnAuto').classList.remove('on'); });
+  window.addEventListener('mousemove', e => { if (!drag) return; rot.y += (e.clientX - lx) * 0.008; rot.x += (e.clientY - ly) * 0.008; rot.x = Math.max(-1.2, Math.min(1.2, rot.x)); lx = e.clientX; ly = e.clientY; });
+  window.addEventListener('mouseup', () => drag = false);
+  canvas.addEventListener('touchstart', e => { drag = true; lx = e.touches[0].clientX; ly = e.touches[0].clientY; autoRotate = false; document.getElementById('btnAuto').classList.remove('on'); }, {passive:true});
+  canvas.addEventListener('touchmove', e => { if (!drag) return; rot.y += (e.touches[0].clientX - lx) * 0.008; rot.x += (e.touches[0].clientY - ly) * 0.008; rot.x = Math.max(-1.2, Math.min(1.2, rot.x)); lx = e.touches[0].clientX; ly = e.touches[0].clientY; }, {passive:true});
+  canvas.addEventListener('touchend', () => drag = false);
+
+  function resize() {
+    const w = canvas.clientWidth;
+    renderer.setSize(w, 380, false);
+    camera.aspect = w / 380;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function animate() {
+    requestAnimationFrame(animate);
+    if (autoRotate) rot.y += 0.006;
+    camPos();
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.toggleAuto = function() {
+    autoRotate = !autoRotate;
+    document.getElementById('btnAuto').classList.toggle('on', autoRotate);
+  };
+  window.resetView = function() { rot = {x: 0.4, y: 0.6}; autoRotate = true; document.getElementById('btnAuto').classList.add('on'); };
+  window.highlightRisk = function(level) {
+    risks.forEach(m => {
+      const s = m.userData.riskScore;
+      const isTarget = (level === 'high' && s >= 15) || (level === 'mid' && s >= 5 && s < 15) || (level === 'low' && s < 5);
+      m.material.opacity = isTarget ? 1.0 : 0.15;
+      m.material.emissive = isTarget ? new THREE.Color(m.userData.color) : new THREE.Color(0x000000);
+      m.material.emissiveIntensity = isTarget ? 0.3 : 0;
+    });
+  };
+})();
+
+// ── Quiz ──
+const questions = [
+  {
+    stem: 'AI 導入的「第三階段」POC（概念驗證）的主要目的是？',
+    opts: ['A. 正式部署 AI 系統並開始商業運作', 'B. 小規模驗證技術可行性，降低大規模投資的風險', 'C. 全面評估企業的數位成熟度', 'D. 制定完整的 AI 策略路圖與預算規劃'],
+    ans: 1,
+    exp: 'POC（Proof of Concept）= 概念驗證，在正式大規模投資前進行的小規模測試，目的是驗證技術是否可行、資料是否足夠、成本是否合理。POC 失敗也有價值——它防止企業在錯誤方向上浪費更多資源。'
+  },
+  {
+    stem: 'GDPR 違規最嚴重的罰款上限是多少？',
+    opts: ['A. 全球年營業額的 2% 或 1000 萬歐元，取較高者', 'B. 固定罰款 500 萬歐元', 'C. 全球年營業額的 4% 或 2000 萬歐元，取較高者', 'D. 全球年營業額的 10% 或 5000 萬歐元，取較高者'],
+    ans: 2,
+    exp: 'GDPR 最嚴重違規（如違反處理個資的基本原則）最高罰款為「全球年營業額的 4%」或「2000 萬歐元」，取較高者。這是 iPAS 必考的數字，注意是取「較高者」，而非較低者。'
+  },
+  {
+    stem: '招聘 AI 系統中，女性應徵者的錄取率為 30%，男性為 70%，Disparate Impact = 0.30/0.70 ≈ 0.43，這代表：',
+    opts: ['A. 模型表現良好，不需要調整', 'B. 需要進一步收集更多資料才能判斷', 'C. 因為 0.43 > 0.3，所以模型是公平的', 'D. 構成間接歧視，違反 80% 原則（0.43 < 0.80）'],
+    ans: 3,
+    exp: 'Disparate Impact = 弱勢群體正向率 / 優勢群體正向率。若結果 < 0.80（80%），依據美國 EEOC 的「80% 原則（Four-Fifths Rule）」，構成間接歧視。本例 0.43 遠低於 0.80，是嚴重的性別偏見。'
+  },
+  {
+    stem: '以下哪種 AI 偏見是由「訓練資料反映了歷史上的社會不公平」所導致？',
+    opts: ['A. 演算法偏見（Algorithmic Bias）', 'B. 標註偏見（Labeling Bias）', 'C. 歷史偏見（Historical Bias）', 'D. 測量偏見（Measurement Bias）'],
+    ans: 2,
+    exp: '歷史偏見（Historical Bias）= 訓練資料本身反映了歷史社會結構中的歧視或不平等，例如過去女性在科技業代表性不足，導致 AI 認為工程師應該是男性。這是 AI 偏見三類型中來源最根本的一種。'
+  },
+  {
+    stem: '企業導入 AI 前需要評估「數位成熟度（DMM）」，下列哪一項不在 DMM 評估範疇內？',
+    opts: ['A. 資料品質與資料整合程度', 'B. 競爭對手的 AI 部署進度', 'C. 組織的人才能力與 AI 文化準備度', 'D. 現有 IT 基礎架構與雲端能力'],
+    ans: 1,
+    exp: '數位成熟度評估（DMM）評估的是企業「自身」準備好導入 AI 的程度，涵蓋資料成熟度、技術基礎、組織能力（人才/流程）、文化準備度。競爭對手的狀況屬於外部市場分析，不是 DMM 的評估面向。'
+  },
+  {
+    stem: 'GDPR 的「被遺忘權（Right to be Forgotten）」在 AI 系統中意味著什麼？',
+    opts: ['A. 企業有權利刪除客戶的投訴記錄', 'B. AI 模型可以自動忘記舊的訓練資料', 'C. 當事人可要求刪除其個人資料，包括可能已被納入訓練集的資料', 'D. 員工離職後公司應刪除其所有工作記錄'],
+    ans: 2,
+    exp: '被遺忘權（Right to Erasure）允許資料主體要求刪除其個人資料。對 AI 的影響：若模型用當事人資料訓練，當事人要求「被遺忘」時，可能需要重新訓練不含其資料的模型（Machine Unlearning）。這是 AI 合規的重要挑戰。'
+  },
+  {
+    stem: '「AI 架構師」在 AI 導入專案中的主要職責是？',
+    opts: ['A. 負責每日資料的清洗與 ETL 處理', 'B. 撰寫模型訓練程式碼並進行特徵工程', 'C. 整體技術架構設計、技術選型與系統擴展性規劃', 'D. 協調部門間溝通並管理專案時程'],
+    ans: 2,
+    exp: 'AI 架構師負責整體技術架構設計，包括選擇雲端平台、微服務架構、API設計，評估技術可行性與系統擴展性，確保系統安全合規。與「資料工程師」（ETL）、「ML工程師」（模型訓練）、「PM」（專案管理）的職責不同。'
+  },
+  {
+    stem: '在風險矩陣中，一個風險項目的「發生機率」為 4（高），「影響程度」為 5（極高），應採取何種應對策略？',
+    opts: ['A. 風險接受（Accept）— 記錄並定期複查', 'B. 風險轉移（Transfer）— 購買保險或外包', 'C. 風險監控（Monitor）— 持續觀察即可', 'D. 風險迴避（Avoid）或立即制定緩解計畫（高優先）'],
+    ans: 3,
+    exp: '風險等級 = 機率 × 影響 = 4 × 5 = 20，屬於「高風險」（≥15），需要立即行動。高風險的首選策略是「風險迴避（不執行高風險活動）」或制定具體的「風險緩解計畫（Mitigation）」。風險接受只適用於低風險（≤4），轉移適用於中高風險但無法迴避的情況。'
+  }
+];
+
+const quizEl = document.getElementById('quiz');
+questions.forEach((q, qi) => {
+  const div = document.createElement('div');
+  div.className = 'q-item reveal';
+  div.innerHTML = `
+    <div class="q-num">Q${qi+1} / ${TOTAL}</div>
+    <div class="q-stem">${q.stem}</div>
+    <div class="q-opts">
+      ${q.opts.map((o, oi) => `<div class="q-opt" onclick="pick(this,${qi},${oi},${q.ans})"><span class="opt-label">${['A','B','C','D'][oi]}</span><span>${o.slice(2)}</span></div>`).join('')}
+    </div>
+    <div class="q-explain" id="exp${qi}">${q.exp}</div>`;
+  quizEl.appendChild(div);
+  obs.observe(div);
+});
+
+function pick(el, qi, oi, ans) {
+  if (answered.has(qi)) return;
+  const opts = el.parentElement.querySelectorAll('.q-opt');
+  opts.forEach((o, i) => { if (i === ans) o.classList.add('correct'); });
+  if (oi !== ans) el.classList.add('wrong');
+  document.getElementById('exp' + qi).classList.add('show');
+  addScore(oi === ans, qi);
+}
+</script>
+</body>
+</html>
