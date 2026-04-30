@@ -1,0 +1,880 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 系統集成與部署 — iPAS AI應用規劃師中級考試</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+* { font-family: 'Calibri', 'Microsoft JhengHei', '微軟正黑體', sans-serif; }
+code, .formula { font-family: 'JetBrains Mono', 'Consolas', monospace !important; }
+:root{
+  --bg:#0F1117;--panel:#1A1D27;--panel2:#21253A;
+  --border:#2E3250;--text:#E8EAF6;--muted:#8892B0;
+  --accent:#FF6B9D;--accent2:#00FFB2;--accent3:#7C6FFF;
+  --yellow:#FFD166;--orange:#FF9B42;--pink:#FF6B9D;--blue:#00D4FF;--purple:#9B5DE5;
+  --r:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Calibri','Microsoft JhengHei','微軟正黑體',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.7;}
+
+.nav{position:sticky;top:0;z-index:200;background:rgba(15,17,23,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:12px 24px;}
+.nav a{color:var(--accent);text-decoration:none;font-weight:700;font-size:.9rem;padding:5px 14px;border-radius:999px;border:1.5px solid var(--accent);transition:all .18s;}
+.nav a:hover{background:var(--accent);color:#000;}
+.nav-title{font-size:1.05rem;}
+.nav-tag{margin-left:auto;background:linear-gradient(135deg,var(--accent),var(--accent3));padding:4px 14px;border-radius:999px;font-size:.78rem;font-weight:900;color:#000;}
+
+.hero{padding:60px 20px 40px;background:linear-gradient(160deg,#0F1117,#1a0812,#0F1117);text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(255,107,157,.12),transparent);}
+.hero-badge{display:inline-block;margin-bottom:16px;padding:5px 18px;border-radius:999px;background:rgba(255,107,157,.12);border:1px solid var(--accent);font-size:.8rem;font-weight:900;color:var(--accent);letter-spacing:1px;}
+.hero-title{font-size:clamp(1.8rem,5vw,3.2rem);background:linear-gradient(135deg,var(--accent),var(--orange),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px;}
+.hero-sub{color:var(--muted);font-size:1rem;max-width:600px;margin:0 auto 24px;}
+.tag-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.tag{padding:4px 12px;border-radius:999px;font-size:.75rem;font-weight:900;border:1px solid;}
+
+.wrap{max-width:980px;margin:0 auto;padding:16px 20px 80px;}
+
+.sec-title{font-size:1.5rem;color:var(--text);margin:44px 0 16px;display:flex;align-items:center;gap:10px;}
+.sec-title::before{content:'';display:inline-block;width:4px;height:24px;border-radius:2px;background:linear-gradient(var(--accent),var(--yellow));}
+
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:20px;}
+.panel-title{font-weight:900;font-size:1rem;color:var(--accent2);margin-bottom:12px;}
+
+.formula{background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin:12px 0;font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--accent2);line-height:2;overflow-x:auto;}
+.formula .cm{color:var(--muted);font-style:italic;}
+.formula .hl{color:var(--yellow);}
+.formula .fn{color:var(--blue);}
+.formula .vr{color:var(--pink);}
+
+.tbl-wrap{overflow-x:auto;margin:12px 0;}
+table{width:100%;border-collapse:collapse;font-size:.88rem;}
+th{background:var(--panel2);padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);color:var(--accent2);font-weight:900;}
+td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--muted);}
+td:first-child{color:var(--text);font-weight:700;}
+tr:hover td{background:rgba(255,107,157,.04);}
+
+.kp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:12px 0;}
+.kp-card{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:16px;border-left:3px solid var(--accent);transition:transform .18s,border-color .18s;}
+.kp-card:hover{transform:translateY(-4px);border-left-color:var(--accent2);}
+.kp-card .kp-title{font-weight:900;font-size:.95rem;color:var(--text);margin-bottom:6px;}
+.kp-card .kp-body{font-size:.83rem;color:var(--muted);line-height:1.6;}
+.kp-card .kp-tag{font-size:.7rem;font-weight:900;color:var(--accent);margin-top:8px;}
+
+.warn-box{background:rgba(255,107,157,.07);border:1px solid var(--pink);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--pink);margin:10px 0;}
+.info-box{background:rgba(0,255,178,.07);border:1px solid var(--accent2);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--accent2);margin:10px 0;}
+
+.stage-flow{display:flex;flex-wrap:wrap;gap:0;margin:14px 0;align-items:stretch;}
+.stage{flex:1;min-width:130px;background:var(--panel2);border:1px solid var(--border);padding:16px 12px;text-align:center;}
+.stage:first-child{border-radius:12px 0 0 12px;}
+.stage:last-child{border-radius:0 12px 12px 0;}
+.stage-num{font-size:.7rem;font-weight:900;color:var(--muted);margin-bottom:4px;}
+.stage-name{font-weight:900;font-size:.95rem;margin-bottom:6px;}
+.stage-desc{font-size:.75rem;color:var(--muted);line-height:1.5;}
+.stage-arrow{display:flex;align-items:center;padding:0 4px;color:var(--accent);font-size:1.2rem;font-weight:900;}
+
+.seg-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.seg-tab{padding:7px 16px;border-radius:999px;border:1.5px solid var(--border);font-size:.83rem;font-weight:900;cursor:pointer;color:var(--muted);background:transparent;transition:all .18s;}
+.seg-tab.active{border-color:var(--accent);color:var(--accent);background:rgba(255,107,157,.1);}
+.seg-box{background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:16px;font-size:.88rem;line-height:1.8;color:var(--muted);}
+.seg-box .hl{color:var(--accent);}
+.seg-box .hl2{color:var(--yellow);}
+.seg-box .hl3{color:var(--accent2);}
+
+.c3d-wrap{background:#0a0c14;border:1px solid var(--border);border-radius:var(--r);position:relative;overflow:hidden;margin:12px 0;}
+.c3d{display:block;width:100%;height:380px;cursor:grab;}
+.c3d:active{cursor:grabbing;}
+.c3d-lbl{position:absolute;top:10px;left:12px;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);padding:4px 12px;border-radius:999px;font-size:.72rem;font-weight:900;color:var(--accent);border:1px solid rgba(255,107,157,.4);}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;padding:10px 12px;background:rgba(0,0,0,.3);}
+.ctrl button{padding:5px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.18);font-size:.72rem;font-weight:900;color:rgba(255,255,255,.6);background:transparent;cursor:pointer;transition:all .18s;}
+.ctrl button:hover,.ctrl button.on{border-color:var(--accent);color:var(--accent);background:rgba(255,107,157,.15);}
+
+.canvas2d-wrap{background:#0a0c14;border:1px solid var(--border);border-radius:10px;margin:12px 0;overflow:hidden;}
+.canvas2d-wrap canvas{display:block;width:100%;}
+
+.progress-bar{height:6px;background:var(--border);border-radius:3px;margin-bottom:20px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--orange));transition:width .5s;}
+.q-item{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;}
+.q-num{font-size:.75rem;font-weight:900;color:var(--accent);margin-bottom:6px;}
+.q-stem{font-weight:700;color:var(--text);font-size:.95rem;margin-bottom:12px;line-height:1.6;}
+.q-opts{display:flex;flex-direction:column;gap:7px;}
+.q-opt{padding:10px 14px;border-radius:8px;cursor:pointer;border:1px solid var(--border);font-size:.88rem;color:var(--muted);transition:all .18s;display:flex;align-items:flex-start;gap:8px;}
+.q-opt:hover{border-color:var(--accent);color:var(--text);background:rgba(255,107,157,.07);}
+.q-opt.correct{border-color:var(--accent2);background:rgba(0,255,178,.07);color:var(--accent2);}
+.q-opt.wrong{border-color:var(--pink);background:rgba(255,107,157,.07);color:var(--pink);}
+.q-opt .opt-label{font-weight:900;min-width:18px;}
+.q-explain{margin-top:12px;padding:10px 14px;background:rgba(255,107,157,.06);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;font-size:.84rem;color:var(--accent);display:none;line-height:1.65;}
+.q-explain.show{display:block;}
+
+#score-banner{position:fixed;bottom:20px;right:20px;z-index:300;background:var(--panel);border:1px solid var(--accent);border-radius:12px;padding:10px 18px;font-weight:900;font-size:.9rem;color:var(--accent);box-shadow:0 4px 20px rgba(255,107,157,.3);}
+
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .5s ease,transform .5s ease;}
+.reveal.vis{opacity:1;transform:translateY(0);}
+footer{text-align:center;padding:28px;font-size:.75rem;color:rgba(232,234,246,.2);}
+</style>
+</head>
+<body>
+
+<div id="score-banner">⭐ 答題得分：<span id="score">0</span> / <span id="total">0</span></div>
+
+<nav class="nav">
+  <a href="index.html">← 返回</a>
+  <span class="nav-title">AI 系統集成與部署</span>
+  <span class="nav-tag">iPAS 中級 · 科目一 L21301/302</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">L21301/302 · AI 系統集成與部署</div>
+  <div class="hero-title">AI 系統集成與部署</div>
+  <div class="hero-sub">模型壓縮（剪枝/量化/知識蒸餾）、邊緣運算 vs 雲端、MLOps 流水線 CI/CD/CT、API 集成策略、模型監控 Data Drift、差分隱私</div>
+  <div class="tag-row">
+    <span class="tag" style="color:var(--accent);border-color:var(--accent)">模型壓縮 3D</span>
+    <span class="tag" style="color:var(--orange);border-color:var(--orange)">MLOps</span>
+    <span class="tag" style="color:var(--accent2);border-color:var(--accent2)">INT8 量化</span>
+    <span class="tag" style="color:var(--blue);border-color:var(--blue)">邊緣運算</span>
+    <span class="tag" style="color:var(--yellow);border-color:var(--yellow)">差分隱私</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ══ 1. 模型壓縮 ══ -->
+<div class="sec-title reveal">🔧 模型壓縮三大技術（核心考點）</div>
+<div class="panel reveal">
+  <div class="panel-title">讓 AI 模型在有限資源環境下運行：剪枝 → 量化 → 知識蒸餾</div>
+  <div class="seg-tabs">
+    <button class="seg-tab active" onclick="showComp(this,'prune')">✂️ 剪枝（Pruning）</button>
+    <button class="seg-tab" onclick="showComp(this,'quant')">📦 量化（Quantization）</button>
+    <button class="seg-tab" onclick="showComp(this,'kd')">🎓 知識蒸餾（KD）</button>
+  </div>
+  <div class="seg-box" id="comp-display"></div>
+  <div class="kp-grid" style="margin-top:14px;">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">剪枝（Pruning）</div>
+      <div class="kp-body">移除<strong>重要性低的連結或神經元</strong>，減少模型大小。<br>• 非結構化：移除個別權重（稀疏矩陣）<br>• 結構化：移除整個濾波器（易於加速）<br>通常壓縮 50~90%，精度損失 &lt;2%</div>
+      <div class="kp-tag">▶ 考點：移除低重要性連結/神經元</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--orange)">
+      <div class="kp-title">量化（Quantization）— 必考數字</div>
+      <div class="kp-body">FP32 → INT8：<strong>記憶體節省 75%（4 bytes→1 byte）</strong><br>推論速度快 2~4×<br>• 後訓練量化（PTQ）：訓練後直接量化，快<br>• 量化感知訓練（QAT）：精度更高</div>
+      <div class="kp-tag">▶ 考點：INT8 比 FP32 省 75% 記憶體</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--accent2)">
+      <div class="kp-title">知識蒸餾（Knowledge Distillation）</div>
+      <div class="kp-body">大模型 <strong>Teacher</strong> → 小模型 <strong>Student</strong><br>Student 學習 Teacher 的軟標籤（Softmax 輸出），而非硬標籤。溫度 T&gt;1 讓輸出更平滑，暴露更多「暗知識」。</div>
+      <div class="kp-tag">▶ 考點：Teacher 大模型 → Student 小模型</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 必記：</strong>FP32=32bit=4bytes → INT8=8bit=1byte，節省 <strong>75%</strong>（=(4-1)/4）。推論速度通常提升 <strong>2~4 倍</strong>。這是最高頻的量化考點！</div>
+</div>
+
+<!-- ══ 2. 邊緣運算 vs 雲端 ══ -->
+<div class="sec-title reveal">📡 邊緣運算 vs 雲端部署</div>
+<div class="panel reveal">
+  <div class="panel-title">選擇部署環境：延遲、頻寬、隱私與成本的權衡</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>比較維度</th><th>邊緣運算（Edge Computing）</th><th>雲端運算（Cloud Computing）</th></tr></thead>
+      <tbody>
+        <tr><td>推論延遲</td><td style="color:var(--accent2)">✅ 毫秒級，無網路往返</td><td>⚠️ 50~200ms+（需網路傳輸）</td></tr>
+        <tr><td>網路依賴</td><td style="color:var(--accent2)">✅ 離線可運作（斷網仍推論）</td><td>❌ 需穩定網路</td></tr>
+        <tr><td>資料隱私</td><td style="color:var(--accent2)">✅ 資料不離裝置</td><td>⚠️ 資料上傳雲端（需加密）</td></tr>
+        <tr><td>算力</td><td>❌ 受限於裝置硬體（需壓縮模型）</td><td style="color:var(--accent2)">✅ GPU/TPU叢集可無限擴展</td></tr>
+        <tr><td>模型更新</td><td>⚠️ 需 OTA（Over-The-Air）更新</td><td style="color:var(--accent2)">✅ 即時更新，無需更新裝置</td></tr>
+        <tr><td>典型情境</td><td style="color:var(--accent2)">自動駕駛、醫療裝置、IoT、工廠</td><td style="color:var(--accent2)">大規模訓練、跨裝置服務、推薦</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">情境題關鍵字</div>
+      <div class="kp-body">「即時偵測行人」「隧道無網路」「保護病患隱私」→ <strong>邊緣運算</strong><br>「根據全站資料調整推薦」「大規模模型訓練」→ <strong>雲端</strong><br>三大邊緣優勢：<strong>低延遲、離線、隱私</strong></div>
+      <div class="kp-tag">▶ 低延遲/離線/隱私 → 邊緣</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">霧運算（Fog Computing）</div>
+      <div class="kp-body">邊緣與雲端的<strong>中間層</strong>，在本地網路（工廠閘道器）先做初步處理，過濾後才上傳雲端。減少雲端頻寬，比純邊緣算力更強。介於 Edge 和 Cloud 之間。</div>
+      <div class="kp-tag">▶ 考點：霧運算 = 中間層</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">邊緣 AI 必備：模型壓縮</div>
+      <div class="kp-body">邊緣裝置（Raspberry Pi、手機、Jetson）算力有限，必搭配：<strong>量化 INT8</strong>（省記憶體）、<strong>剪枝</strong>（省計算）、<strong>知識蒸餾</strong>（輕量模型）。目標：5W 功耗內完成推論。</div>
+      <div class="kp-tag">▶ 邊緣 AI = 壓縮 + 低功耗</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 3. Three.js 3D ══ -->
+<div class="sec-title reveal">✂️ 3D 神經網路剪枝視覺化</div>
+<div class="panel reveal">
+  <div class="panel-title">稠密網路 → 剪枝稀疏網路動畫（可拖曳旋轉）</div>
+  <div class="c3d-wrap">
+    <canvas id="c3d" class="c3d"></canvas>
+    <div class="c3d-lbl">✂️ 模型剪枝 3D · 拖曳旋轉</div>
+    <div class="ctrl">
+      <button id="btnAuto" class="on" onclick="toggleAuto()">⟳ 自動旋轉</button>
+      <button onclick="resetView()">↺ 重置視角</button>
+      <button id="btnPrune" onclick="togglePrune()">✂️ 開始剪枝</button>
+      <button id="btnKD" onclick="toggleKD()">🎓 知識蒸餾</button>
+      <button onclick="restoreAll()">🔄 全部還原</button>
+    </div>
+  </div>
+  <div class="formula">
+    <span class="cm">// 模型壓縮效益（核心考點）</span><br>
+    <span class="fn">FP32</span> → <span class="hl">INT8</span>: 記憶體節省 <span class="vr">75%</span>（32bit → 8bit，4bytes → 1byte）<br>
+    <span class="fn">Pruning</span>: 連結數量 <span class="vr">↓60~90%</span>，精度損失 <span class="vr">&lt;2%</span><br>
+    <span class="fn">KD</span>: Teacher 大模型 → Student 小模型（<span class="vr">×0.1</span> 大小，≈精度）<br><br>
+    <span class="cm">// 精度位元對照</span><br>
+    <span class="hl">FP32</span>: 4B  |  <span class="hl">FP16</span>: 2B  |  <span class="hl">INT8</span>: 1B  |  <span class="hl">INT4</span>: 0.5B
+  </div>
+</div>
+
+<!-- ══ 4. MLOps ══ -->
+<div class="sec-title reveal">⚙️ MLOps 流水線（CI / CD / CT）</div>
+<div class="panel reveal">
+  <div class="panel-title">機器學習的 DevOps：持續集成 → 持續部署 → 持續訓練</div>
+  <div class="stage-flow">
+    <div class="stage" style="border-left:3px solid var(--blue)">
+      <div class="stage-num">CI</div>
+      <div class="stage-name" style="color:var(--blue)">持續集成</div>
+      <div class="stage-desc">自動測試程式碼、資料驗證、模型單元測試、特徵一致性</div>
+    </div>
+    <div class="stage-arrow">→</div>
+    <div class="stage" style="border-left:3px solid var(--orange)">
+      <div class="stage-num">CD</div>
+      <div class="stage-name" style="color:var(--orange)">持續部署</div>
+      <div class="stage-desc">Docker 打包、藍綠部署、Canary Release（5%流量→全量）</div>
+    </div>
+    <div class="stage-arrow">→</div>
+    <div class="stage" style="border-left:3px solid var(--accent)">
+      <div class="stage-num">CT</div>
+      <div class="stage-name" style="color:var(--accent)">持續訓練</div>
+      <div class="stage-desc">Data Drift 觸發自動再訓練、版本管控新模型</div>
+    </div>
+    <div class="stage-arrow">→</div>
+    <div class="stage" style="border-left:3px solid var(--accent2)">
+      <div class="stage-num">監控</div>
+      <div class="stage-name" style="color:var(--accent2)">持續監控</div>
+      <div class="stage-desc">效能指標監控、Data/Concept Drift 偵測、觸發告警</div>
+    </div>
+  </div>
+  <div class="canvas2d-wrap">
+    <canvas id="mlops-canvas" height="160"></canvas>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">CI（持續集成）</div>
+      <div class="kp-body">程式碼提交後自動執行：程式碼風格（Linting）、資料 Schema 驗證、模型單元測試。工具：GitHub Actions、Jenkins、GitLab CI。</div>
+      <div class="kp-tag">▶ 考點：CI = 自動測試品質</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--orange)">
+      <div class="kp-title">CD 部署策略</div>
+      <div class="kp-body"><strong>藍綠部署</strong>：兩套環境，一次切換 100% 流量，零停機。<strong>Canary Release</strong>：先 5~10% 流量走新版，確認正常後全量切換，降低風險。</div>
+      <div class="kp-tag">▶ 考點：Canary = 少量流量先測試</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">CT（持續訓練）— MLOps 特有</div>
+      <div class="kp-body">傳統 DevOps 只有 CI+CD，MLOps 加了第三個 C：<strong>CT</strong>。當偵測到 Data Drift 時，自動觸發再訓練流水線。ML 模型會因數據分佈改變而退化，程式碼不會。</div>
+      <div class="kp-tag">▶ 考點：CT = MLOps 獨有</div>
+    </div>
+  </div>
+  <div class="info-box">💡 <strong>考試情境：</strong>「輸入資料分佈與訓練資料不同，應觸發哪個 MLOps 流程？」→ <strong>CT（持續訓練）</strong>。「零停機部署新版模型」→ <strong>藍綠部署</strong>。「先讓少量用戶使用新模型」→ <strong>Canary Release</strong>。</div>
+</div>
+
+<!-- ══ 5. API 集成 ══ -->
+<div class="sec-title reveal">🔗 API 集成策略（REST vs gRPC）</div>
+<div class="panel reveal">
+  <div class="panel-title">AI 服務推論 API 的兩大主流協議比較</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>比較維度</th><th>REST API</th><th>gRPC</th></tr></thead>
+      <tbody>
+        <tr><td>格式</td><td>HTTP/1.1 + JSON（文字）</td><td>HTTP/2 + Protocol Buffers（二進位）</td></tr>
+        <tr><td>效能</td><td>⚠️ JSON 序列化開銷大</td><td style="color:var(--accent2)">✅ 速度快 5~10×，資料小 3~10×</td></tr>
+        <tr><td>適用</td><td>對外公開 API、瀏覽器客戶端</td><td>微服務內部高吞吐量推論</td></tr>
+        <tr><td>開發難度</td><td style="color:var(--accent2)">✅ 低（Swagger/Postman 生態豐富）</td><td>⚠️ 需定義 .proto 文件</td></tr>
+        <tr><td>串流</td><td>❌ 不原生支援雙向串流</td><td style="color:var(--accent2)">✅ 支援雙向串流</td></tr>
+        <tr><td>AI 應用</td><td>Flask/FastAPI 對外入口</td><td>TF Serving、Triton Inference Server</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="warn-box">📌 <strong>記憶口訣：</strong>對外展示用 <strong>REST</strong>（人人能用），服務內部高速傳輸用 <strong>gRPC</strong>（快但需約定格式）。Kubernetes 叢集內 ML 微服務推薦 gRPC；公開給第三方開發者的 API 用 REST。</div>
+</div>
+
+<!-- ══ 6. 模型監控 ══ -->
+<div class="sec-title reveal">📊 模型監控（Data Drift / Concept Drift）</div>
+<div class="panel reveal">
+  <div class="panel-title">AI 系統上線後的效能退化偵測</div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">資料漂移（Data Drift）</div>
+      <div class="kp-body"><strong>輸入特徵 X 的統計分佈改變</strong>，但任務定義不變。<br>例：2020年訓練的詐欺偵測模型，2024年詐欺手法演變 → 輸入模式不同。<br>偵測：<strong>KS-test</strong>、PSI（Population Stability Index）。</div>
+      <div class="kp-tag">▶ 輸入特徵分佈改變 → 觸發 CT</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">概念漂移（Concept Drift）</div>
+      <div class="kp-body"><strong>X→Y 的映射關係改變</strong>，即任務定義本身改變。<br>例：「垃圾郵件」定義隨新型詐騙演進。即使輸入分佈沒變，模型也會失準。<br>比 Data Drift 更難偵測，需標記新資料確認。</div>
+      <div class="kp-tag">▶ X→Y 映射改變（任務定義變）</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--orange)">
+      <div class="kp-title">模型退化監控策略</div>
+      <div class="kp-body">設定效能警戒線（如 F1 &lt; 0.85 觸發告警）→ 自動觸發 CT 再訓練 → 評估新模型是否優於現役 → 通過則部署（CD）。<br>工具：MLflow、Evidently AI、WhyLogs。</div>
+      <div class="kp-tag">▶ 效能下滑 → 觸發 CT</div>
+    </div>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>漂移類型</th><th>什麼改變</th><th>偵測方法</th><th>應對</th></tr></thead>
+      <tbody>
+        <tr><td>Data Drift</td><td>輸入特徵 X 的分佈</td><td>KS-test、PSI</td><td>用新資料再訓練</td></tr>
+        <tr><td>Concept Drift</td><td>X→Y 映射關係</td><td>需新標記資料確認</td><td>重新標記 + 再訓練</td></tr>
+        <tr><td>Label Drift</td><td>輸出標籤 Y 的分佈</td><td>預測分佈監控</td><td>確認業務定義改變</td></tr>
+        <tr><td>Prediction Drift</td><td>模型輸出分佈</td><td>預測值統計分析</td><td>檢查是否為 Data Drift</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ══ 7. 差分隱私 ══ -->
+<div class="sec-title reveal">🔒 差分隱私（Differential Privacy）</div>
+<div class="panel reveal">
+  <div class="panel-title">在不洩露個人記錄的前提下學習統計規律</div>
+  <div class="formula">
+    <span class="cm">// ε-差分隱私定義</span><br>
+    P[<span class="fn">M</span>(<span class="vr">D</span>) ∈ <span class="hl">S</span>] ≤ e<sup>ε</sup> × P[<span class="fn">M</span>(<span class="vr">D'</span>) ∈ <span class="hl">S</span>]<br><br>
+    <span class="cm">// ε（隱私預算）越小 = 保護越強（噪聲越大）</span><br>
+    ε → <span class="vr">0</span>: 強保護（高噪聲，效用低）<br>
+    ε → <span class="vr">∞</span>: 弱保護（低噪聲，效用高）<br><br>
+    <span class="cm">// 兩大噪聲機制</span><br>
+    <span class="fn">拉普拉斯機制</span>: Noise ~ <span class="hl">Lap</span>(Δf / ε)   <span class="cm">// 數值查詢</span><br>
+    <span class="fn">高斯機制</span>:    Noise ~ <span class="hl">N</span>(0, σ²)        <span class="cm">// 深度學習 DP-SGD</span>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">差分隱私直覺理解</div>
+      <div class="kp-body">「任何人無法透過觀察演算法輸出，判斷<strong>某筆特定記錄是否在訓練集</strong>」。透過<strong>加入隨機噪聲</strong>實現。差分隱私 ≠ 加密（加密可解密；DP 的噪聲不可逆）。</div>
+      <div class="kp-tag">▶ 考點：加噪聲隱藏個別記錄存在</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">DP-SGD（深度學習差分隱私）</div>
+      <div class="kp-body">梯度下降時：<br>1. <strong>梯度裁剪</strong>：限制最大梯度範數 C<br>2. <strong>加高斯噪聲</strong>：Noise~N(0,σ²C²)<br>3. 平均後更新參數<br>工具：Opacus（PyTorch）、TF Privacy</div>
+      <div class="kp-tag">▶ DP-SGD = 梯度裁剪 + 高斯噪聲</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">聯邦學習（Federated Learning）</div>
+      <div class="kp-body">資料<strong>不集中到中央</strong>，模型在各裝置本地訓練，只上傳<strong>梯度</strong>。常與差分隱私結合：上傳梯度加噪聲，防止「梯度反轉攻擊」逆推原始資料。</div>
+      <div class="kp-tag">▶ 考點：資料不動、梯度動</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>考試必記：</strong>差分隱私核心 = <strong>加入高斯或拉普拉斯隨機噪聲</strong>保護個別記錄。ε 越小保護越強但模型效用越低。與資料匿名化（k-匿名、概化）的區別：DP 提供<strong>數學可量化</strong>的隱私保護保證。</div>
+</div>
+
+<!-- ══ 8. 程式碼考點 ══ -->
+<div class="sec-title reveal">💻 程式碼考點（AI 系統部署相關 Python 工具）</div>
+
+<div class="panel reveal">
+  <div class="panel-title">模型量化（PyTorch 動態量化 FP32→INT8）</div>
+  <div class="formula">
+<span class="cm"># PyTorch 動態量化：不需校正資料，最快速的量化方式</span><br>
+<span class="fn">import</span> <span class="vr">torch</span><br>
+<span class="fn">import</span> <span class="vr">torch.quantization</span><br><br>
+<span class="cm"># 1. 載入已訓練的 FP32 模型並設為推論模式</span><br>
+<span class="vr">model_fp32</span> = <span class="fn">MyModel</span>()<br>
+<span class="vr">model_fp32</span>.<span class="fn">load_state_dict</span>(<span class="fn">torch.load</span>(<span class="hl">'model.pth'</span>))<br>
+<span class="vr">model_fp32</span>.<span class="fn">eval</span>()  <span class="cm"># 量化前必須設為 eval 模式</span><br><br>
+<span class="cm"># 2. 動態量化（對 Linear 層量化為 INT8）</span><br>
+<span class="vr">model_int8</span> = <span class="fn">torch.quantization.quantize_dynamic</span>(<br>
+&nbsp;&nbsp;<span class="vr">model_fp32</span>,<br>
+&nbsp;&nbsp;{<span class="fn">torch.nn.Linear</span>},   <span class="cm"># 指定量化的層類型</span><br>
+&nbsp;&nbsp;<span class="vr">dtype</span>=<span class="fn">torch.qint8</span>     <span class="cm"># 目標精度 INT8</span><br>
+)<br><br>
+<span class="cm"># FP32 大小 ÷ 4 ≈ INT8 大小（節省 75%）</span><br>
+<span class="fn">print</span>(<span class="hl">f"INT8 節省約 {(1 - 1/4)*100:.0f}% 記憶體"</span>)  <span class="cm"># 輸出：75%</span>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card">
+      <div class="kp-title">quantize_dynamic() vs quantize_static()</div>
+      <div class="kp-body"><strong>動態量化</strong>：不需校正資料集，直接量化 Weights，適合 NLP/LSTM。<strong>靜態量化</strong>：需要少量校正資料估計啟動值範圍，精度更好，適合 CNN/Vision。QAT（量化感知訓練）精度最佳但最耗時。</div>
+      <div class="kp-tag">▶ 動態快、靜態準、QAT最佳</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">model.eval() 的重要性</div>
+      <div class="kp-body">量化前必須呼叫 <code>.eval()</code>，關閉 Dropout 和 BatchNorm 的訓練模式。否則量化時無法正確估計啟動值範圍（calibration 失敗），輸出不確定性高。</div>
+      <div class="kp-tag">▶ 量化前必須 eval() 模式</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">dtype 精度選項</div>
+      <div class="kp-body"><code>torch.qint8</code>：有符號 INT8，-128~127（用於 Weights）<br><code>torch.quint8</code>：無符號 INT8，0~255（用於 Activations）<br><code>torch.float16</code>：FP16 半精度，省 50%，GPU 友好</div>
+      <div class="kp-tag">▶ qint8 vs quint8 區別</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel reveal">
+  <div class="panel-title">FastAPI 部署 AI 推論服務（REST API）</div>
+  <div class="formula">
+<span class="cm"># FastAPI 建立模型推論端點（現代 AI API 首選框架）</span><br>
+<span class="fn">from</span> <span class="vr">fastapi</span> <span class="fn">import</span> <span class="vr">FastAPI</span><br>
+<span class="fn">from</span> <span class="vr">pydantic</span> <span class="fn">import</span> <span class="vr">BaseModel</span><br>
+<span class="fn">import</span> <span class="vr">numpy</span> <span class="fn">as</span> <span class="vr">np</span><br><br>
+<span class="vr">app</span> = <span class="fn">FastAPI</span>()<br><br>
+<span class="cm"># 定義輸入資料結構（Pydantic 自動型別驗證）</span><br>
+<span class="fn">class</span> <span class="vr">PredictRequest</span>(<span class="fn">BaseModel</span>):<br>
+&nbsp;&nbsp;<span class="vr">features</span>: <span class="fn">list</span>[<span class="fn">float</span>]<br><br>
+<span class="cm"># POST 端點（推論傳資料用 POST，查詢用 GET）</span><br>
+@<span class="vr">app</span>.<span class="fn">post</span>(<span class="hl">"/predict"</span>)<br>
+<span class="fn">async def</span> <span class="vr">predict</span>(<span class="vr">req</span>: <span class="fn">PredictRequest</span>):<br>
+&nbsp;&nbsp;<span class="vr">X</span> = <span class="fn">np.array</span>(<span class="vr">req.features</span>).<span class="fn">reshape</span>(<span class="vr">1</span>, <span class="vr">-1</span>)<br>
+&nbsp;&nbsp;<span class="vr">pred</span> = <span class="vr">model</span>.<span class="fn">predict</span>(<span class="vr">X</span>)[<span class="vr">0</span>]<br>
+&nbsp;&nbsp;<span class="fn">return</span> {<span class="hl">"prediction"</span>: <span class="fn">float</span>(<span class="vr">pred</span>)}<br><br>
+<span class="cm"># 啟動：uvicorn main:app --host 0.0.0.0 --port 8000</span>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card">
+      <div class="kp-title">FastAPI vs Flask</div>
+      <div class="kp-body">FastAPI：<strong>自動生成 Swagger 文件</strong>、<strong>Pydantic 型別驗證</strong>、<strong>async/await</strong>（高並發）。Flask：簡單但無 async。iPAS 考試考 FastAPI 或 Flask 基本用法，理解 <code>@app.post()</code> 路由即可。</div>
+      <div class="kp-tag">▶ FastAPI = 現代 AI API 首選</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">HTTP 方法語意</div>
+      <div class="kp-body">AI 推論 API 用 <strong>POST</strong>（需要傳遞特徵到 Request Body）。<code>GET</code>：查詢（無 Body）。<code>PUT</code>：更新。<code>DELETE</code>：刪除。考試常考：「推論端點應用哪個 HTTP 方法？」→ POST。</div>
+      <div class="kp-tag">▶ 推論用 POST，查詢用 GET</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">BaseModel（Pydantic）自動驗證</div>
+      <div class="kp-body">繼承 <code>BaseModel</code> 定義 API 輸入結構，若傳入型別錯誤（如 features 傳字串），FastAPI 自動返回 <strong>422 Unprocessable Entity</strong>，不需手動寫驗證邏輯。</div>
+      <div class="kp-tag">▶ 422 = 型別驗證失敗</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel reveal">
+  <div class="panel-title">Data Drift 偵測（scipy KS-test）</div>
+  <div class="formula">
+<span class="cm"># Kolmogorov-Smirnov 雙樣本檢定偵測資料漂移</span><br>
+<span class="fn">from</span> <span class="vr">scipy</span> <span class="fn">import</span> <span class="vr">stats</span><br>
+<span class="fn">import</span> <span class="vr">numpy</span> <span class="fn">as</span> <span class="vr">np</span><br><br>
+<span class="cm"># 訓練集特徵分佈（基準）</span><br>
+<span class="vr">train_feat</span> = <span class="fn">np.random.normal</span>(<span class="vr">50</span>, <span class="vr">10</span>, <span class="vr">1000</span>)  <span class="cm"># 均值=50</span><br>
+<span class="cm"># 生產環境特徵（模擬漂移：均值從50→65）</span><br>
+<span class="vr">prod_feat</span> = <span class="fn">np.random.normal</span>(<span class="vr">65</span>, <span class="vr">15</span>, <span class="vr">500</span>)    <span class="cm"># 均值=65（漂移！）</span><br><br>
+<span class="cm"># KS 雙樣本檢定</span><br>
+<span class="vr">ks_stat</span>, <span class="vr">p_value</span> = <span class="fn">stats.ks_2samp</span>(<span class="vr">train_feat</span>, <span class="vr">prod_feat</span>)<br>
+<span class="fn">print</span>(<span class="hl">f"KS={ks_stat:.3f}, p={p_value:.4f}"</span>)<br><br>
+<span class="cm"># p < 0.05 → 分佈顯著不同 → 觸發 CT 再訓練警告！</span><br>
+<span class="fn">if</span> <span class="vr">p_value</span> &lt; <span class="vr">0.05</span>:<br>
+&nbsp;&nbsp;<span class="fn">print</span>(<span class="hl">"⚠️ Data Drift 偵測！建議觸發 CT 再訓練"</span>)
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card">
+      <div class="kp-title">stats.ks_2samp()</div>
+      <div class="kp-body">比較兩個樣本是否來自同一分佈。<code>ks_stat</code> 越大（接近1）= 差異越大。<code>p_value &lt; 0.05</code> = 統計顯著差異 = 偵測到 Data Drift，應觸發再訓練。</div>
+      <div class="kp-tag">▶ p &lt; 0.05 = 漂移顯著</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">PSI（Population Stability Index）</div>
+      <div class="kp-body">PSI = Σ(實際比例 - 預期比例) × ln(實際/預期)<br>• PSI &lt; 0.1：無漂移<br>• PSI 0.1~0.2：輕微（監控）<br>• PSI &gt; 0.2：嚴重（再訓練）<br>金融業常用 PSI 監控信用模型。</div>
+      <div class="kp-tag">▶ PSI &gt; 0.2 = 嚴重漂移</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">np.random.normal()</div>
+      <div class="kp-body">生成常態分佈隨機數 <code>(loc=均值, scale=標準差, size=樣本數)</code>。模擬 Data Drift 時，改變 loc（均值偏移）或 scale（波動擴大），可測試偵測系統的靈敏度。</div>
+      <div class="kp-tag">▶ 模擬 Data Drift 情境</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel reveal" style="border-left:3px solid var(--yellow)">
+  <div class="panel-title">🧪 歷屆考題程式題型</div>
+  <div style="margin-bottom:14px;">
+    <div style="font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:8px;">
+      Q1：執行 <code>torch.quantization.quantize_dynamic(model, {torch.nn.Linear}, dtype=torch.qint8)</code> 後，最主要的效果是？
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;font-size:.85rem;">
+      <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);color:var(--muted);">A. 提升模型準確率（增加參數量）</div>
+      <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--accent2);color:var(--accent2);background:rgba(0,255,178,.06);">B. ✓ Linear 層權重從 FP32 壓縮為 INT8，節省約 75% 記憶體</div>
+      <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);color:var(--muted);">C. 將模型從 CPU 搬至 GPU 加速</div>
+      <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);color:var(--muted);">D. 訓練一個更小的 Student 模型（知識蒸餾）</div>
+    </div>
+  </div>
+  <div>
+    <div style="font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:8px;">
+      Q2：<code>stats.ks_2samp(train_data, prod_data)</code> 返回 <code>p_value = 0.003</code>，代表什麼？
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px;font-size:.85rem;">
+      <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);color:var(--muted);">A. 訓練與生產資料分佈相同，模型穩定</div>
+      <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);color:var(--muted);">B. 需更多資料才能判斷</div>
+      <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--accent2);color:var(--accent2);background:rgba(0,255,178,.06);">C. ✓ p &lt; 0.05，統計顯著，偵測到 Data Drift，建議觸發 CT 再訓練</div>
+      <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);color:var(--muted);">D. KS 統計量為 0.003，漂移非常微小</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ 9. 仿真考題 ══ -->
+<div class="sec-title reveal">🎯 仿真考題（8 題）</div>
+<div class="progress-bar"><div class="progress-fill" id="pbar" style="width:0%"></div></div>
+<div id="quiz"></div>
+
+<footer>iPAS AI 應用規劃師中級考試學習站 · 內容依據官方評鑑範圍整理 · 實際考試以 iPAS 官網公告為準</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ── Reveal ──
+const obs = new IntersectionObserver(e => e.forEach(x => x.isIntersecting && x.target.classList.add('vis')), {threshold:.08});
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// ── Score ──
+let score = 0;
+const answered = new Set();
+const TOTAL = 8;
+function addScore(correct, qIdx) {
+  if (!answered.has(qIdx)) {
+    answered.add(qIdx);
+    if (correct) score++;
+    document.getElementById('score').textContent = score;
+    document.getElementById('total').textContent = answered.size;
+    document.getElementById('pbar').style.width = (answered.size / TOTAL * 100) + '%';
+  }
+}
+
+// ── Compression Tabs ──
+const compData = {
+  prune: `<span class="hl">剪枝（Pruning）</span> — 移除重要性低的神經元連結<br><br>
+📍 <span class="hl2">非結構化剪枝：</span>移除個別權重（|w| &lt; threshold）→ 產生稀疏矩陣，需稀疏計算加速<br>
+📍 <span class="hl2">結構化剪枝：</span>移除整個 Filter 或 Channel → 直接縮小模型結構，更易部署<br>
+📍 <span class="hl2">彩票假說（Lottery Ticket）：</span>大網路中包含多個「中獎子網路」，可直接剪枝得到<br>
+📍 <span class="hl2">壓縮效益：</span>通常壓縮 50~90%，精度損失 &lt;2%，需微調（Fine-tuning）補回精度<br>
+📍 <span class="hl3">考試關鍵：</span>結構化剪枝比非結構化更易硬體加速；剪枝不改變精度類型（仍 FP32）`,
+
+  quant: `<span class="hl">量化（Quantization）</span> — 降低數字精度節省記憶體<br><br>
+📍 <span class="hl2">位元對照（必記）：</span>FP64(8B) → FP32(4B) → FP16(2B) → INT8(1B) → INT4(0.5B)<br>
+📍 <span class="hl2">FP32→INT8：</span>記憶體節省 <strong>75%</strong>（4→1 byte），速度快 2~4×<br>
+📍 <span class="hl2">後訓練量化（PTQ）：</span>訓練完直接量化，快但精度損失稍大<br>
+📍 <span class="hl2">量化感知訓練（QAT）：</span>訓練中模擬量化效果，精度更佳（接近 FP32）<br>
+📍 <span class="hl2">混合精度：</span>敏感層（如 softmax）保留 FP32，其他 INT8 → 兼顧精度與效率<br>
+📍 <span class="hl3">考試關鍵：</span>INT8 省 75%、QAT 比 PTQ 精度高、FP16 省 50%`,
+
+  kd: `<span class="hl">知識蒸餾（Knowledge Distillation）</span> — 讓小模型學習大模型的「暗知識」<br><br>
+📍 <span class="hl2">架構：</span>Teacher（大型高精度）→ Student（小型輕量）<br>
+📍 <span class="hl2">軟標籤：</span>Student 不只學 One-Hot 標籤，學習 Teacher 的 Softmax 輸出（包含類別相似度）<br>
+📍 <span class="hl2">溫度 T：</span>T &gt; 1 使 Softmax 更平滑，暴露更多類別間相似度資訊（暗知識）<br>
+📍 <span class="hl2">損失函數：</span>L = α×L_hard（原始標籤）+ (1-α)×L_soft（蒸餾損失，溫度 T）<br>
+📍 <span class="hl2">實例：</span>DistilBERT = BERT（Teacher）→ 小 BERT（Student），縮小 40%，速度快 60%<br>
+📍 <span class="hl3">考試關鍵：</span>Teacher 大模型、Student 小模型、軟標籤含暗知識`
+};
+
+function showComp(btn, key) {
+  document.querySelectorAll('.seg-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('comp-display').innerHTML = compData[key];
+}
+showComp(document.querySelector('.seg-tab'), 'prune');
+
+// ── Three.js Neural Network Pruning ──
+(function() {
+  const canvas = document.getElementById('c3d');
+  const renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true});
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setClearColor(0x0a0c14, 1);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / 380, 0.1, 200);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+  const dLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  dLight.position.set(5, 10, 5);
+  scene.add(dLight);
+
+  // Teacher network: 4 layers [4, 5, 5, 3]
+  const layerSizes = [4, 5, 5, 3];
+  const layerX = [-4.5, -1.5, 1.5, 4.5];
+  const layerColors = [0x00D4FF, 0xFF6B9D, 0xFF6B9D, 0x00FFB2];
+
+  const nodePositions = [];
+  layerSizes.forEach((size, li) => {
+    const pos = [];
+    for (let ni = 0; ni < size; ni++) {
+      const y = (ni - (size - 1) / 2) * 1.4;
+      const geo = new THREE.SphereGeometry(0.22, 12, 12);
+      const mat = new THREE.MeshPhongMaterial({color: layerColors[li], emissive: layerColors[li], emissiveIntensity: 0.3});
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.set(layerX[li], y, 0);
+      scene.add(mesh);
+      pos.push(new THREE.Vector3(layerX[li], y, 0));
+    }
+    nodePositions.push(pos);
+  });
+
+  // Edges
+  const edges = [], edgeMats = [];
+  for (let li = 0; li < layerSizes.length - 1; li++) {
+    for (let ni = 0; ni < layerSizes[li]; ni++) {
+      for (let nj = 0; nj < layerSizes[li + 1]; nj++) {
+        const mat = new THREE.LineBasicMaterial({color: 0x4455AA, transparent: true, opacity: 0.55});
+        const geo = new THREE.BufferGeometry().setFromPoints([nodePositions[li][ni], nodePositions[li+1][nj]]);
+        scene.add(new THREE.Line(geo, mat));
+        edges.push({mat});
+        edgeMats.push(mat);
+      }
+    }
+  }
+
+  // Pick ~62% of edges to prune
+  const shuffled = [...edges.keys()].sort(() => Math.random() - 0.5);
+  const pruneIdx = shuffled.slice(0, Math.floor(edges.length * 0.62));
+
+  // Student network: smaller, offset below [3,3,2]
+  const stuSizes = [3, 3, 2];
+  const stuX = [-3, 0, 3];
+  const stuPos = [];
+  const stuNodes = [], stuEdgeMats = [];
+
+  stuSizes.forEach((size, li) => {
+    const pos = [];
+    for (let ni = 0; ni < size; ni++) {
+      const y = (ni - (size-1)/2) * 1.2;
+      const p = new THREE.Vector3(stuX[li], y - 4.5, 0);
+      const geo = new THREE.SphereGeometry(0.17, 10, 10);
+      const mat = new THREE.MeshPhongMaterial({color: 0xFFD166, transparent: true, opacity: 0});
+      const mesh = new THREE.Mesh(geo, mat);
+      mesh.position.copy(p);
+      scene.add(mesh);
+      stuNodes.push(mat);
+      pos.push(p);
+    }
+    stuPos.push(pos);
+  });
+  stuSizes.forEach((size, li) => {
+    if (li >= stuSizes.length - 1) return;
+    for (let ni = 0; ni < size; ni++) {
+      for (let nj = 0; nj < stuSizes[li+1]; nj++) {
+        const mat = new THREE.LineBasicMaterial({color: 0xFFD166, transparent: true, opacity: 0});
+        const geo = new THREE.BufferGeometry().setFromPoints([stuPos[li][ni], stuPos[li+1][nj]]);
+        scene.add(new THREE.Line(geo, mat));
+        stuEdgeMats.push(mat);
+      }
+    }
+  });
+
+  let rot = {x: 0.25, y: 0.5};
+  let autoRotate = true;
+  let pruned = false, pruneProgress = 0, pruneAnimating = false;
+  let kdVisible = false;
+  const R = 13;
+
+  function camPos() {
+    camera.position.x = R * Math.sin(rot.y) * Math.cos(rot.x);
+    camera.position.y = R * Math.sin(rot.x);
+    camera.position.z = R * Math.cos(rot.y) * Math.cos(rot.x);
+    camera.lookAt(0, 0, 0);
+  }
+
+  let drag = false, lx = 0, ly = 0;
+  canvas.addEventListener('mousedown', e => { drag=true; lx=e.clientX; ly=e.clientY; autoRotate=false; document.getElementById('btnAuto').classList.remove('on'); });
+  window.addEventListener('mousemove', e => { if(!drag) return; rot.y+=(e.clientX-lx)*0.008; rot.x+=(e.clientY-ly)*0.008; rot.x=Math.max(-1.2,Math.min(1.2,rot.x)); lx=e.clientX; ly=e.clientY; });
+  window.addEventListener('mouseup', () => drag=false);
+  canvas.addEventListener('touchstart', e=>{drag=true;lx=e.touches[0].clientX;ly=e.touches[0].clientY;autoRotate=false;document.getElementById('btnAuto').classList.remove('on');},{passive:true});
+  canvas.addEventListener('touchmove', e=>{if(!drag)return;rot.y+=(e.touches[0].clientX-lx)*0.008;rot.x+=(e.touches[0].clientY-ly)*0.008;rot.x=Math.max(-1.2,Math.min(1.2,rot.x));lx=e.touches[0].clientX;ly=e.touches[0].clientY;},{passive:true});
+  canvas.addEventListener('touchend', ()=>drag=false);
+
+  function resize() {
+    const w = canvas.clientWidth;
+    renderer.setSize(w, 380, false);
+    camera.aspect = w / 380;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function animate() {
+    requestAnimationFrame(animate);
+    if (autoRotate) rot.y += 0.005;
+    if (pruneAnimating) {
+      pruneProgress = Math.min(1, pruneProgress + 0.018);
+      pruneIdx.forEach((idx, i) => {
+        const t = Math.max(0, Math.min(1, pruneProgress * pruneIdx.length - i));
+        edgeMats[idx].opacity = 0.55 * (1 - t * 0.93);
+      });
+      if (pruneProgress >= 1) pruneAnimating = false;
+    }
+    camPos();
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.toggleAuto = function() {
+    autoRotate = !autoRotate;
+    document.getElementById('btnAuto').classList.toggle('on', autoRotate);
+  };
+  window.resetView = function() { rot={x:.25,y:.5}; autoRotate=true; document.getElementById('btnAuto').classList.add('on'); };
+  window.togglePrune = function() {
+    if (!pruned) {
+      pruned=true; pruneProgress=0; pruneAnimating=true;
+      document.getElementById('btnPrune').textContent='🔄 還原稠密';
+    } else {
+      pruned=false; pruneAnimating=false;
+      edgeMats.forEach(m=>m.opacity=0.55);
+      document.getElementById('btnPrune').textContent='✂️ 開始剪枝';
+    }
+  };
+  window.toggleKD = function() {
+    kdVisible = !kdVisible;
+    const op = kdVisible ? 0.75 : 0;
+    stuNodes.forEach(m=>m.opacity=op);
+    stuEdgeMats.forEach(m=>m.opacity=kdVisible?0.45:0);
+    document.getElementById('btnKD').classList.toggle('on', kdVisible);
+  };
+  window.restoreAll = function() {
+    pruned=false; pruneAnimating=false; kdVisible=false;
+    edgeMats.forEach(m=>m.opacity=0.55);
+    stuNodes.forEach(m=>m.opacity=0);
+    stuEdgeMats.forEach(m=>m.opacity=0);
+    document.getElementById('btnPrune').textContent='✂️ 開始剪枝';
+    document.getElementById('btnKD').classList.remove('on');
+  };
+})();
+
+// ── MLOps Canvas 2D ──
+(function() {
+  const canvas = document.getElementById('mlops-canvas');
+  if (!canvas) return;
+  function draw() {
+    const W = canvas.parentElement.clientWidth || 900;
+    canvas.width = W;
+    canvas.height = 160;
+    const ctx = canvas.getContext('2d');
+    const stages = [
+      {label:'📥 資料收集', color:'#00D4FF'},
+      {label:'⚙️ 特徵工程', color:'#7C6FFF'},
+      {label:'🧠 模型訓練', color:'#FF9B42'},
+      {label:'✅ CI 測試', color:'#00FFB2'},
+      {label:'🚀 CD 部署', color:'#FF6B9D'},
+      {label:'📊 CT 監控', color:'#FFD166'},
+    ];
+    const sw = W / stages.length;
+    stages.forEach((s, i) => {
+      const x = i * sw;
+      ctx.fillStyle = s.color + '22';
+      ctx.strokeStyle = s.color + '88';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(x+5, 15, sw-10, 120, 8) : (()=>{
+        const [rx,ry,rw,rh,rr]=[x+5,15,sw-10,120,8];
+        ctx.moveTo(rx+rr,ry);ctx.lineTo(rx+rw-rr,ry);ctx.quadraticCurveTo(rx+rw,ry,rx+rw,ry+rr);
+        ctx.lineTo(rx+rw,ry+rh-rr);ctx.quadraticCurveTo(rx+rw,ry+rh,rx+rw-rr,ry+rh);
+        ctx.lineTo(rx+rr,ry+rh);ctx.quadraticCurveTo(rx,ry+rh,rx,ry+rh-rr);
+        ctx.lineTo(rx,ry+rr);ctx.quadraticCurveTo(rx,ry,rx+rr,ry);ctx.closePath();
+      })();
+      ctx.fill(); ctx.stroke();
+      ctx.font = `bold ${Math.min(11, sw*0.14)}px Calibri, Microsoft JhengHei, sans-serif`;
+      ctx.fillStyle = s.color;
+      ctx.textAlign = 'center';
+      ctx.fillText(s.label, x + sw/2, 82);
+      if (i < stages.length-1) {
+        ctx.strokeStyle = '#4455AA';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3,3]);
+        ctx.beginPath();
+        ctx.moveTo(x+sw-5, 75);
+        ctx.lineTo(x+sw+5, 75);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+    });
+    // CT feedback arrow
+    ctx.strokeStyle = '#FFD16699';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4,3]);
+    ctx.beginPath();
+    ctx.moveTo(W - sw/2, 145);
+    ctx.lineTo(sw/2, 145);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.font = '10px Calibri, sans-serif';
+    ctx.fillStyle = '#FFD16699';
+    ctx.textAlign = 'center';
+    ctx.fillText('⟵ CT 持續訓練反饋迴圈', W * 0.5, 158);
+  }
+  draw();
+  window.addEventListener('resize', draw);
+})();
+
+// ── Quiz ──
+const questions = [
+  {
+    stem: 'AI 模型量化時，將 FP32 轉換為 INT8，記憶體節省比例是多少？',
+    opts: ['A. 25%（4 bytes → 3 bytes）', 'B. 50%（4 bytes → 2 bytes）', 'C. 75%（4 bytes → 1 byte）', 'D. 87.5%（4 bytes → 0.5 bytes）'],
+    ans: 2,
+    exp: 'FP32 = 32bits = 4bytes；INT8 = 8bits = 1byte。節省比例 = (4-1)/4 = 75%。這是 iPAS 最高頻量化考點：INT8 比 FP32 節省 75% 記憶體，推論速度通常提升 2~4 倍。INT4 才是省 87.5%（4→0.5 bytes）。'
+  },
+  {
+    stem: '自動駕駛汽車的 AI 系統需在幾毫秒內偵測行人，且必須在隧道（無網路）中正常運作。以下哪種部署方式最適合？',
+    opts: ['A. 雲端部署，使用 GPU 伺服器叢集', 'B. 邊緣運算，模型直接在車載計算單元推論', 'C. 聯邦學習，多台車輛協作訓練', 'D. 差分隱私部署，在雲端加噪聲保護資料'],
+    ans: 1,
+    exp: '邊緣運算適合：(1)低延遲（幾毫秒，來不及傳到雲端再回傳）；(2)離線（隧道無網路）；(3)隱私（車內畫面不上傳）。這是邊緣運算三大優勢的經典情境。雲端適合大規模訓練或跨裝置服務。'
+  },
+  {
+    stem: '知識蒸餾（Knowledge Distillation）中，Teacher 和 Student 的關係是？',
+    opts: ['A. Teacher 是 Student 的前一層，共享部分權重', 'B. Teacher 是大型高精度模型，Student 學習其軟標籤的輕量模型', 'C. Teacher 提供標記資料，Student 負責資料清洗', 'D. Teacher 在雲端，Student 是邊緣裝置的複製版'],
+    ans: 1,
+    exp: '知識蒸餾 = Teacher（大模型）→ Student（小模型）。Student 學習 Teacher 的 Softmax 軟標籤（含類別間相似度的「暗知識」），不只學 One-Hot 硬標籤。溫度 T>1 讓輸出更平滑。例：DistilBERT（Teacher=BERT，縮小40%）。'
+  },
+  {
+    stem: 'MLOps 相比傳統 DevOps 多了哪個「C」？',
+    opts: ['A. CC（持續合規）', 'B. CM（持續監控）', 'C. CT（持續訓練）', 'D. CF（持續反饋）'],
+    ans: 2,
+    exp: 'MLOps = CI（持續集成）+ CD（持續部署）+ CT（持續訓練）。CT 是 ML 特有：當偵測到 Data Drift 時，自動觸發模型再訓練流水線。傳統軟體只有 CI+CD，因為程式碼不會因環境改變而「腐化」，但 AI 模型效能會隨數據分佈改變而下滑。'
+  },
+  {
+    stem: '生產環境中，詐欺偵測模型的 F1 Score 從 0.92 降至 0.73。技術團隊偵測到輸入特徵的統計分佈與訓練時顯著不同。這個現象稱為？',
+    opts: ['A. 模型過擬合（Overfitting）', 'B. 欠擬合（Underfitting）', 'C. 資料漂移（Data Drift）', 'D. 標籤偏移（Label Shift）'],
+    ans: 2,
+    exp: '資料漂移（Data Drift）= 生產環境輸入特徵分佈與訓練時不同，導致模型效能下滑。詐欺手法演變 → 特徵分佈改變 → Data Drift。區分：Label Shift = 標籤比例改變；Concept Drift = X→Y 映射關係改變。本例明確說「輸入特徵統計分佈顯著不同」= Data Drift。'
+  },
+  {
+    stem: '差分隱私（Differential Privacy）的核心機制是？',
+    opts: ['A. 使用 AES-256 對訓練資料加密儲存', 'B. 刪除訓練資料中的個人識別欄位', 'C. 在模型輸出或梯度中加入隨機噪聲（高斯或拉普拉斯），使無法反推個別記錄', 'D. 將資料分散儲存在多台伺服器防止單點洩露'],
+    ans: 2,
+    exp: '差分隱私核心 = 加入隨機噪聲（Laplace 或 Gaussian）。ε（隱私預算）越小噪聲越大保護越強。DP-SGD = 梯度裁剪 + 高斯噪聲，用於深度學習。差分隱私 ≠ 加密（加密可解密，DP 的噪聲不可逆）。核心保證：無法判斷某筆特定記錄是否在訓練集中。'
+  },
+  {
+    stem: '在高流量 AI 推論服務中，微服務間需以最低延遲傳遞大量特徵向量。哪種 API 協議最適合？',
+    opts: ['A. REST API（JSON）— 易於開發調試', 'B. gRPC（Protocol Buffers）— 高效二進位，適合服務間通信', 'C. WebSocket — 雙向全雙工', 'D. GraphQL — 靈活查詢語言'],
+    ans: 1,
+    exp: 'gRPC 使用 Protocol Buffers（二進位序列化），比 JSON 快 5~10×，資料小 3~10×，HTTP/2 多路複用。適合：微服務高頻率大量資料傳輸。TF Serving 和 Triton Inference Server 原生支援 gRPC。REST 適合對外公開 API（可讀性 > 效能）。'
+  },
+  {
+    stem: '「Canary Release（金絲雀發布）」在 AI 模型部署中的意義是？',
+    opts: ['A. 只在小型測試環境部署，不上生產', 'B. 先讓少量流量（如 5%）進入新模型，確認效能後逐步放量', 'C. 用歷史資料反覆測試模型在各情境的表現', 'D. 同時部署兩個相同模型互相對照輸出'],
+    ans: 1,
+    exp: 'Canary Release = 5~10% 真實流量引導至新版本，多數仍走舊版。若新版效能正常，逐漸增至 100%；若出問題立即回滾。與「藍綠部署」的區別：Blue-Green 是一次性切換 100%（需兩套完整環境）；Canary 是漸進式切換，風險更低。'
+  }
+];
+
+const quizEl = document.getElementById('quiz');
+questions.forEach((q, qi) => {
+  const div = document.createElement('div');
+  div.className = 'q-item reveal';
+  div.innerHTML = `
+    <div class="q-num">Q${qi+1} / ${TOTAL}</div>
+    <div class="q-stem">${q.stem}</div>
+    <div class="q-opts">
+      ${q.opts.map((o, oi) => `<div class="q-opt" onclick="pick(this,${qi},${oi},${q.ans})"><span class="opt-label">${['A','B','C','D'][oi]}</span><span>${o.slice(2)}</span></div>`).join('')}
+    </div>
+    <div class="q-explain" id="exp${qi}">${q.exp}</div>`;
+  quizEl.appendChild(div);
+  obs.observe(div);
+});
+
+function pick(el, qi, oi, ans) {
+  if (answered.has(qi)) return;
+  const opts = el.parentElement.querySelectorAll('.q-opt');
+  opts.forEach((o, i) => { if (i === ans) o.classList.add('correct'); });
+  if (oi !== ans) el.classList.add('wrong');
+  document.getElementById('exp' + qi).classList.add('show');
+  addScore(oi === ans, qi);
+}
+</script>
+</body>
+</html>
