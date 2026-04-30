@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>機器學習基礎數學 — iPAS AI應用規劃師中級考試</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+* { font-family: 'Calibri', 'Microsoft JhengHei', '微軟正黑體', sans-serif; }
+code, .formula { font-family: 'JetBrains Mono', 'Consolas', monospace !important; }
+:root{
+  --bg:#0F1117;--panel:#1A1D27;--panel2:#21253A;
+  --border:#2E3250;--text:#E8EAF6;--muted:#8892B0;
+  --accent:#9B5DE5;--accent2:#00FFB2;--accent3:#7C6FFF;
+  --yellow:#FFD166;--orange:#FF9B42;--pink:#FF6B9D;--blue:#00D4FF;--purple:#9B5DE5;
+  --r:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Calibri','Microsoft JhengHei','微軟正黑體',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.7;}
+
+.nav{position:sticky;top:0;z-index:200;background:rgba(15,17,23,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:12px 24px;}
+.nav a{color:var(--accent);text-decoration:none;font-weight:700;font-size:.9rem;padding:5px 14px;border-radius:999px;border:1.5px solid var(--accent);transition:all .18s;}
+.nav a:hover{background:var(--accent);color:#fff;}
+.nav-title{font-size:1.05rem;}
+.nav-tag{margin-left:auto;background:linear-gradient(135deg,var(--accent),var(--accent3));padding:4px 14px;border-radius:999px;font-size:.78rem;font-weight:900;color:#fff;}
+
+.hero{padding:60px 20px 40px;background:linear-gradient(160deg,#0F1117,#120d1a,#0F1117);text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(155,93,229,.12),transparent);}
+.hero-badge{display:inline-block;margin-bottom:16px;padding:5px 18px;border-radius:999px;background:rgba(155,93,229,.12);border:1px solid var(--accent);font-size:.8rem;font-weight:900;color:var(--accent);letter-spacing:1px;}
+.hero-title{font-size:clamp(1.8rem,5vw,3.2rem);background:linear-gradient(135deg,var(--accent),var(--blue),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px;}
+.hero-sub{color:var(--muted);font-size:1rem;max-width:620px;margin:0 auto 24px;}
+.tag-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.tag{padding:4px 12px;border-radius:999px;font-size:.75rem;font-weight:900;border:1px solid;}
+
+.wrap{max-width:980px;margin:0 auto;padding:16px 20px 80px;}
+
+.sec-title{font-size:1.5rem;color:var(--text);margin:44px 0 16px;display:flex;align-items:center;gap:10px;}
+.sec-title::before{content:'';display:inline-block;width:4px;height:24px;border-radius:2px;background:linear-gradient(var(--accent),var(--yellow));}
+
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:20px;}
+.panel-title{font-weight:900;font-size:1rem;color:var(--accent2);margin-bottom:12px;}
+
+.formula{background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin:12px 0;font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--accent2);line-height:2;overflow-x:auto;}
+.formula .cm{color:var(--muted);font-style:italic;}
+.formula .hl{color:var(--yellow);}
+.formula .fn{color:var(--blue);}
+.formula .vr{color:var(--pink);}
+
+.tbl-wrap{overflow-x:auto;margin:12px 0;}
+table{width:100%;border-collapse:collapse;font-size:.88rem;}
+th{background:var(--panel2);padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);color:var(--accent2);font-weight:900;}
+td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--muted);}
+td:first-child{color:var(--text);font-weight:700;}
+tr:hover td{background:rgba(155,93,229,.04);}
+
+.kp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:12px 0;}
+.kp-card{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:16px;border-left:3px solid var(--accent);transition:transform .18s,border-color .18s;}
+.kp-card:hover{transform:translateY(-4px);border-left-color:var(--accent2);}
+.kp-card .kp-title{font-weight:900;font-size:.95rem;color:var(--text);margin-bottom:6px;}
+.kp-card .kp-body{font-size:.83rem;color:var(--muted);line-height:1.6;}
+.kp-card .kp-tag{font-size:.7rem;font-weight:900;color:var(--accent);margin-top:8px;}
+
+.warn-box{background:rgba(155,93,229,.07);border:1px solid var(--accent);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--accent);margin:10px 0;}
+.info-box{background:rgba(0,255,178,.07);border:1px solid var(--accent2);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--accent2);margin:10px 0;}
+
+.seg-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.seg-tab{padding:7px 16px;border-radius:999px;border:1.5px solid var(--border);font-size:.83rem;font-weight:900;cursor:pointer;color:var(--muted);background:transparent;transition:all .18s;}
+.seg-tab.active{border-color:var(--accent);color:var(--accent);background:rgba(155,93,229,.1);}
+.seg-box{background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:16px;font-size:.88rem;line-height:1.8;color:var(--muted);}
+.seg-box .hl{color:var(--accent);}
+.seg-box .hl2{color:var(--yellow);}
+.seg-box .hl3{color:var(--accent2);}
+
+.c3d-wrap{background:#0a0c14;border:1px solid var(--border);border-radius:var(--r);position:relative;overflow:hidden;margin:12px 0;}
+.c3d{display:block;width:100%;height:380px;cursor:grab;}
+.c3d:active{cursor:grabbing;}
+.c3d-lbl{position:absolute;top:10px;left:12px;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);padding:4px 12px;border-radius:999px;font-size:.72rem;font-weight:900;color:var(--accent);border:1px solid rgba(155,93,229,.4);}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;padding:10px 12px;background:rgba(0,0,0,.3);}
+.ctrl button{padding:5px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.18);font-size:.72rem;font-weight:900;color:rgba(255,255,255,.6);background:transparent;cursor:pointer;transition:all .18s;}
+.ctrl button:hover,.ctrl button.on{border-color:var(--accent);color:var(--accent);background:rgba(155,93,229,.15);}
+
+.canvas2d-wrap{background:#0a0c14;border:1px solid var(--border);border-radius:10px;margin:12px 0;overflow:hidden;}
+.canvas2d-wrap canvas{display:block;width:100%;}
+
+.progress-bar{height:6px;background:var(--border);border-radius:3px;margin-bottom:20px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--blue));transition:width .5s;}
+.q-item{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;}
+.q-num{font-size:.75rem;font-weight:900;color:var(--accent);margin-bottom:6px;}
+.q-stem{font-weight:700;color:var(--text);font-size:.95rem;margin-bottom:12px;line-height:1.6;}
+.q-opts{display:flex;flex-direction:column;gap:7px;}
+.q-opt{padding:10px 14px;border-radius:8px;cursor:pointer;border:1px solid var(--border);font-size:.88rem;color:var(--muted);transition:all .18s;display:flex;align-items:flex-start;gap:8px;}
+.q-opt:hover{border-color:var(--accent);color:var(--text);background:rgba(155,93,229,.07);}
+.q-opt.correct{border-color:var(--accent2);background:rgba(0,255,178,.07);color:var(--accent2);}
+.q-opt.wrong{border-color:var(--pink);background:rgba(255,107,157,.07);color:var(--pink);}
+.q-opt .opt-label{font-weight:900;min-width:18px;}
+.q-explain{margin-top:12px;padding:10px 14px;background:rgba(155,93,229,.06);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;font-size:.84rem;color:var(--accent);display:none;line-height:1.65;}
+.q-explain.show{display:block;}
+
+#score-banner{position:fixed;bottom:20px;right:20px;z-index:300;background:var(--panel);border:1px solid var(--accent);border-radius:12px;padding:10px 18px;font-weight:900;font-size:.9rem;color:var(--accent);box-shadow:0 4px 20px rgba(155,93,229,.3);}
+
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .5s ease,transform .5s ease;}
+.reveal.vis{opacity:1;transform:translateY(0);}
+footer{text-align:center;padding:28px;font-size:.75rem;color:rgba(232,234,246,.2);}
+</style>
+</head>
+<body>
+
+<div id="score-banner">⭐ 答題得分：<span id="score">0</span> / <span id="total">0</span></div>
+
+<nav class="nav">
+  <a href="index.html">← 返回</a>
+  <span class="nav-title">機器學習基礎數學</span>
+  <span class="nav-tag">iPAS 中級 · 科目三 L231</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">L231 · 機器學習基礎數學</div>
+  <div class="hero-title">機器學習基礎數學</div>
+  <div class="hero-sub">機率分佈、貝氏定理、特徵值分解、SVD 奇異值分解、梯度下降三大變體、Adam / Adagrad / Momentum 最佳化器、梯度消失與爆炸</div>
+  <div class="tag-row">
+    <span class="tag" style="color:var(--accent);border-color:var(--accent)">損失曲面 3D</span>
+    <span class="tag" style="color:var(--blue);border-color:var(--blue)">貝氏定理</span>
+    <span class="tag" style="color:var(--accent2);border-color:var(--accent2)">SVD 分解</span>
+    <span class="tag" style="color:var(--yellow);border-color:var(--yellow)">Adam 最佳化</span>
+    <span class="tag" style="color:var(--pink);border-color:var(--pink)">梯度消失</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- 1. 機率分佈 -->
+<div class="sec-title reveal">📊 機率分佈（核心考點）</div>
+<div class="panel reveal">
+  <div class="panel-title">五大機率分佈：特性、公式、機器學習應用場景</div>
+  <div class="seg-tabs">
+    <button class="seg-tab active" onclick="showDist(this,'normal')">🔔 常態分佈</button>
+    <button class="seg-tab" onclick="showDist(this,'bernoulli')">🎲 伯努利分佈</button>
+    <button class="seg-tab" onclick="showDist(this,'chi2')">χ² 卡方分佈</button>
+    <button class="seg-tab" onclick="showDist(this,'exp')">📉 指數分佈</button>
+    <button class="seg-tab" onclick="showDist(this,'uniform')">📏 均勻分佈</button>
+  </div>
+  <div class="seg-box" id="dist-display"></div>
+  <div class="kp-grid" style="margin-top:14px;">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">常態分佈 N(μ, σ²)</div>
+      <div class="kp-body">鐘型對稱，均值=中位數=眾數。<br>68-95-99.7 法則：<br>μ±1σ≈68%，μ±2σ≈95%，μ±3σ≈99.7%<br>中央極限定理：大樣本均值→常態</div>
+      <div class="kp-tag">▶ 誤差分佈假設、初始化權重</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">伯努利分佈 Bernoulli(p)</div>
+      <div class="kp-body">P(X=1)=p, P(X=0)=1-p（二元結果）<br>均值=p，方差=p(1-p)<br>邏輯迴歸假設目標服從伯努利<br>最大化伯努利似然 ↔ 最小化 BCE</div>
+      <div class="kp-tag">▶ 考點：邏輯迴歸假設 Bernoulli</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">卡方分佈 χ²(k)</div>
+      <div class="kp-body">k 個獨立標準常態平方和，右偏正值<br>均值=k，方差=2k<br>用於特徵獨立性檢定（SelectKBest）<br>自由度越大越接近常態</div>
+      <div class="kp-tag">▶ 考點：特徵選擇、獨立性檢定</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 必記：</strong>常態分佈鐘型對稱（μ±1σ=68%）、伯努利→邏輯迴歸、卡方→特徵獨立性檢定、指數分佈→時間等待建模（唯一具無記憶性的連續分佈）</div>
+</div>
+
+<!-- 2. 貝氏定理 -->
+<div class="sec-title reveal">🔮 貝氏定理（Bayes' Theorem）</div>
+<div class="panel reveal">
+  <div class="panel-title">條件機率更新：先驗 × 似然 → 後驗（機器學習最核心公式之一）</div>
+  <div class="formula">
+    <span class="cm">// 貝氏定理核心公式</span><br>
+    P(<span class="hl">A</span>|<span class="vr">B</span>) = P(<span class="vr">B</span>|<span class="hl">A</span>) × P(<span class="hl">A</span>) / P(<span class="vr">B</span>)<br><br>
+    <span class="cm">// 各項意義</span><br>
+    P(<span class="hl">A</span>|<span class="vr">B</span>) → <span class="fn">後驗機率</span>（觀察到 B 後 A 的機率）<br>
+    P(<span class="vr">B</span>|<span class="hl">A</span>) → <span class="fn">似然函數</span>（給定 A 時 B 發生的機率）<br>
+    P(<span class="hl">A</span>)   → <span class="fn">先驗機率</span>（觀察前對 A 的初始估計）<br>
+    P(<span class="vr">B</span>)   → <span class="fn">邊際機率</span>（正規化常數）<br><br>
+    <span class="cm">// 樸素貝氏（假設特徵條件獨立）</span><br>
+    P(C|x₁,...xₙ) ∝ P(C) × <span class="hl">∏</span> P(xᵢ|C)
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">醫療診斷情境（高頻考點）</div>
+      <div class="kp-body">疾病盛行率 1%（先驗低），檢測陽性敏感度 99%，假陽性率 5%。<br>陽性但實際患病率 ≈ 17%！<br><strong>貝氏更新</strong>：先驗機率低→即使似然高，後驗仍可能出乎意料低</div>
+      <div class="kp-tag">▶ 考點：先驗低→後驗意外低</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">最大似然估計（MLE）</div>
+      <div class="kp-body">最大化 P(data|θ)，找讓資料出現機率最大的參數 θ。<br>等效：最小化負對數似然（NLL）<br>邏輯迴歸訓練 = 最大化伯努利似然 = 最小化交叉熵</div>
+      <div class="kp-tag">▶ 考點：MLE ↔ 最小化交叉熵</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">貝氏最佳化（超參數調校）</div>
+      <div class="kp-body">用高斯過程建立目標函數代理模型，以後驗引導超參數搜索。<br>比 Grid Search 更高效：同等預算找到更好超參數。<br>採集函數（Acquisition Function）決定下一個試驗點</div>
+      <div class="kp-tag">▶ 考點：超參數調校策略</div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. 特徵值 & SVD -->
+<div class="sec-title reveal">🔢 特徵值分解與 SVD 奇異值分解</div>
+<div class="panel reveal">
+  <div class="panel-title">矩陣分解是 PCA 降維、推薦系統、NLP 語義分析的數學基礎</div>
+  <div class="formula">
+    <span class="cm">// 特徵值分解（方陣）</span><br>
+    <span class="hl">Σv = λv</span>  →  Σ = Q Λ Qᵀ<br>
+    <span class="cm">// λ=特徵值，v=特徵向量，Q=特徵向量矩陣，Λ=對角特徵值矩陣</span><br><br>
+    <span class="cm">// PCA：對協方差矩陣做特徵值分解</span><br>
+    <span class="fn">PCA</span>: Cov(X) → 特徵值分解 → 選前 k 大特徵向量（主成分）<br><br>
+    <span class="cm">// SVD 奇異值分解（任意矩陣）</span><br>
+    <span class="hl">X = U Σ Vᵀ</span><br>
+    <span class="cm">// U=左奇異向量(m×m)，Σ=奇異值對角矩陣，V=右奇異向量(n×n)</span><br>
+    <span class="fn">Truncated SVD</span>: 保留前 k 個奇異值 → 低秩近似，重建誤差最小<br>
+    <span class="fn">LSA</span>: 文本 TF-IDF 矩陣做 SVD → 語義主題
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">特徵值的幾何意義</div>
+      <div class="kp-body">特徵向量：矩陣變換後<strong>方向不變</strong>的向量<br>特徵值 λ：變換後的<strong>縮放比例</strong><br>λ 越大 → 資料在此方向的<strong>方差越大</strong><br>PCA 選 λ 最大的 k 個特徵向量</div>
+      <div class="kp-tag">▶ 考點：大特徵值=大方差方向</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">SVD vs 特徵值分解</div>
+      <div class="kp-body">特徵值分解：僅適用<strong>方陣</strong>（n×n）<br>SVD：適用<strong>任意矩陣</strong>（m×n），更通用<br>全連接層參數壓縮 → SVD 低秩分解<br>推薦系統協同濾波 → 矩陣分解（MF）</div>
+      <div class="kp-tag">▶ 考點：SVD 比特徵值分解更通用</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--accent2)">
+      <div class="kp-title">LSA（潛在語義分析）</div>
+      <div class="kp-body">詞-文件矩陣（TF-IDF）做 Truncated SVD<br>→ 找出隱藏語義主題<br>奇異值代表<strong>主題的重要性</strong><br>U→文件-主題，V→詞-主題<br>解決同義詞（多詞同義）問題</div>
+      <div class="kp-tag">▶ 考點：LSA = TF-IDF + SVD</div>
+    </div>
+  </div>
+</div>
+
+<!-- 4. Three.js 3D -->
+<div class="sec-title reveal">⛰️ 3D 損失曲面與梯度下降動畫</div>
+<div class="panel reveal">
+  <div class="panel-title">SGD vs Adam 在 3D 損失曲面上的收斂軌跡（可拖曳旋轉）</div>
+  <div class="c3d-wrap">
+    <canvas id="c3d" class="c3d"></canvas>
+    <div class="c3d-lbl">⛰️ 損失曲面 3D · 拖曳旋轉</div>
+    <div class="ctrl">
+      <button id="btnAuto" class="on" onclick="toggleAuto()">⟳ 自動旋轉</button>
+      <button onclick="resetView()">↺ 重置視角</button>
+      <button id="btnSGD" class="on" onclick="toggleSGD()">🟠 SGD 軌跡</button>
+      <button id="btnAdam" class="on" onclick="toggleAdam()">🟢 Adam 軌跡</button>
+      <button onclick="resetBalls()">🔄 重置動畫</button>
+    </div>
+  </div>
+  <div class="formula">
+    <span class="cm">// 梯度下降三大變體（核心考點）</span><br>
+    <span class="fn">BGD</span>  ：θ ← θ - η·<span class="hl">∇L(全部資料)</span>   → 穩定但慢，每步用全資料<br>
+    <span class="fn">SGD</span>  ：θ ← θ - η·<span class="hl">∇L(單一樣本)</span>   → 快但震盪，可跳出局部最小<br>
+    <span class="fn">Mini-batch</span>：θ ← θ - η·<span class="hl">∇L(batch B)</span>  → 實務首選（batch=32/64）<br><br>
+    <span class="cm">// Adam = Momentum + RMSProp（自適應學習率）</span><br>
+    <span class="vr">m_t</span> = β₁·m_{t-1} + (1-β₁)·g_t       <span class="cm">// 一階動量（β₁=0.9）</span><br>
+    <span class="vr">v_t</span> = β₂·v_{t-1} + (1-β₂)·g_t²      <span class="cm">// 二階動量（β₂=0.999）</span><br>
+    θ ← θ - η · m̂_t / (√v̂_t + ε)        <span class="cm">// 偏差修正後更新</span>
+  </div>
+</div>
+
+<!-- 5. 最佳化器比較 -->
+<div class="sec-title reveal">⚡ 最佳化器比較（Adam / Adagrad / Momentum）</div>
+<div class="panel reveal">
+  <div class="panel-title">各最佳化器特性、適用場景與考試重點</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>最佳化器</th><th>核心機制</th><th>優點</th><th>缺點</th><th>適用場景</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>SGD</td><td>固定學習率更新</td><td>記憶體小、簡單</td><td style="color:var(--pink)">震盪大、需調學習率</td><td>大規模、簡單任務</td></tr>
+        <tr><td>Momentum</td><td>加入動量項 β·v_{t-1}</td><td style="color:var(--accent2)">加速收斂、減少震盪</td><td>可能越過極小值</td><td>損失曲面多鞍點</td></tr>
+        <tr><td>Adagrad</td><td>累積梯度平方調整 η</td><td style="color:var(--accent2)">稀疏特徵自動大步長</td><td style="color:var(--pink)">學習率單調遞減→後期停止更新</td><td style="color:var(--yellow)">稀疏資料（NLP 詞嵌入）</td></tr>
+        <tr><td>RMSProp</td><td>指數衰減移動平均梯度平方</td><td style="color:var(--accent2)">解決 Adagrad 遞減問題</td><td>需調衰減率 ρ</td><td>RNN 時序模型</td></tr>
+        <tr><td style="color:var(--accent)">Adam</td><td>Momentum + RMSProp + 偏差修正</td><td style="color:var(--accent2)">收斂快、自適應、魯棒</td><td>泛化有時不如 SGD</td><td style="color:var(--yellow)">深度學習實務首選</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">Adam 預設超參數</div>
+      <div class="kp-body">β₁ = 0.9（動量衰減率）<br>β₂ = 0.999（RMSProp 衰減率）<br>ε = 1e-8（防止除以零）<br>η（學習率）= 1e-3 或 3e-4<br>偏差修正：m̂_t = m_t/(1-β₁ᵗ)</div>
+      <div class="kp-tag">▶ 考點：β₁=0.9, β₂=0.999</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">Adagrad 稀疏資料優勢</div>
+      <div class="kp-body">累積梯度平方：G_t += g_t²<br>更新：θ -= η/√(G_t+ε) · g_t<br>稀疏資料：少更新的參數 G_t 小→學習率大→充分更新稀有詞嵌入<br><strong>缺點：G_t 只增不減→後期 η≈0</strong></div>
+      <div class="kp-tag">▶ 考點：Adagrad→稀疏資料/NLP</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--pink)">
+      <div class="kp-title">學習率衰減策略</div>
+      <div class="kp-body">Step Decay：每 N epoch 乘以 γ<br>Cosine Annealing：餘弦曲線衰減<br>Warm-up + Decay：先升後降（Transformer）<br>學習率過大 → 震盪不收斂<br>學習率過小 → 收斂太慢</div>
+      <div class="kp-tag">▶ 考點：Warm-up → Transformer 常用</div>
+    </div>
+  </div>
+</div>
+
+<!-- 6. 梯度消失/爆炸 -->
+<div class="sec-title reveal">⚠️ 梯度消失與梯度爆炸</div>
+<div class="panel reveal">
+  <div class="panel-title">深度神經網路訓練最大挑戰：反向傳播中梯度異常（必考）</div>
+  <div class="canvas2d-wrap">
+    <canvas id="grad-canvas" height="160"></canvas>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--pink)">
+      <div class="kp-title">梯度消失（Vanishing Gradient）</div>
+      <div class="kp-body">梯度反向傳播逐層相乘 → 趨近 0<br><strong>原因：</strong>Sigmoid/Tanh 飽和區導數&lt;&lt;1<br><strong>後果：</strong>淺層權重幾乎不更新<br><strong>解法：</strong>ReLU、BatchNorm、ResNet 殘差連結、LSTM 門控</div>
+      <div class="kp-tag">▶ 考點：解法 → ReLU + ResNet</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--orange)">
+      <div class="kp-title">梯度爆炸（Exploding Gradient）</div>
+      <div class="kp-body">梯度逐層相乘 → 指數級增大 → NaN<br><strong>原因：</strong>權重初始化過大、層數過深<br><strong>後果：</strong>損失 NaN，模型發散<br><strong>解法：</strong>梯度裁剪（Gradient Clipping）<br><code>clip_grad_norm_(params, max_norm=1.0)</code></div>
+      <div class="kp-tag">▶ 考點：梯度裁剪解決爆炸</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--accent2)">
+      <div class="kp-title">解決方案總覽</div>
+      <div class="kp-body">
+        <strong>消失：</strong>ReLU（非飽和）、BatchNorm（標準化中間層）、殘差連結（梯度高速公路）、LSTM/GRU（記憶閘門）<br><br>
+        <strong>爆炸：</strong>梯度裁剪 clip_grad_norm_、Xavier/He 初始化、L2 正則化
+      </div>
+      <div class="kp-tag">▶ 消失→ReLU/BN；爆炸→裁剪</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 必記：</strong>梯度消失→ReLU（正區間導數=1，不飽和）；梯度爆炸→梯度裁剪（clip max_norm）；BatchNorm 讓每層輸出標準化 → 兩者都能改善。RNN 最容易爆炸（時序反向傳播多步相乘）。</div>
+</div>
+
+<!-- 7. 機率分佈互動圖 -->
+<div class="sec-title reveal">📈 機率分佈視覺化</div>
+<div class="panel reveal">
+  <div class="panel-title">常態 vs 指數 vs 均勻分佈 — PDF 曲線比較</div>
+  <div class="canvas2d-wrap">
+    <canvas id="dist-canvas" height="220"></canvas>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">常態分佈 N(0,1)</div>
+      <div class="kp-body">μ=0, σ=1 標準常態，鐘型對稱<br>68% 落在 [-1,1]，95% 落在 [-2,2]<br>機器學習誤差項、初始化權重常假設常態<br>標準化 Z-score=(x-μ)/σ</div>
+      <div class="kp-tag">▶ 68-95-99.7 法則必記</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--orange)">
+      <div class="kp-title">指數分佈 Exp(λ)</div>
+      <div class="kp-body">建模等待時間（伺服器請求間隔）<br>無記憶性：P(T>s+t|T>s) = P(T>t)<br>PDF: f(x)=λe^(-λx)，均值=1/λ<br>唯一具無記憶性的連續分佈</div>
+      <div class="kp-tag">▶ 無記憶性是核心考點</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">均勻分佈 U(a,b)</div>
+      <div class="kp-body">每個值等機率，PDF=1/(b-a)<br>Xavier 初始化：U(-√6/√(n_in+n_out), +√6/√(n_in+n_out))<br>超參數隨機搜索的基礎分佈<br>均值=(a+b)/2，方差=(b-a)²/12</div>
+      <div class="kp-tag">▶ Xavier 初始化用均勻分佈</div>
+    </div>
+  </div>
+</div>
+
+<!-- 8. 程式碼考點 -->
+<div class="sec-title reveal">💻 程式碼考點（NumPy / SciPy / 梯度下降實作）</div>
+
+<div class="panel reveal">
+  <div class="panel-title">NumPy — 特徵值分解與 SVD</div>
+  <div class="formula">
+<span class="fn">import</span> numpy <span class="fn">as</span> <span class="vr">np</span><br><br>
+<span class="cm"># 特徵值分解（方陣）</span><br>
+<span class="vr">A</span> = np.array([[<span class="hl">4</span>, <span class="hl">2</span>], [<span class="hl">1</span>, <span class="hl">3</span>]])<br>
+<span class="vr">eigenvalues</span>, <span class="vr">eigenvectors</span> = np.<span class="fn">linalg</span>.<span class="fn">eig</span>(<span class="vr">A</span>)  <span class="cm"># λ, v</span><br>
+<span class="cm"># eigenvalues = [5., 2.] → 主成分方向的方差大小</span><br><br>
+<span class="cm"># SVD 分解（任意矩陣）</span><br>
+<span class="vr">U</span>, <span class="vr">S</span>, <span class="vr">Vt</span> = np.<span class="fn">linalg</span>.<span class="fn">svd</span>(<span class="vr">A</span>, full_matrices=<span class="hl">False</span>)  <span class="cm"># X=UΣVᵀ</span><br>
+<span class="cm"># S = 奇異值（降序排列）</span><br>
+<span class="vr">k</span> = <span class="hl">1</span>  <span class="cm"># 保留 k 個奇異值→低秩近似</span><br>
+<span class="vr">A_approx</span> = <span class="vr">U</span>[:, :<span class="vr">k</span>] @ np.<span class="fn">diag</span>(<span class="vr">S</span>[:<span class="vr">k</span>]) @ <span class="vr">Vt</span>[:<span class="vr">k</span>, :]<br><br>
+<span class="cm"># PCA 手動實作</span><br>
+<span class="vr">X_c</span> = <span class="vr">X</span> - <span class="vr">X</span>.<span class="fn">mean</span>(axis=<span class="hl">0</span>)           <span class="cm"># 中心化</span><br>
+<span class="vr">cov</span> = np.<span class="fn">cov</span>(<span class="vr">X_c</span>.T)<br>
+<span class="vr">vals</span>, <span class="vr">vecs</span> = np.<span class="fn">linalg</span>.<span class="fn">eigh</span>(<span class="vr">cov</span>)  <span class="cm"># eigh：對稱矩陣，更穩定</span><br>
+<span class="vr">X_pca</span> = <span class="vr">X_c</span> @ <span class="vr">vecs</span>[:, -<span class="vr">k</span>:]          <span class="cm"># 選前 k 大特徵向量</span>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">np.linalg.eig vs eigh</div>
+      <div class="kp-body"><code>eig</code>：通用矩陣，可回傳複數特徵值<br><code>eigh</code>：對稱/Hermitian 矩陣，回傳實數，更穩定數值<br>協方差矩陣是對稱矩陣 → 用 <code>eigh</code> 更準確</div>
+      <div class="kp-tag">▶ 協方差矩陣用 eigh</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">np.linalg.svd 參數</div>
+      <div class="kp-body"><code>full_matrices=True</code>：完整 U(m×m), Vt(n×n)<br><code>full_matrices=False</code>：精簡版，節省記憶體<br>奇異值 S 已按降序排列<br>低秩近似只需前 k 個奇異值</div>
+      <div class="kp-tag">▶ full_matrices=False 節省記憶</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--accent2)">
+      <div class="kp-title">解釋方差比例</div>
+      <div class="kp-body">截斷 SVD 最小化 Frobenius 範數誤差：<br>‖A - Aₖ‖² = Σ(i&gt;k) σᵢ²<br>解釋比例 = Σσᵢ²(前k) / Σσᵢ²(全部)<br>類比 PCA 解釋累積方差比例</div>
+      <div class="kp-tag">▶ 解釋比例 = 累積奇異值平方比</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel reveal">
+  <div class="panel-title">SciPy — 機率分佈與假設檢定</div>
+  <div class="formula">
+<span class="fn">from</span> scipy <span class="fn">import</span> stats<br><br>
+<span class="cm"># 常態分佈</span><br>
+<span class="vr">nd</span> = stats.<span class="fn">norm</span>(loc=<span class="hl">0</span>, scale=<span class="hl">1</span>)    <span class="cm"># N(0,1)</span><br>
+<span class="vr">p</span>  = <span class="vr">nd</span>.<span class="fn">cdf</span>(<span class="hl">1.96</span>)                   <span class="cm"># P(X ≤ 1.96) ≈ 0.975</span><br>
+<span class="vr">x</span>  = <span class="vr">nd</span>.<span class="fn">ppf</span>(<span class="hl">0.975</span>)                  <span class="cm"># 分位數 ≈ 1.96</span><br><br>
+<span class="cm"># 卡方獨立性檢定（特徵選擇）</span><br>
+<span class="vr">chi2_stat</span>, <span class="vr">p_val</span> = stats.<span class="fn">chi2_contingency</span>(<span class="vr">observed</span>)[:2]<br>
+<span class="cm"># p_val < 0.05 → 兩變數有顯著關聯（拒絕獨立假設）</span><br><br>
+<span class="cm"># sklearn 卡方特徵選擇</span><br>
+<span class="fn">from</span> sklearn.feature_selection <span class="fn">import</span> <span class="fn">SelectKBest</span>, <span class="fn">chi2</span><br>
+<span class="vr">selector</span> = <span class="fn">SelectKBest</span>(<span class="fn">chi2</span>, k=<span class="hl">10</span>)<br>
+<span class="vr">X_new</span>   = <span class="vr">selector</span>.<span class="fn">fit_transform</span>(<span class="vr">X</span>, <span class="vr">y</span>)  <span class="cm"># 選 10 個最佳特徵</span>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">stats.norm 常用方法</div>
+      <div class="kp-body"><code>.pdf(x)</code>：機率密度函數值<br><code>.cdf(x)</code>：累積分佈 P(X≤x)<br><code>.ppf(q)</code>：分位數（cdf 反函數）<br><code>.rvs(size=n)</code>：隨機抽樣</div>
+      <div class="kp-tag">▶ cdf/ppf 是高頻考點</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">假設檢定 p-value 判讀</div>
+      <div class="kp-body">p &lt; 0.05 → 拒絕虛無假設（有顯著差異）<br>p ≥ 0.05 → 無法拒絕虛無假設<br>卡方獨立性：p &lt; 0.05 → 特徵與標籤有關<br>t 檢定：p &lt; 0.05 → 兩組均值顯著不同</div>
+      <div class="kp-tag">▶ p&lt;0.05 拒絕 H₀</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--pink)">
+      <div class="kp-title">SelectKBest 評分函數選擇</div>
+      <div class="kp-body">chi2：非負整數/計數特徵（詞頻）<br>f_classif：ANOVA F 統計量（連續特徵）<br>mutual_info_classif：互資訊（非線性關係）<br>chi2 不適合負值特徵</div>
+      <div class="kp-tag">▶ chi2→詞頻；f_classif→連續</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel reveal">
+  <div class="panel-title">梯度下降與 Adam 手動實作（NumPy）</div>
+  <div class="formula">
+<span class="fn">import</span> numpy <span class="fn">as</span> <span class="vr">np</span><br><br>
+<span class="cm"># Mini-Batch SGD（線性迴歸示例）</span><br>
+<span class="vr">theta</span> = np.<span class="fn">zeros</span>(<span class="hl">3</span>)    <span class="cm"># 初始化參數</span><br>
+<span class="vr">lr</span>, <span class="vr">batch</span> = <span class="hl">0.01</span>, <span class="hl">32</span><br>
+<span class="fn">for</span> epoch <span class="fn">in</span> <span class="fn">range</span>(<span class="hl">100</span>):<br>
+&nbsp;&nbsp;<span class="vr">idx</span> = np.<span class="fn">random.permutation</span>(<span class="hl">100</span>)  <span class="cm"># 打亂索引</span><br>
+&nbsp;&nbsp;<span class="fn">for</span> i <span class="fn">in</span> <span class="fn">range</span>(<span class="hl">0</span>, <span class="hl">100</span>, <span class="vr">batch</span>):<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="vr">Xb</span>, <span class="vr">yb</span> = <span class="vr">X</span>[<span class="vr">idx</span>[i:i+<span class="vr">batch</span>]], <span class="vr">y</span>[<span class="vr">idx</span>[i:i+<span class="vr">batch</span>]]<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="vr">grad</span> = <span class="vr">Xb</span>.T @ (<span class="vr">Xb</span> @ <span class="vr">theta</span> - <span class="vr">yb</span>) / <span class="vr">batch</span>  <span class="cm"># MSE 梯度</span><br>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="vr">theta</span> -= <span class="vr">lr</span> * <span class="vr">grad</span><br><br>
+<span class="cm"># Adam 最佳化器手動實作</span><br>
+<span class="vr">m</span>, <span class="vr">v</span>, <span class="vr">t</span> = <span class="hl">0</span>, <span class="hl">0</span>, <span class="hl">0</span>  <span class="cm"># 一階動量、二階動量、時間步</span><br>
+<span class="vr">b1</span>, <span class="vr">b2</span>, <span class="vr">eps</span> = <span class="hl">0.9</span>, <span class="hl">0.999</span>, <span class="hl">1e-8</span><br>
+<span class="vr">t</span> += <span class="hl">1</span><br>
+<span class="vr">m</span> = <span class="vr">b1</span>*<span class="vr">m</span> + (<span class="hl">1</span>-<span class="vr">b1</span>)*<span class="vr">grad</span>            <span class="cm"># 一階動量</span><br>
+<span class="vr">v</span> = <span class="vr">b2</span>*<span class="vr">v</span> + (<span class="hl">1</span>-<span class="vr">b2</span>)*<span class="vr">grad</span>**<span class="hl">2</span>         <span class="cm"># 二階動量</span><br>
+<span class="vr">m_hat</span> = <span class="vr">m</span>/(<span class="hl">1</span>-<span class="vr">b1</span>**<span class="vr">t</span>)               <span class="cm"># 偏差修正</span><br>
+<span class="vr">v_hat</span> = <span class="vr">v</span>/(<span class="hl">1</span>-<span class="vr">b2</span>**<span class="vr">t</span>)               <span class="cm"># 偏差修正</span><br>
+<span class="vr">theta</span> -= <span class="vr">lr</span> * <span class="vr">m_hat</span> / (np.<span class="fn">sqrt</span>(<span class="vr">v_hat</span>) + <span class="vr">eps</span>)<br><br>
+<span class="cm"># 梯度裁剪（防止爆炸）</span><br>
+<span class="vr">norm</span> = np.<span class="fn">linalg.norm</span>(<span class="vr">grad</span>)<br>
+<span class="fn">if</span> <span class="vr">norm</span> > <span class="hl">1.0</span>: <span class="vr">grad</span> *= <span class="hl">1.0</span> / <span class="vr">norm</span>  <span class="cm"># 裁剪至 max_norm=1.0</span>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">批次大小影響</div>
+      <div class="kp-body">batch=1（SGD）：噪聲大，可跳出局部最小<br>batch=32/64：Mini-batch，速度與穩定性平衡<br>batch=全部（BGD）：精確梯度，記憶體需求大<br>實務 batch=32 或 64 最常見</div>
+      <div class="kp-tag">▶ 實務 batch=32 或 64</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">偏差修正的必要性</div>
+      <div class="kp-body">t=1 時，m=0.1·grad（初始化為 0 帶來偏差）<br>m_hat = m/(1-0.9¹) = grad（修正後正確）<br>前幾步不修正→更新量偏小→初始收斂慢<br>t 越大，偏差修正因子趨近 1</div>
+      <div class="kp-tag">▶ 偏差修正解決初始步偏小</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--accent2)">
+      <div class="kp-title">PyTorch 梯度裁剪</div>
+      <div class="kp-body"><code>loss.backward()</code><br><code>torch.nn.utils.clip_grad_norm_(</code><br>&nbsp;&nbsp;<code>model.parameters(), max_norm=1.0)</code><br><code>optimizer.step()</code><br>RNN/LSTM 必用（時序反向傳播容易爆炸）</div>
+      <div class="kp-tag">▶ RNN/LSTM 必用梯度裁剪</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel reveal" style="border-left:3px solid var(--yellow)">
+  <div class="panel-title">🧪 歷屆考題程式題型</div>
+  <div style="display:flex;flex-direction:column;gap:18px;">
+    <div>
+      <div style="font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:8px;">
+        Q1：以下哪個 NumPy 函式可對任意矩陣（非方陣）進行奇異值分解？
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:.85rem;">
+        <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);color:var(--muted);">A. np.linalg.eig(A)</div>
+        <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);color:var(--muted);">B. np.linalg.eigh(A)</div>
+        <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--accent2);color:var(--accent2);background:rgba(0,255,178,.06);">C. ✓ np.linalg.svd(A, full_matrices=False)</div>
+        <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);color:var(--muted);">D. np.linalg.det(A)</div>
+      </div>
+    </div>
+    <div>
+      <div style="font-size:.88rem;font-weight:700;color:var(--text);margin-bottom:8px;">
+        Q2：Adam 最佳化器的預設 β₁ 與 β₂ 值分別為何？
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;font-size:.85rem;">
+        <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);color:var(--muted);">A. β₁=0.99, β₂=0.9</div>
+        <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--accent2);color:var(--accent2);background:rgba(0,255,178,.06);">B. ✓ β₁=0.9, β₂=0.999</div>
+        <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);color:var(--muted);">C. β₁=0.5, β₂=0.5</div>
+        <div style="padding:6px 12px;border-radius:6px;border:1px solid var(--border);color:var(--muted);">D. β₁=0.001, β₂=0.0001</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 9. 仿真考題 -->
+<div class="sec-title reveal">🎯 仿真考題（8 題）</div>
+<div class="progress-bar"><div class="progress-fill" id="pbar" style="width:0%"></div></div>
+<div id="quiz"></div>
+
+<footer>iPAS AI 應用規劃師中級考試學習站 · 內容依據官方評鑑範圍整理 · 實際考試以 iPAS 官網公告為準</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// Reveal
+const obs = new IntersectionObserver(e => e.forEach(x => x.isIntersecting && x.target.classList.add('vis')), {threshold:.08});
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// Score
+let score = 0;
+const answered = new Set();
+const TOTAL = 8;
+function addScore(correct, qIdx) {
+  if (!answered.has(qIdx)) {
+    answered.add(qIdx);
+    if (correct) score++;
+    document.getElementById('score').textContent = score;
+    document.getElementById('total').textContent = answered.size;
+    document.getElementById('pbar').style.width = (answered.size / TOTAL * 100) + '%';
+  }
+}
+
+// Distribution tabs
+const distData = {
+  normal: `<span class="hl">常態分佈 N(μ, σ²)</span> — 鐘型對稱，機器學習最重要的分佈<br><br>
+📍 <span class="hl2">PDF：</span>f(x) = (1/σ√2π) · exp[-(x-μ)²/2σ²]<br>
+📍 <span class="hl2">68-95-99.7 法則（必記）：</span>μ±1σ≈68%，μ±2σ≈95%，μ±3σ≈99.7%<br>
+📍 <span class="hl2">標準化 Z-score：</span>Z = (x-μ)/σ → 轉換為 N(0,1)<br>
+📍 <span class="hl2">ML 應用：</span>初始化神經網路權重（Xavier/He）、誤差項假設、BatchNorm 後輸出<br>
+📍 <span class="hl3">考試關鍵：</span>鐘型對稱（均值=中位數=眾數）；中央極限定理→大樣本均值服從常態`,
+
+  bernoulli: `<span class="hl">伯努利分佈 Bernoulli(p)</span> — 二元事件（0 或 1）<br><br>
+📍 <span class="hl2">PMF：</span>P(X=1)=p，P(X=0)=1-p<br>
+📍 <span class="hl2">均值=p，方差=p(1-p)（p=0.5 時方差最大）</span><br>
+📍 <span class="hl2">ML 應用：</span>邏輯迴歸假設目標變數服從伯努利分佈<br>
+📍 <span class="hl2">交叉熵：</span>最大化伯努利似然 ↔ 最小化二元交叉熵損失（BCE）<br>
+📍 <span class="hl3">考試關鍵：</span>邏輯迴歸=Bernoulli；多分類=Categorical；n次伯努利=二項分佈`,
+
+  chi2: `<span class="hl">卡方分佈 χ²(k)</span> — k 個獨立標準常態隨機變數的平方和<br><br>
+📍 <span class="hl2">PDF：</span>右偏（正偏態），值域 [0, ∞)，k=自由度<br>
+📍 <span class="hl2">均值=k，方差=2k；</span>自由度越大越接近常態<br>
+📍 <span class="hl2">ML 應用：</span>卡方獨立性檢定、SelectKBest(chi2) 特徵選擇<br>
+📍 <span class="hl2">卡方檢定：</span>計算觀察值與期望值差距 → p&lt;0.05 → 特徵與標籤有關<br>
+📍 <span class="hl3">考試關鍵：</span>卡方→類別特徵獨立性；卡方分佈右偏正值；適合計數資料`,
+
+  exp: `<span class="hl">指數分佈 Exp(λ)</span> — 建模等待時間、事件間隔<br><br>
+📍 <span class="hl2">PDF：</span>f(x) = λ·e^(-λx)，x ≥ 0<br>
+📍 <span class="hl2">均值=1/λ，方差=1/λ²</span><br>
+📍 <span class="hl2">無記憶性（必記）：</span>P(T&gt;s+t | T&gt;s) = P(T&gt;t)<br>
+📍 <span class="hl2">ML 應用：</span>排隊模型、網路請求間隔、指數衰減學習率<br>
+📍 <span class="hl3">考試關鍵：</span>指數分佈是唯一具有無記憶性的<strong>連續</strong>分佈（離散版=幾何分佈）`,
+
+  uniform: `<span class="hl">均勻分佈 U(a, b)</span> — 每個值等機率出現<br><br>
+📍 <span class="hl2">PDF：</span>f(x) = 1/(b-a)，均值=(a+b)/2，方差=(b-a)²/12<br>
+📍 <span class="hl2">ML 應用：</span>Xavier 初始化 U(-√6/√(n_in+n_out), +√6/√(n_in+n_out))<br>
+📍 <span class="hl2">超參數搜索：</span>Random Search 在均勻分佈範圍內採樣<br>
+📍 <span class="hl2">亂數生成：</span>np.random.uniform(a, b, size=n)<br>
+📍 <span class="hl3">考試關鍵：</span>Xavier 用均勻分佈初始化；所有值等機率是核心特性`
+};
+
+function showDist(btn, key) {
+  document.querySelectorAll('.seg-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('dist-display').innerHTML = distData[key];
+}
+showDist(document.querySelector('.seg-tab'), 'normal');
+
+// Three.js 3D Loss Surface
+(function() {
+  const canvas = document.getElementById('c3d');
+  const renderer = new THREE.WebGLRenderer({canvas, antialias: true, alpha: true});
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.setClearColor(0x0a0c14, 1);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(45, canvas.clientWidth / 380, 0.1, 200);
+  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+  const dL = new THREE.DirectionalLight(0xffffff, 0.7);
+  dL.position.set(5, 10, 5);
+  scene.add(dL);
+
+  const res = 40, sz = 5.5;
+  function loss(x, z) {
+    return 0.28*x*x + 0.28*z*z + 0.35*Math.sin(x*1.6)*Math.cos(z*1.6) + 0.15*Math.cos(x*0.8+z*1.0);
+  }
+
+  let minL = Infinity, maxL = -Infinity;
+  for (let i = 0; i < res; i++) for (let j = 0; j < res; j++) {
+    const x = (i/(res-1)-0.5)*sz*2, z = (j/(res-1)-0.5)*sz*2;
+    const y = loss(x,z); if(y<minL)minL=y; if(y>maxL)maxL=y;
+  }
+
+  const verts=[], colors=[], indices=[];
+  const cLow = new THREE.Color(0x9B5DE5), cHigh = new THREE.Color(0xFF6B9D);
+  for (let i = 0; i < res; i++) for (let j = 0; j < res; j++) {
+    const x=(i/(res-1)-0.5)*sz*2, z=(j/(res-1)-0.5)*sz*2, y=loss(x,z);
+    verts.push(x, y*0.75-1.5, z);
+    const c=cLow.clone().lerp(cHigh,(y-minL)/(maxL-minL));
+    colors.push(c.r,c.g,c.b);
+  }
+  for (let i = 0; i < res-1; i++) for (let j = 0; j < res-1; j++) {
+    const a=i*res+j,b=a+1,c=a+res,d=c+1;
+    indices.push(a,b,c,b,d,c);
+  }
+  const geo = new THREE.BufferGeometry();
+  geo.setAttribute('position', new THREE.Float32BufferAttribute(verts,3));
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(colors,3));
+  geo.setIndex(indices);
+  geo.computeVertexNormals();
+  scene.add(new THREE.Mesh(geo, new THREE.MeshPhongMaterial({vertexColors:true,side:THREE.DoubleSide,transparent:true,opacity:0.8,shininess:25})));
+
+  function grad(x, z) {
+    return [0.56*x + 1.6*0.35*Math.cos(x*1.6)*Math.cos(z*1.6) + 0.8*0.15*(-Math.sin(x*0.8+z*1.0)),
+            0.56*z - 1.6*0.35*Math.sin(x*1.6)*Math.sin(z*1.6) + 1.0*0.15*(-Math.sin(x*0.8+z*1.0))];
+  }
+
+  function makePath(sx, sz, steps, lr, noiseScale, color, isAdam) {
+    let cx=sx, cz=sz, m0=0, m1=0, v0=0, v1=0, t=0;
+    const pts=[new THREE.Vector3(cx, loss(cx,cz)*0.75-1.5+0.12, cz)];
+    for (let i=0; i<steps; i++) {
+      const [gx,gz] = grad(cx,cz);
+      const nx=(Math.random()-0.5)*noiseScale, nz=(Math.random()-0.5)*noiseScale;
+      if (isAdam) {
+        t++; const b1=0.9,b2=0.999,eps=1e-8;
+        m0=b1*m0+(1-b1)*(gx+nx); m1=b1*m1+(1-b1)*(gz+nz);
+        v0=b2*v0+(1-b2)*(gx+nx)**2; v1=b2*v1+(1-b2)*(gz+nz)**2;
+        const mh0=m0/(1-b1**t), mh1=m1/(1-b1**t);
+        const vh0=v0/(1-b2**t), vh1=v1/(1-b2**t);
+        cx -= lr*mh0/(Math.sqrt(vh0)+eps);
+        cz -= lr*mh1/(Math.sqrt(vh1)+eps);
+      } else {
+        cx -= lr*(gx+nx); cz -= lr*(gz+nz);
+      }
+      cx=Math.max(-sz,Math.min(sz,cx)); cz=Math.max(-sz,Math.min(sz,cz));
+      pts.push(new THREE.Vector3(cx, loss(cx,cz)*0.75-1.5+0.12, cz));
+    }
+    const g=new THREE.BufferGeometry().setFromPoints(pts);
+    const line=new THREE.Line(g, new THREE.LineBasicMaterial({color,linewidth:2}));
+    scene.add(line);
+    return {line, pts, mat:line.material};
+  }
+
+  const sgdPath  = makePath( 4.5, 4,  70, 0.10, 0.45, 0xFF9B42, false);
+  const adamPath = makePath(-4.5, 4,  70, 0.25, 0.04, 0x00FFB2, true);
+
+  function makeBall(color) {
+    const m=new THREE.MeshPhongMaterial({color,emissive:color,emissiveIntensity:0.5});
+    const mesh=new THREE.Mesh(new THREE.SphereGeometry(0.18,12,12), m);
+    scene.add(mesh); return mesh;
+  }
+  const sgdBall=makeBall(0xFF9B42), adamBall=makeBall(0x00FFB2);
+
+  let rot={x:0.5,y:0.6}, autoRotate=true, sgdVisible=true, adamVisible=true, animT=0;
+  const R=16;
+
+  function camPos() {
+    camera.position.x=R*Math.sin(rot.y)*Math.cos(rot.x);
+    camera.position.y=R*Math.sin(rot.x);
+    camera.position.z=R*Math.cos(rot.y)*Math.cos(rot.x);
+    camera.lookAt(0,0,0);
+  }
+
+  let drag=false, lx=0, ly=0;
+  canvas.addEventListener('mousedown',e=>{drag=true;lx=e.clientX;ly=e.clientY;autoRotate=false;document.getElementById('btnAuto').classList.remove('on');});
+  window.addEventListener('mousemove',e=>{if(!drag)return;rot.y+=(e.clientX-lx)*0.008;rot.x+=(e.clientY-ly)*0.008;rot.x=Math.max(-1.2,Math.min(1.2,rot.x));lx=e.clientX;ly=e.clientY;});
+  window.addEventListener('mouseup',()=>drag=false);
+  canvas.addEventListener('touchstart',e=>{drag=true;lx=e.touches[0].clientX;ly=e.touches[0].clientY;autoRotate=false;document.getElementById('btnAuto').classList.remove('on');},{passive:true});
+  canvas.addEventListener('touchmove',e=>{if(!drag)return;rot.y+=(e.touches[0].clientX-lx)*0.008;rot.x+=(e.touches[0].clientY-ly)*0.008;rot.x=Math.max(-1.2,Math.min(1.2,rot.x));lx=e.touches[0].clientX;ly=e.touches[0].clientY;},{passive:true});
+  canvas.addEventListener('touchend',()=>drag=false);
+
+  function resize() {
+    const w=canvas.clientWidth;
+    renderer.setSize(w,380,false);
+    camera.aspect=w/380;
+    camera.updateProjectionMatrix();
+  }
+  resize();
+  window.addEventListener('resize',resize);
+
+  function animate() {
+    requestAnimationFrame(animate);
+    if(autoRotate) rot.y+=0.004;
+    animT=(animT+0.007)%1;
+    const si=Math.floor(animT*(sgdPath.pts.length-1));
+    const ai=Math.floor(animT*(adamPath.pts.length-1));
+    sgdBall.position.copy(sgdPath.pts[si]);
+    adamBall.position.copy(adamPath.pts[ai]);
+    sgdBall.visible=sgdVisible; sgdPath.line.visible=sgdVisible;
+    adamBall.visible=adamVisible; adamPath.line.visible=adamVisible;
+    camPos();
+    renderer.render(scene,camera);
+  }
+  animate();
+
+  window.toggleAuto=function(){autoRotate=!autoRotate;document.getElementById('btnAuto').classList.toggle('on',autoRotate);};
+  window.resetView=function(){rot={x:.5,y:.6};autoRotate=true;document.getElementById('btnAuto').classList.add('on');};
+  window.toggleSGD=function(){sgdVisible=!sgdVisible;document.getElementById('btnSGD').classList.toggle('on',sgdVisible);};
+  window.toggleAdam=function(){adamVisible=!adamVisible;document.getElementById('btnAdam').classList.toggle('on',adamVisible);};
+  window.resetBalls=function(){animT=0;};
+})();
+
+// Gradient canvas
+(function() {
+  const canvas=document.getElementById('grad-canvas');
+  if(!canvas)return;
+  function draw() {
+    const W=canvas.parentElement.clientWidth||900;
+    canvas.width=W; canvas.height=160;
+    const ctx=canvas.getContext('2d');
+    ctx.clearRect(0,0,W,160);
+    const layers=6, maxH=90;
+    const vanish=[1.0,0.32,0.10,0.032,0.010,0.003];
+    const explode=[1.0,3.2,8.5,22,58,99];
+
+    // Left: vanishing
+    ctx.fillStyle='rgba(255,107,157,0.06)';
+    ctx.fillRect(0,0,W/2-4,160);
+    ctx.fillStyle='#FF6B9D';
+    ctx.font='bold 11px Calibri,sans-serif';
+    ctx.textAlign='center';
+    ctx.fillText('梯度消失（Vanishing Gradient）',W/4,14);
+    vanish.forEach((g,i)=>{
+      const x=(i+0.5)*(W/2)/layers;
+      const h=Math.max(g*maxH,2);
+      ctx.fillStyle=`rgba(155,93,229,${0.25+g*0.7})`;
+      ctx.fillRect(x-13,130-h,26,h);
+      ctx.fillStyle='#8892B0';
+      ctx.font='9px Calibri,sans-serif';
+      ctx.fillText('L'+(layers-i),x,148);
+      ctx.fillStyle='#9B5DE5';
+      ctx.fillText(g.toFixed(3),x,128-h);
+    });
+    ctx.fillStyle='#FF6B9D66';
+    ctx.font='9px Calibri,sans-serif';
+    ctx.fillText('← 反向傳播方向',W/4,158);
+
+    // Right: exploding
+    ctx.fillStyle='rgba(255,155,66,0.06)';
+    ctx.fillRect(W/2+4,0,W/2-4,160);
+    ctx.fillStyle='#FF9B42';
+    ctx.font='bold 11px Calibri,sans-serif';
+    ctx.fillText('梯度爆炸（Exploding Gradient）',W*3/4,14);
+    explode.forEach((g,i)=>{
+      const x=W/2+4+(i+0.5)*(W/2-4)/layers;
+      const h=Math.min(g/99*maxH+2,maxH);
+      ctx.fillStyle=`rgba(255,155,66,${0.25+Math.min(g/99,1)*0.7})`;
+      ctx.fillRect(x-13,130-h,26,h);
+      ctx.fillStyle='#8892B0';
+      ctx.font='9px Calibri,sans-serif';
+      ctx.fillText('L'+(i+1),x,148);
+      ctx.fillStyle='#FF9B42';
+      ctx.fillText(g>50?g.toFixed(0)+'!':g.toFixed(1),x,128-h);
+    });
+    ctx.fillStyle='#FF9B4266';
+    ctx.font='9px Calibri,sans-serif';
+    ctx.fillText('→ 反向傳播方向',W*3/4,158);
+  }
+  draw();
+  window.addEventListener('resize',draw);
+})();
+
+// Distribution canvas
+(function() {
+  const canvas=document.getElementById('dist-canvas');
+  if(!canvas)return;
+  function draw() {
+    const W=canvas.parentElement.clientWidth||900;
+    canvas.width=W; canvas.height=220;
+    const ctx=canvas.getContext('2d');
+    ctx.clearRect(0,0,W,220);
+    const pad=36, plotH=160, xMin=-4, xMax=4;
+    function toC(x,y){return[pad+(x-xMin)/(xMax-xMin)*(W-pad*2), 200-y*plotH];}
+
+    // Axes
+    ctx.strokeStyle='#2E3250'; ctx.lineWidth=1;
+    ctx.beginPath();
+    ctx.moveTo(pad,200); ctx.lineTo(W-pad,200);
+    ctx.moveTo(pad,20);  ctx.lineTo(pad,200);
+    ctx.stroke();
+
+    // Grid lines
+    [-3,-2,-1,0,1,2,3].forEach(v=>{
+      const [cx]=toC(v,0);
+      ctx.strokeStyle='#2E325044'; ctx.lineWidth=0.5;
+      ctx.beginPath(); ctx.moveTo(cx,200); ctx.lineTo(cx,20); ctx.stroke();
+      ctx.fillStyle='#8892B0'; ctx.font='10px Calibri,sans-serif'; ctx.textAlign='center';
+      ctx.fillText(v,cx,216);
+    });
+
+    function curve(fn,color,xr){
+      ctx.strokeStyle=color; ctx.lineWidth=2.5;
+      ctx.beginPath(); let first=true;
+      for(let px=0;px<=W-pad*2;px++){
+        const x=xr[0]+(px/(W-pad*2))*(xr[1]-xr[0]);
+        const y=fn(x);
+        const [cx,cy]=toC(x,y);
+        first?ctx.moveTo(cx,cy):ctx.lineTo(cx,cy); first=false;
+      }
+      ctx.stroke();
+    }
+
+    // Normal N(0,1)
+    curve(x=>Math.exp(-x*x/2)/Math.sqrt(2*Math.PI),'#9B5DE5',[xMin,xMax]);
+    // Exponential Exp(1)
+    curve(x=>x>=0?Math.exp(-x):0,'#FF9B42',[0,xMax]);
+    // Uniform U(-2,2)
+    curve(x=>(x>=-2&&x<=2)?0.25:0,'#00D4FF',[xMin,xMax]);
+
+    // 68% shading
+    const [x1]=toC(-1,0),[x2]=toC(1,0);
+    ctx.fillStyle='rgba(155,93,229,0.12)';
+    ctx.fillRect(x1,20,x2-x1,180);
+    ctx.fillStyle='#9B5DE5'; ctx.font='bold 10px Calibri,sans-serif'; ctx.textAlign='center';
+    ctx.fillText('68%',(x1+x2)/2,50);
+
+    // Labels
+    [{t:'N(0,1) 常態',c:'#9B5DE5',x:W*0.18,y:32},
+     {t:'Exp(1) 指數',c:'#FF9B42',x:W*0.62,y:55},
+     {t:'U(-2,2) 均勻',c:'#00D4FF',x:W*0.35,y:130}
+    ].forEach(l=>{
+      ctx.fillStyle=l.c; ctx.font='bold 11px Calibri,sans-serif'; ctx.textAlign='center';
+      ctx.fillText(l.t,l.x,l.y);
+    });
+  }
+  draw();
+  window.addEventListener('resize',draw);
+})();
+
+// Quiz
+const questions = [
+  {
+    stem:'以下關於常態分佈（Normal Distribution）的敘述，何者正確？',
+    opts:['A. 常態分佈為右偏，均值 > 中位數','B. μ±2σ 範圍涵蓋約 68% 的資料','C. 常態分佈均值=中位數=眾數，鐘型對稱，μ±1σ 涵蓋約 68%','D. 常態分佈只適用於非負數值'],
+    ans:2,
+    exp:'常態分佈 N(μ,σ²) 是對稱鐘型分佈，均值=中位數=眾數。68-95-99.7 法則：μ±1σ≈68%，μ±2σ≈95%，μ±3σ≈99.7%。常態分佈值域(-∞,+∞)，可建模負值。右偏是均值>中位數（如收入分佈）與常態不同。'
+  },
+  {
+    stem:'貝氏定理 P(A|B) = P(B|A)×P(A)/P(B) 中，P(A) 稱為？',
+    opts:['A. 後驗機率（Posterior）','B. 似然函數（Likelihood）','C. 先驗機率（Prior）','D. 邊際機率（Marginal）'],
+    ans:2,
+    exp:'貝氏定理各項：P(A|B)=後驗機率（觀察B後A的機率）；P(B|A)=似然函數（給定A時B的機率）；P(A)=先驗機率（觀察前初始估計）；P(B)=邊際機率（正規化常數）。記憶口訣：後驗 ∝ 似然 × 先驗。'
+  },
+  {
+    stem:'PCA 主成分分析的核心數學操作是？',
+    opts:['A. 對資料矩陣直接求逆矩陣','B. 對協方差矩陣進行特徵值分解，選取最大特徵值對應的特徵向量','C. 對原始資料做 L2 正規化','D. 對資料矩陣執行 Min-Max 縮放'],
+    ans:1,
+    exp:'PCA 步驟：(1)資料中心化；(2)計算協方差矩陣；(3)特徵值分解 Σv=λv；(4)選前k個最大特徵值對應的特徵向量作為主成分。特徵值越大代表該方向的方差越大（保留最多資訊）。'
+  },
+  {
+    stem:'SVD 奇異值分解 X=UΣVᵀ，以下敘述何者正確？',
+    opts:['A. SVD 只適用於方陣（n×n）','B. Σ 對角線的奇異值按升序排列','C. SVD 適用任意矩陣（m×n），奇異值按降序排列（σ₁≥σ₂≥...≥0）','D. U 和 V 是相同的矩陣'],
+    ans:2,
+    exp:'SVD：X=UΣVᵀ。U(m×m)=左奇異向量；Σ=對角奇異值矩陣，按降序排列；Vᵀ(n×n)=右奇異向量轉置。SVD 適用任意形狀矩陣（特徵值分解只適用方陣）。截斷 SVD 保留前k個奇異值→低秩近似→LSA/推薦系統。'
+  },
+  {
+    stem:'Adam 最佳化器相比 SGD 的核心優勢是？',
+    opts:['A. Adam 完全不需要設定學習率','B. Adam 結合 Momentum（一階動量）和 RMSProp（二階動量），自適應調整學習率','C. Adam 保證找到全域最小值','D. Adam 比 SGD 使用更少的記憶體'],
+    ans:1,
+    exp:'Adam = Momentum + RMSProp + 偏差修正。一階動量加速收斂減少震盪；二階動量對不同參數自適應調整學習率（頻繁更新的參數學習率縮小）。預設 β₁=0.9, β₂=0.999, ε=1e-8。Adam 仍需設定初始學習率（通常 1e-3 或 3e-4）。'
+  },
+  {
+    stem:'Adagrad 最佳化器特別適合哪種資料類型？原因為何？',
+    opts:['A. 密集資料，因為對所有特徵使用相同學習率','B. 稀疏資料（如 NLP 詞嵌入），因為對少更新的參數保留較大學習率','C. 影像資料，因為累積梯度加速訓練','D. 時序資料，因為有記憶機制'],
+    ans:1,
+    exp:'Adagrad 累積梯度平方 G_t+=g_t²，更新量∝η/√G_t。稀疏資料中（NLP詞嵌入），稀有詞更新少→G_t小→學習率大→充分更新。最大缺點：G_t只增不減→後期η≈0→停止學習。RMSProp 用指數移動平均解決此問題。'
+  },
+  {
+    stem:'深層神經網路出現「梯度消失」問題，以下哪種組合最有效解決？',
+    opts:['A. 增大學習率至 0.5，強制梯度更新','B. 將激活函數全改為 Sigmoid，限制輸出在 [0,1]','C. 使用 ReLU 激活函數搭配殘差連結（ResNet），使梯度能直接流通','D. 減少網路層數至 2~3 層'],
+    ans:2,
+    exp:'梯度消失原因：Sigmoid/Tanh飽和區導數<<1，多層相乘→趨近0。解法：(1)ReLU：正區間導數=1，不飽和；(2)殘差連結：y=F(x)+x，梯度可直接繞過（梯度高速公路）；(3)BatchNorm：標準化防止飽和。Sigmoid反而加重梯度消失，增大學習率會導致爆炸。'
+  },
+  {
+    stem:'「梯度裁剪（Gradient Clipping）」的目的與機制為何？',
+    opts:['A. 裁剪訓練資料中的離群值，防止過擬合','B. 限制梯度向量的 L2 範數不超過閾值，防止梯度爆炸導致參數發散','C. 將梯度設為零，使特定層停止更新','D. 梯度裁剪等同於 L2 正則化'],
+    ans:1,
+    exp:'梯度裁剪：當梯度L2範數 > max_norm，將所有梯度等比縮小使範數=max_norm。PyTorch：clip_grad_norm_(model.parameters(), max_norm=1.0)。常用於RNN/LSTM（時序模型反向傳播多步驟容易爆炸）。與L2正則化不同：正則化懲罰大權重；裁剪限制梯度大小。'
+  }
+];
+
+const quizEl = document.getElementById('quiz');
+questions.forEach((q, qi) => {
+  const div = document.createElement('div');
+  div.className = 'q-item reveal';
+  div.innerHTML = `
+    <div class="q-num">Q${qi+1} / ${TOTAL}</div>
+    <div class="q-stem">${q.stem}</div>
+    <div class="q-opts">
+      ${q.opts.map((o,oi)=>`<div class="q-opt" onclick="pick(this,${qi},${oi},${q.ans})"><span class="opt-label">${['A','B','C','D'][oi]}</span><span>${o.slice(2)}</span></div>`).join('')}
+    </div>
+    <div class="q-explain" id="exp${qi}">${q.exp}</div>`;
+  quizEl.appendChild(div);
+  obs.observe(div);
+});
+
+function pick(el, qi, oi, ans) {
+  if (answered.has(qi)) return;
+  const opts = el.parentElement.querySelectorAll('.q-opt');
+  opts.forEach((o, i) => { if(i===ans) o.classList.add('correct'); });
+  if (oi !== ans) el.classList.add('wrong');
+  document.getElementById('exp'+qi).classList.add('show');
+  addScore(oi===ans, qi);
+}
+</script>
+</body>
+</html>
