@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MLOps 進階：模型監控與超參數優化 — iPAS AI應用規劃師中級</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+*{font-family:'Calibri','Microsoft JhengHei','微軟正黑體',sans-serif;margin:0;padding:0;box-sizing:border-box;}
+code,.formula{font-family:'JetBrains Mono','Consolas',monospace!important;}
+:root{
+  --bg:#0F1117;--panel:#1A1D27;--panel2:#21253A;
+  --border:#2E3250;--text:#E8EAF6;--muted:#8892B0;
+  --accent:#00D4FF;--accent2:#00FFB2;--accent3:#7C6FFF;
+  --yellow:#FFD166;--orange:#FF9B42;--pink:#FF6B9D;--red:#FF4D6D;
+  --r:14px;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);min-height:100vh;line-height:1.7;overflow-x:hidden;}
+
+.nav{position:sticky;top:0;z-index:200;background:rgba(15,17,23,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:12px 24px;flex-wrap:wrap;}
+.nav a{color:var(--accent);text-decoration:none;font-weight:700;font-size:.88rem;padding:5px 14px;border-radius:999px;border:1.5px solid var(--accent);transition:all .18s;}
+.nav a:hover{background:var(--accent);color:#000;}
+.nav-title{font-size:1rem;color:var(--text);font-weight:700;}
+.nav-tag{margin-left:auto;background:linear-gradient(135deg,var(--accent),var(--accent3));padding:4px 14px;border-radius:999px;font-size:.75rem;font-weight:900;color:#000;}
+
+.hero{padding:60px 20px 44px;background:linear-gradient(160deg,#0F1117,#0a1520,#0F1117);text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(0,212,255,.1),transparent);}
+.hero-badge{display:inline-block;margin-bottom:14px;padding:5px 18px;border-radius:999px;background:rgba(0,212,255,.1);border:1px solid var(--accent);font-size:.78rem;font-weight:900;color:var(--accent);letter-spacing:1px;}
+.hero-title{font-size:clamp(1.8rem,5vw,3rem);background:linear-gradient(135deg,var(--accent),var(--accent2),var(--accent3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px;}
+.hero-sub{color:var(--muted);font-size:.95rem;max-width:640px;margin:0 auto 20px;}
+.tag-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.tag{padding:4px 14px;border-radius:999px;font-size:.75rem;font-weight:900;border:1px solid;}
+.tag-r{color:var(--red);border-color:var(--red);}
+.tag-b{color:var(--accent);border-color:var(--accent);}
+.tag-g{color:var(--accent2);border-color:var(--accent2);}
+.tag-y{color:var(--yellow);border-color:var(--yellow);}
+
+.wrap{max-width:980px;margin:0 auto;padding:16px 20px 100px;}
+
+.sec-title{font-size:1.4rem;color:var(--text);margin:48px 0 16px;display:flex;align-items:center;gap:10px;}
+.sec-title::before{content:'';display:inline-block;width:4px;height:22px;border-radius:2px;background:linear-gradient(var(--accent),var(--accent2));}
+
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:18px;}
+.panel-title{font-weight:900;font-size:.98rem;color:var(--accent2);margin-bottom:12px;}
+
+.formula{background:#080b12;border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin:12px 0;font-size:.88rem;color:var(--accent2);line-height:2.1;overflow-x:auto;}
+.formula .cm{color:var(--muted);font-style:italic;}
+.formula .hl{color:var(--yellow);}
+.formula .fn{color:var(--accent);}
+.formula .vr{color:var(--pink);}
+
+.tbl-wrap{overflow-x:auto;margin:12px 0;}
+table{width:100%;border-collapse:collapse;font-size:.86rem;}
+th{background:var(--panel2);padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);color:var(--accent);font-weight:900;}
+td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--muted);}
+td:first-child{color:var(--text);font-weight:700;}
+tr:hover td{background:rgba(0,212,255,.03);}
+
+.kp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px;margin:12px 0;}
+.kp-card{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:16px;border-left:3px solid var(--accent);transition:transform .18s,border-color .18s;}
+.kp-card:hover{transform:translateY(-4px);border-left-color:var(--accent2);}
+.kp-card .kp-title{font-weight:900;font-size:.92rem;color:var(--text);margin-bottom:6px;}
+.kp-card .kp-body{font-size:.82rem;color:var(--muted);line-height:1.6;}
+.kp-card .kp-tag{font-size:.68rem;font-weight:900;color:var(--accent);margin-top:8px;}
+
+.info-box{background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.3);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--accent);margin:10px 0;}
+.warn-box{background:rgba(255,77,109,.07);border:1px solid rgba(255,77,109,.3);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--red);margin:10px 0;}
+.tip-box{background:rgba(255,209,102,.07);border:1px solid rgba(255,209,102,.3);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--yellow);margin:10px 0;}
+.ok-box{background:rgba(0,255,178,.07);border:1px solid rgba(0,255,178,.3);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--accent2);margin:10px 0;}
+
+.flow{display:flex;flex-wrap:wrap;gap:0;margin:14px 0;align-items:stretch;}
+.flow-step{flex:1;min-width:110px;background:var(--panel2);border:1px solid var(--border);padding:14px 10px;text-align:center;}
+.flow-step:first-child{border-radius:12px 0 0 12px;}
+.flow-step:last-child{border-radius:0 12px 12px 0;}
+.flow-num{font-size:.68rem;font-weight:900;color:var(--muted);margin-bottom:4px;}
+.flow-name{font-weight:900;font-size:.88rem;color:var(--text);margin-bottom:5px;}
+.flow-desc{font-size:.72rem;color:var(--muted);line-height:1.4;}
+.flow-arrow{display:flex;align-items:center;padding:0 4px;color:var(--accent);font-size:1.3rem;}
+
+.compare-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:12px 0;}
+.compare-card{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:16px;}
+.compare-card .cc-head{font-weight:900;font-size:.9rem;padding:4px 10px;border-radius:6px;display:inline-block;margin-bottom:10px;}
+.compare-card ul{list-style:none;padding:0;}
+.compare-card li{font-size:.82rem;color:var(--muted);padding:3px 0;border-bottom:1px solid rgba(255,255,255,.04);}
+.compare-card li:last-child{border-bottom:none;}
+.compare-card li::before{content:'▸ ';color:var(--accent);}
+
+.canvas2d-wrap{background:#080b12;border:1px solid var(--border);border-radius:10px;margin:12px 0;overflow:hidden;}
+.canvas2d-wrap canvas{display:block;width:100%;}
+
+/* ─── Questions ─── */
+.progress-bar{height:6px;background:var(--border);border-radius:3px;margin-bottom:20px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .5s;}
+.q-item{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:14px;}
+.q-badge{font-size:.68rem;font-weight:900;color:var(--accent);background:rgba(0,212,255,.1);border:1px solid rgba(0,212,255,.3);padding:2px 8px;border-radius:999px;display:inline-block;margin-bottom:8px;}
+.q-stem{font-weight:700;color:var(--text);font-size:.94rem;margin-bottom:14px;line-height:1.65;}
+.q-opts{display:flex;flex-direction:column;gap:7px;}
+.q-opt{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:9px;cursor:pointer;transition:all .17s;background:rgba(255,255,255,.02);}
+.q-opt:hover:not(.locked){border-color:var(--accent);background:rgba(0,212,255,.05);}
+.q-opt.sel{border-color:var(--accent);background:rgba(0,212,255,.08);}
+.q-opt.correct{border-color:var(--accent2);background:rgba(0,255,178,.06);}
+.q-opt.wrong{border-color:var(--red);background:rgba(255,77,109,.06);}
+.q-opt.locked{cursor:default;}
+.q-letter{width:26px;height:26px;min-width:26px;border-radius:6px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:900;color:var(--muted);transition:all .17s;}
+.q-opt.sel .q-letter{background:var(--accent);color:#000;}
+.q-opt.correct .q-letter{background:var(--accent2);color:#0F1117;}
+.q-opt.wrong .q-letter{background:var(--red);color:#fff;}
+.q-opt-text{font-size:.9rem;color:var(--text);flex:1;line-height:1.55;}
+.q-ctrl{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.btn{padding:9px 20px;border-radius:8px;border:1.5px solid;cursor:pointer;font-size:.86rem;font-weight:700;font-family:inherit;transition:all .17s;}
+.btn-confirm{border-color:var(--accent);background:rgba(0,212,255,.1);color:var(--accent);}
+.btn-confirm:hover:not(:disabled){background:rgba(0,212,255,.22);}
+.btn-confirm:disabled{opacity:.35;cursor:not-allowed;}
+.btn-skip{border-color:var(--yellow);background:rgba(255,209,102,.08);color:var(--yellow);}
+.btn-skip:hover:not(:disabled){background:rgba(255,209,102,.16);}
+.btn-next{border-color:var(--border);background:transparent;color:var(--muted);}
+.btn-next:hover{border-color:var(--accent3);color:var(--accent3);}
+.exp-panel{margin-top:14px;border-radius:10px;overflow:hidden;display:none;}
+.exp-hdr{padding:10px 16px;font-size:.8rem;font-weight:900;letter-spacing:.5px;}
+.exp-hdr.ok{background:rgba(0,255,178,.12);color:var(--accent2);border-bottom:1px solid rgba(0,255,178,.2);}
+.exp-hdr.fail{background:rgba(255,77,109,.12);color:var(--red);border-bottom:1px solid rgba(255,77,109,.2);}
+.exp-body{background:rgba(255,255,255,.03);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:16px;}
+.exp-row{margin-bottom:10px;padding:9px 12px;border-radius:8px;font-size:.86rem;line-height:1.6;}
+.exp-row:last-child{margin-bottom:0;}
+.exp-row.exp-ok{background:rgba(0,255,178,.05);border:1px solid rgba(0,255,178,.2);}
+.exp-row.exp-no{background:rgba(255,255,255,.02);border:1px solid var(--border);}
+.exp-ltr{font-weight:900;margin-right:6px;}
+.exp-row.exp-ok .exp-ltr{color:var(--accent2);}
+.exp-row.exp-no .exp-ltr{color:var(--muted);}
+.exp-txt{color:var(--muted);}
+
+.score-banner{background:var(--panel);border:2px solid var(--accent);border-radius:var(--r);padding:32px;text-align:center;display:none;margin:20px 0;}
+.score-num{font-size:3.5rem;font-weight:900;}
+.score-num.pass{color:var(--accent2);}
+.score-num.fail{color:var(--red);}
+.score-lbl{color:var(--muted);font-size:1rem;margin-bottom:16px;}
+.score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;}
+.sg-item{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px;}
+.sg-val{font-size:1.5rem;font-weight:900;}
+.sg-val.c{color:var(--accent2);}
+.sg-val.w{color:var(--red);}
+.sg-val.s{color:var(--yellow);}
+.sg-lbl{font-size:.72rem;color:var(--muted);margin-top:4px;}
+.btn-restart{padding:11px 30px;border-radius:8px;border:1.5px solid var(--accent);background:rgba(0,212,255,.1);color:var(--accent);cursor:pointer;font-size:.9rem;font-weight:700;font-family:inherit;transition:all .18s;margin-top:10px;}
+.btn-restart:hover{background:rgba(0,212,255,.22);}
+
+.back-fab{position:fixed;bottom:24px;right:24px;z-index:300;background:var(--accent);color:#000;border:none;border-radius:999px;padding:11px 20px;font-weight:900;font-size:.85rem;cursor:pointer;box-shadow:0 4px 20px rgba(0,212,255,.4);transition:all .18s;text-decoration:none;display:flex;align-items:center;gap:6px;}
+.back-fab:hover{transform:translateY(-3px);box-shadow:0 6px 28px rgba(0,212,255,.55);}
+
+.psi-bar{display:flex;align-items:center;gap:10px;margin:8px 0;}
+.psi-label{width:90px;font-size:.8rem;color:var(--text);font-weight:700;flex-shrink:0;}
+.psi-track{flex:1;height:14px;background:var(--border);border-radius:7px;overflow:hidden;}
+.psi-fill{height:100%;border-radius:7px;transition:width 1s;}
+.psi-val{width:50px;font-size:.78rem;color:var(--muted);text-align:right;flex-shrink:0;}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html">← 首頁</a>
+  <span class="nav-title">MLOps 進階：模型監控與超參數優化</span>
+  <span class="nav-tag">科一 弱點強化</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">iPAS AI 應用規劃師 · 中級 · 弱點補強</div>
+  <div class="hero-title">MLOps 進階<br>模型監控 × CI/CD × 超參數優化</div>
+  <div class="hero-sub">本頁針對您在科一答錯的 9 道高頻考題進行精準補強<br>覆蓋：資料漂移偵測、部署策略、持續整合、超參數調校進階陷阱</div>
+  <div class="tag-row">
+    <span class="tag tag-r">模型監控 PSI / KL散度</span>
+    <span class="tag tag-b">CI/CD for ML</span>
+    <span class="tag tag-g">漸進式部署</span>
+    <span class="tag tag-y">Bayesian 超參數搜尋</span>
+    <span class="tag tag-r">Nested CV 防洩漏</span>
+    <span class="tag tag-b">GPU 記憶體優化</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ═══════════════════════════════════════════
+     SECTION 1: Data Drift 偵測
+════════════════════════════════════════════ -->
+<div class="sec-title">① 資料漂移偵測（Data Drift Detection）</div>
+
+<div class="panel">
+  <div class="panel-title">🔍 Data Drift vs Concept Drift ── 你錯了哪種？</div>
+  <div class="kp-grid">
+    <div class="kp-card">
+      <div class="kp-title">Data Drift（特徵漂移）</div>
+      <div class="kp-body">輸入特徵 X 的分佈隨時間改變，但 X→Y 的關係不變。<br><br>例：顧客年齡分佈改變，但購買行為邏輯相同。</div>
+      <div class="kp-tag">👉 Q22, Q32 考點</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">Concept Drift（概念漂移）</div>
+      <div class="kp-body">X→Y 的對應關係改變，相同特徵導致不同結果。<br><br>例：疫情後「出行頻率」對「消費力」的預測關係改變。</div>
+      <div class="kp-tag">👉 Q46 考點</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">Model Drift（模型衰退）</div>
+      <div class="kp-body">模型準確率隨時間下降，通常由前兩者導致。是結果，不是原因。</div>
+      <div class="kp-tag">👉 監控目標</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">📐 KL 散度（KL Divergence）── Q22 答案 D 的核心概念</div>
+  <p style="color:var(--muted);font-size:.88rem;margin-bottom:12px;">KL 散度量化兩個機率分佈的差異程度，是確認 Data Drift 是否發生的直接工具。</p>
+
+  <div class="formula">
+    <span class="cm">// KL 散度公式（非對稱）</span><br>
+    <span class="fn">D_KL</span>(<span class="vr">P</span> ‖ <span class="vr">Q</span>) = Σ <span class="vr">P(x)</span> · <span class="fn">log</span>( <span class="vr">P(x)</span> / <span class="vr">Q(x)</span> )<br><br>
+    <span class="cm">// P = 訓練時的特徵分佈</span><br>
+    <span class="cm">// Q = 生產環境中的特徵分佈</span><br>
+    <span class="cm">// 結果越大 → 漂移越嚴重 → 需重新訓練</span>
+  </div>
+
+  <div class="warn-box">⚠️ 考試陷阱：定期重新訓練（A）是「解決方案」，提升複雜度（B）、增加測試資料（C）都無法「偵測」分佈變化。只有 KL 散度才是確認漂移的診斷工具。</div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">📊 PSI（Population Stability Index）── Q32 答案 D 的核心概念</div>
+  <p style="color:var(--muted);font-size:.88rem;margin-bottom:14px;">PSI 是 Data Drift 的標準監控指標，能提前預警模型效能下滑風險。</p>
+
+  <div class="formula">
+    <span class="fn">PSI</span> = Σ ( <span class="vr">P_prod</span> - <span class="vr">P_train</span> ) × <span class="fn">ln</span>( <span class="vr">P_prod</span> / <span class="vr">P_train</span> )<br><br>
+    <span class="cm">// P_prod = 生產環境各分桶比例</span><br>
+    <span class="cm">// P_train = 訓練時各分桶比例</span>
+  </div>
+
+  <div class="panel-title" style="margin-top:16px;">PSI 判斷標準</div>
+  <div class="psi-bar"><span class="psi-label">PSI &lt; 0.1</span><div class="psi-track"><div class="psi-fill" style="width:15%;background:var(--accent2);"></div></div><span class="psi-val" style="color:var(--accent2);">穩定</span></div>
+  <div class="psi-bar"><span class="psi-label">0.1 ≤ PSI &lt; 0.2</span><div class="psi-track"><div class="psi-fill" style="width:45%;background:var(--yellow);"></div></div><span class="psi-val" style="color:var(--yellow);">輕微漂移</span></div>
+  <div class="psi-bar"><span class="psi-label">PSI ≥ 0.2</span><div class="psi-track"><div class="psi-fill" style="width:85%;background:var(--red);"></div></div><span class="psi-val" style="color:var(--red);">顯著漂移</span></div>
+
+  <div class="info-box" style="margin-top:14px;">💡 PSI ≥ 0.2 應觸發模型再訓練！PSI 是最具預測效力的早期預警指標，比 CPU/記憶體使用率、API 延遲更能提前發現問題。</div>
+
+  <div class="tbl-wrap" style="margin-top:14px;">
+    <table>
+      <thead><tr><th>監控指標</th><th>監控對象</th><th>能否預警模型衰退</th><th>考試評分</th></tr></thead>
+      <tbody>
+        <tr><td>PSI（Population Stability Index）</td><td>輸入特徵分佈</td><td>✅ 最佳選擇</td><td>⭐⭐⭐</td></tr>
+        <tr><td>KL 散度</td><td>特徵分佈差異</td><td>✅ 可用（診斷工具）</td><td>⭐⭐⭐</td></tr>
+        <tr><td>模型置信度分佈</td><td>預測輸出</td><td>⚠️ 間接反映</td><td>⭐⭐</td></tr>
+        <tr><td>CPU / 記憶體使用率</td><td>系統資源</td><td>❌ 無關</td><td>✘</td></tr>
+        <tr><td>API 平均回應時間</td><td>系統延遲</td><td>❌ 無關</td><td>✘</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 2: CI/CD for ML
+════════════════════════════════════════════ -->
+<div class="sec-title">② ML 持續整合（CI/CD for ML）</div>
+
+<div class="panel">
+  <div class="panel-title">⚡ CI 核心實踐 ── Q29 答案 B 的完整解析</div>
+  <div class="warn-box">❌ 常見錯誤：選 A（每日手動合併）→ CI 的「持續」代表自動、頻繁，手動觸發不符合 CI 精神。</div>
+  <div class="ok-box">✅ 正確答案 B：每次 commit 後自動觸發建置 + 單元測試 + 靜態分析，是 CI 的核心定義。</div>
+
+  <div style="margin-top:16px;">
+    <div class="flow">
+      <div class="flow-step"><div class="flow-num">STEP 1</div><div class="flow-name">Code Commit</div><div class="flow-desc">開發者推送程式碼</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="flow-num">STEP 2</div><div class="flow-name">自動建置</div><div class="flow-desc">Docker build / 依賴安裝</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="flow-num">STEP 3</div><div class="flow-name">自動測試</div><div class="flow-desc">單元測試 + 靜態分析</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="flow-num">STEP 4</div><div class="flow-name">模型評估</div><div class="flow-desc">性能指標超過閾值</div></div>
+      <div class="flow-arrow">→</div>
+      <div class="flow-step"><div class="flow-num">STEP 5</div><div class="flow-name">自動部署</div><div class="flow-desc">推送至暫存環境</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 3: 漸進式部署策略
+════════════════════════════════════════════ -->
+<div class="sec-title">③ 漸進式部署策略（Phased Rollout）</div>
+
+<div class="panel">
+  <div class="panel-title">🚀 四種部署策略完整比較 ── Q23 考點</div>
+  <p style="color:var(--muted);font-size:.86rem;margin-bottom:14px;">Q23 情境：大型醫院導入輔助診斷 AI，需要「降低衝擊 + 風險可控 + 回饋可收斂」。</p>
+  <div class="compare-grid">
+    <div class="compare-card">
+      <div class="cc-head" style="background:rgba(0,255,178,.12);color:var(--accent2);">✅ 答案 A：漸進式上線</div>
+      <ul>
+        <li>從單一部門（放射科）開始</li>
+        <li>收集真實反饋後逐步擴展</li>
+        <li>降低整體風險，可快速回滾</li>
+        <li>最符合醫療高風險場景</li>
+      </ul>
+    </div>
+    <div class="compare-card">
+      <div class="cc-head" style="background:rgba(124,111,255,.12);color:var(--accent3);">藍綠部署（Blue-Green）</div>
+      <ul>
+        <li>維持兩套相同環境</li>
+        <li>瞬間切換流量，零停機</li>
+        <li>出問題可立即回滾</li>
+        <li>適合需要審計的金融/法規場景</li>
+      </ul>
+    </div>
+    <div class="compare-card">
+      <div class="cc-head" style="background:rgba(255,209,102,.12);color:var(--yellow);">金絲雀部署（Canary）</div>
+      <ul>
+        <li>先將少量流量（5%）導至新版本</li>
+        <li>逐步增加比例</li>
+        <li>仍有部分用戶受新版本影響</li>
+        <li>適合 B2C 產品驗證新功能</li>
+      </ul>
+    </div>
+    <div class="compare-card">
+      <div class="cc-head" style="background:rgba(0,212,255,.12);color:var(--accent);">影子模式（Shadow Mode）</div>
+      <ul>
+        <li>AI 在後台並行運作</li>
+        <li>不影響現有流程</li>
+        <li>記錄 AI vs 人類決策差異</li>
+        <li>零風險收集真實數據</li>
+      </ul>
+    </div>
+  </div>
+  <div class="warn-box">⚠️ Q23 陷阱：C 選項「僅在夜班啟用」不符合「回饋可收斂」的要求（夜班樣本偏差）；D 選項全院同步提示會造成認知偏差風險。</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 4: 超參數優化
+════════════════════════════════════════════ -->
+<div class="sec-title">④ 超參數搜尋三大方法 ── Q36 核心</div>
+
+<div class="panel">
+  <div class="panel-title">🔬 Grid Search vs Random Search vs Bayesian Optimization</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>方法</th><th>搜尋策略</th><th>優點</th><th>缺點</th><th>適用場景</th></tr></thead>
+      <tbody>
+        <tr><td>Grid Search（網格搜尋）</td><td>窮舉所有組合</td><td>系統化、不遺漏</td><td>計算成本隨維度爆炸</td><td>超參數少（≤3個）、計算資源充足</td></tr>
+        <tr><td>Random Search（隨機搜尋）</td><td>隨機抽樣組合</td><td>探索效率優於 Grid</td><td>無法保證找到最佳</td><td>超參數多、快速探索</td></tr>
+        <tr><td style="color:var(--accent2);">Bayesian Optimization（貝葉斯）</td><td>基於歷次結果動態調整</td><td>⭐ 最智慧、效率最高</td><td>實現複雜</td><td>訓練代價高、超參數多</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="info-box">💡 Q36 答案 B（Grid Search）：題目描述「系統化測試多種模型設定」，關鍵字「系統化」對應 Grid Search 的窮舉特性。Bayesian（D）雖效率更高，但題目強調「系統化」，故 Grid Search 是最直接的選項。</div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 5: 交叉驗證 & Data Leakage
+════════════════════════════════════════════ -->
+<div class="sec-title">⑤ 超參數調校的資料洩漏陷阱 ── Q14 & Q41</div>
+
+<div class="panel">
+  <div class="panel-title">🚨 K-Fold + 超參數調校 → Data Leakage 問題（Q41）</div>
+  <div class="canvas2d-wrap">
+    <canvas id="cvCanvas" height="200"></canvas>
+  </div>
+
+  <div class="warn-box">❌ 問題根源：在 K-Fold 上直接調超參數 → 超參數針對整體資料分佈優化 → 過度樂觀偏差（Over-optimistic Bias）= Data Leakage！</div>
+  <div class="ok-box">✅ 正確解法：使用巢狀交叉驗證（Nested CV）
+    <br>外層 CV：評估整體模型性能
+    <br>內層 CV：選擇最佳超參數（隔離選擇過程）
+  </div>
+
+  <div style="margin-top:16px;padding:14px;background:#080b12;border-radius:10px;font-size:.84rem;">
+    <p style="color:var(--accent);font-weight:900;margin-bottom:10px;">巢狀交叉驗證（Nested CV）示意</p>
+    <p style="color:var(--muted);line-height:1.8;">
+      外層 Fold 1（測試集隔離）<br>
+      &nbsp;&nbsp;└ 內層 K-Fold → 選出最佳超參數<br>
+      外層 Fold 2（測試集隔離）<br>
+      &nbsp;&nbsp;└ 內層 K-Fold → 選出最佳超參數<br>
+      &nbsp;&nbsp;... 重複<br>
+      <span style="color:var(--accent2);">最終報告外層的平均性能 → 無偏估計！</span>
+    </p>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">🎯 交叉驗證最佳化泛化能力（Q14）</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>做法</th><th>是否有效</th><th>原因</th></tr></thead>
+      <tbody>
+        <tr><td style="color:var(--accent2);">A. 交叉驗證（Cross-Validation）</td><td style="color:var(--accent2);">✅ 最佳答案</td><td>多組 train/val 切分評估，選出在驗證資料上最穩定的超參數</td></tr>
+        <tr><td>B. Early Stopping</td><td>⚠️ 部分正確</td><td>監控的是驗證誤差（不是訓練誤差）；屬訓練策略，非超參數搜尋方法</td></tr>
+        <tr><td>C. 特徵標準化</td><td>❌ 無關</td><td>資料前處理，改善數值穩定性，不直接解決超參數過擬合</td></tr>
+        <tr><td>D. 提高模型複雜度</td><td>❌ 錯誤</td><td>複雜度提升 → 更容易過擬合，方向相反</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     SECTION 6: GPU 記憶體優化
+════════════════════════════════════════════ -->
+<div class="sec-title">⑥ GPU 記憶體不足解決策略 ── Q37</div>
+
+<div class="panel">
+  <div class="panel-title">🖥️ 大型模型訓練 GPU OOM 處理</div>
+  <p style="color:var(--muted);font-size:.86rem;margin-bottom:14px;">情境：語音合成大型模型，模型架構固定、不能換硬體，需在維持效能前提下降低單 GPU 記憶體壓力。</p>
+
+  <div class="compare-grid">
+    <div class="compare-card" style="border:1.5px solid var(--accent2);">
+      <div class="cc-head" style="background:rgba(0,255,178,.12);color:var(--accent2);">✅ 答案 B：最有效</div>
+      <ul>
+        <li>較小的 Batch Size</li>
+        <li>+ 資料分片（Data Sharding）</li>
+        <li>+ 梯度累積（Gradient Accumulation）</li>
+        <li>模擬大批次訓練效果</li>
+      </ul>
+    </div>
+    <div class="compare-card">
+      <div class="cc-head" style="background:rgba(124,111,255,.12);color:var(--accent3);">模型並行（Model Parallelism）</div>
+      <ul>
+        <li>將模型不同層分配到不同 GPU</li>
+        <li>適合超大模型（單卡無法容納）</li>
+        <li>題目說模型架構固定 → 較複雜</li>
+      </ul>
+    </div>
+    <div class="compare-card">
+      <div class="cc-head" style="background:rgba(255,209,102,.12);color:var(--yellow);">混合精度訓練（FP16）</div>
+      <ul>
+        <li>記憶體減少約 50%</li>
+        <li>是常用優化技術</li>
+        <li>但超大模型仍需搭配分散式策略</li>
+      </ul>
+    </div>
+    <div class="compare-card">
+      <div class="cc-head" style="background:rgba(255,77,109,.12);color:var(--red);">❌ 減少訓練資料（A）</div>
+      <ul>
+        <li>降低訓練效果，不是解決方案</li>
+        <li>❌ 增加學習率（C）→ 加速不等於省記憶體</li>
+        <li>❌ 用測試集訓練（D）→ 違背ML基本原則</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="formula" style="margin-top:14px;">
+    <span class="cm">// 梯度累積原理（模擬大 Batch Size）</span><br>
+    <span class="cm">// 實際 batch=8，累積 4 步 → 等效 batch=32</span><br>
+    for step in range(<span class="hl">accumulation_steps</span>):<br>
+    &nbsp;&nbsp;loss = model(small_batch) / <span class="hl">accumulation_steps</span><br>
+    &nbsp;&nbsp;loss.backward()  <span class="cm">// 累積梯度</span><br>
+    optimizer.step()   <span class="cm">// 每 N 步才更新一次</span><br>
+    optimizer.zero_grad()
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     PRACTICE QUESTIONS
+════════════════════════════════════════════ -->
+<div class="sec-title">📝 弱點強化練習（9 道考古題）</div>
+<p style="color:var(--muted);font-size:.86rem;margin-bottom:16px;">以下 9 題均來自您此次答錯的科一考古題，逐題突破！</p>
+
+<div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+<div id="progLabel" style="font-size:.78rem;color:var(--muted);margin-bottom:16px;text-align:right;">第 0 / 9 題已作答</div>
+<div id="qWrap"></div>
+<div class="score-banner" id="scoreBanner">
+  <div class="score-num" id="scoreNum"></div>
+  <div class="score-lbl" id="scoreLbl"></div>
+  <div class="score-grid">
+    <div class="sg-item"><div class="sg-val c" id="sgC">0</div><div class="sg-lbl">答對</div></div>
+    <div class="sg-item"><div class="sg-val w" id="sgW">0</div><div class="sg-lbl">答錯</div></div>
+    <div class="sg-item"><div class="sg-val s" id="sgS">0</div><div class="sg-lbl">略過</div></div>
+  </div>
+  <button class="btn-restart" onclick="restartQuiz()">🔄 重新練習</button>
+</div>
+
+</div><!-- /wrap -->
+
+<a class="back-fab" href="index.html">🏠 返回首頁</a>
+
+<script>
+/* ─── Canvas: Nested CV 示意 ─── */
+(function(){
+  const c = document.getElementById('cvCanvas');
+  if(!c) return;
+  const W = c.parentElement.clientWidth || 700;
+  c.width = W; c.height = 200;
+  const ctx = c.getContext('2d');
+  const colors = {bg:'#080b12',panel:'#1A1D27',border:'#2E3250',
+    accent:'#00D4FF',green:'#00FFB2',yellow:'#FFD166',red:'#FF4D6D',muted:'#8892B0',text:'#E8EAF6'};
+
+  ctx.fillStyle = colors.bg;
+  ctx.fillRect(0,0,W,200);
+
+  const fold = ['Fold1','Fold2','Fold3','Fold4','Fold5'];
+  const colW = (W - 80) / fold.length;
+  const startX = 60;
+
+  ctx.font = '700 11px Calibri';
+  ctx.fillStyle = colors.accent;
+  ctx.fillText('標準 K-Fold + 超參數調整 → Data Leakage！', startX, 22);
+
+  // Row 1: standard K-Fold
+  fold.forEach((f,i)=>{
+    const x = startX + i*colW;
+    const isTest = i===2;
+    ctx.fillStyle = isTest ? colors.red+'33' : colors.green+'22';
+    ctx.strokeStyle = isTest ? colors.red : colors.green;
+    ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.roundRect(x+2,30,colW-4,30,4);ctx.fill();ctx.stroke();
+    ctx.fillStyle = isTest ? colors.red : colors.green;
+    ctx.font='700 9px Calibri';
+    ctx.fillText(f, x+colW/2-14, 50);
+    ctx.fillStyle = colors.muted;
+    ctx.font='8px Calibri';
+    ctx.fillText(isTest?'Test':'Train', x+colW/2-10, 52);
+  });
+
+  ctx.fillStyle = colors.red;
+  ctx.font='11px Calibri';
+  ctx.fillText('超參數選擇基於全部 fold → 間接「看」到了測試集 → 洩漏！', startX, 82);
+
+  ctx.fillStyle = colors.accent;
+  ctx.font='700 11px Calibri';
+  ctx.fillText('✅  Nested CV → 外層 fold 完全隔離', startX, 110);
+
+  // Outer folds
+  fold.forEach((f,i)=>{
+    const x = startX + i*colW;
+    const isOuter = i===4;
+    ctx.fillStyle = isOuter ? colors.yellow+'33' : colors.accent+'22';
+    ctx.strokeStyle = isOuter ? colors.yellow : colors.accent;
+    ctx.lineWidth=1.5;
+    ctx.beginPath();ctx.roundRect(x+2,118,colW-4,22,4);ctx.fill();ctx.stroke();
+    ctx.fillStyle = isOuter ? colors.yellow : colors.accent;
+    ctx.font='700 8px Calibri';
+    ctx.fillText(isOuter?'外Test':'外Train', x+4, 133);
+  });
+
+  // Inner folds inside outer train
+  const innerW = colW*4 - 8;
+  const innerFolds = 3;
+  const innerColW = innerW / innerFolds;
+  ['Inner1','Inner2','Inner3'].forEach((lbl,i)=>{
+    const x = startX + 2 + i*innerColW;
+    const isInnerTest = i===1;
+    ctx.fillStyle = isInnerTest ? colors.red+'22' : colors.green+'15';
+    ctx.strokeStyle = isInnerTest ? colors.red+'80' : colors.green+'50';
+    ctx.lineWidth=1;
+    ctx.beginPath();ctx.roundRect(x+1,142,innerColW-2,22,3);ctx.fill();ctx.stroke();
+    ctx.fillStyle = isInnerTest ? colors.red : colors.green;
+    ctx.font='8px Calibri';
+    ctx.fillText(lbl, x+4, 157);
+  });
+  ctx.fillStyle = colors.muted;
+  ctx.font='9px Calibri';
+  ctx.fillText('內層選超參數（與外層Test完全隔離）→ 無偏估計！', startX, 190);
+})();
+
+/* ─── Quiz Engine ─── */
+const QUESTIONS = [
+  {
+    id:'Q14',topic:'超參數調整',
+    stem:'在調整模型超參數（Hyperparameters）時，若希望避免因過度調整參數而導致過擬合，下列哪一種做法最有效提升模型的泛化能力？',
+    opts:{A:'採用交叉驗證（Cross-Validation）於多組參數組合間反覆評估，選擇在驗證資料上表現最穩定的設定',B:'使用早期停止機制（Early Stopping）監控訓練誤差並在收斂前停止訓練，以防模型學習過度',C:'對輸入特徵進行標準化以減少特徵值差異帶來的過擬合風險',D:'提高模型複雜度並使用更多超參數搜尋範圍，以確保模型能充分學習資料特徵'},
+    answer:'A',
+    exps:{A:'✅ 正確。Cross-Validation 在多組超參數上反覆訓練/驗證，能有效評估未見資料的泛化能力，選出最穩定組合。',B:'❌ Early Stopping 監控的是驗證誤差（非訓練誤差），且屬訓練策略而非超參數選擇方法。',C:'❌ 特徵標準化是資料前處理，改善數值穩定性，不直接解決超參數過擬合問題。',D:'❌ 提高複雜度通常加劇過擬合，與目標相悖。'}
+  },
+  {
+    id:'Q22',topic:'Data Drift 偵測',
+    stem:'某電商平台的顧客流失預測模型上線數月後準確率下降。團隊懷疑出現資料漂移（Data Drift）。為偵測並確認資料分佈是否發生變化，下列哪一種作法最合適？',
+    opts:{A:'定期重新訓練模型以應對外部變化',B:'提升模型複雜度以捕捉更多資料變異性',C:'增加測試資料量以提高評估準確度',D:'計算輸入特徵分佈間的 KL散度（KL Divergence）'},
+    answer:'D',
+    exps:{A:'❌ 重新訓練是「解決方案」，但在確認漂移發生之前，這是治標不治本的做法。',B:'❌ 提升複雜度無法解決特徵分佈已改變的根本問題。',C:'❌ 增加測試資料量無法診斷分佈是否改變。',D:'✅ 正確。KL 散度量化當前分佈 vs. 訓練時分佈的差異，是診斷 Data Drift 最直接的工具。'}
+  },
+  {
+    id:'Q23',topic:'漸進式部署',
+    stem:'某大型醫院即將部署輔助診斷 AI 系統，為降低對臨床流程的衝擊，同時確保風險可控與回饋可收斂，應採取何種「漸進式部署」策略最為合適？',
+    opts:{A:'從單一專科（如放射科）或特定病房開始啟用，逐步擴展至全院',B:'先部署於病例量較高的急診單位，加速收集高頻使用回饋',C:'僅在夜班或離峰時段啟用，避免影響主要臨床工作負載',D:'在使用者界面啟用提示模式，讓全院同步體驗但不影響診斷流程'},
+    answer:'A',
+    exps:{A:'✅ 正確。從單一部門試點（Pilot Testing），收集真實反饋後逐步擴展，是高風險場景的最佳漸進式策略。',B:'❌ 急診環境壓力最高，不適合作為新系統的首批試點，樣本也可能有偏差。',C:'❌ 夜班樣本偏差（病例類型不同），無法代表全院使用情況，回饋不具代表性。',D:'❌ 全院同步上線提示可能造成認知偏差，且難以控制風險。'}
+  },
+  {
+    id:'Q29',topic:'持續整合 CI',
+    stem:'某AI開發團隊計畫實施持續整合（CI）流程。下列哪一項做法最符合 CI 的核心實踐，且能有效減少整合風險？',
+    opts:{A:'在主分支每日固定時間手動合併並執行完整測試流程',B:'每次程式碼提交（Commit）後自動觸發建置、單元測試及靜態程式碼分析',C:'於模型訓練完成後，定期安排開發團隊回顧並合併程式碼',D:'透過自動化部署腳本，將模型在特定時間點批次釋出到測試環境'},
+    answer:'B',
+    exps:{A:'❌ 「每日固定時間」且「手動」合併，不符合 CI 的「持續」（Continuous = 每次 commit 自動觸發）精神。',B:'✅ 正確。每次 commit 自動觸發建置+測試是 CI 的核心定義，能即時發現整合問題。',C:'❌ 「定期安排」是批次式整合，等同舊有做法，無法做到持續整合。',D:'❌ 定時批次釋出屬於 CD（Continuous Delivery）的初階版本，且不是 CI 的核心。'}
+  },
+  {
+    id:'Q32',topic:'MLOps 監控指標',
+    stem:'某企業 AI 模型已部署於生產環境，技術團隊希望透過監控指標進行預警，提早發現模型效能下滑風險。下列哪一項監控指標最具預測效力？',
+    opts:{A:'系統 CPU 與記憶體使用率波動幅度',B:'模型推論結果的置信度（Confidence）分佈變化趨勢',C:'API 平均回應時間與延遲百分位數變化',D:'輸入特徵與訓練資料分布差異的 PSI（Population Stability Index）指數'},
+    answer:'D',
+    exps:{A:'❌ CPU/記憶體監控的是系統資源，與模型預測品質無直接關聯，無法提前預警。',B:'⚠️ 置信度分佈能間接反映模型表現，但相較 PSI 反應較慢，是事後指標。',C:'❌ API 延遲監控的是系統效能，不反映模型的預測品質。',D:'✅ 正確。PSI 量化輸入特徵分布的變化程度，是偵測 Data Drift 的標準指標，PSI ≥ 0.2 即觸發再訓練，具備最強的預測效力。'}
+  },
+  {
+    id:'Q36',topic:'超參數搜尋',
+    stem:'某資料科學團隊針對多種模型設定（學習率、樹深度、正則化係數等）進行系統化測試，希望找出在驗證資料上表現最穩定的組合。此過程最可能採用下列哪一種方法？',
+    opts:{A:'使用交叉驗證（Cross Validation）反覆評估模型以降低過擬合風險',B:'透過網格搜尋（Grid Search）在多組超參數設定中進行系統化搜尋與評估',C:'以隨機搜尋（Random Search）快速探索部分參數空間以提升搜尋效率',D:'採用貝葉斯優化（Bayesian Optimization）根據歷次結果動態調整搜尋方向'},
+    answer:'B',
+    exps:{A:'❌ Cross-Validation 是評估工具，不是超參數搜尋方法（兩者可組合使用）。',B:'✅ 正確。「系統化測試」是 Grid Search 的核心特性——窮舉所有指定的超參數組合，確保不遺漏任何組合。',C:'❌ Random Search 是「隨機」而非「系統化」，題目強調系統化。',D:'❌ Bayesian 優化雖然更高效，但是「動態調整」而非「系統化」搜尋。'}
+  },
+  {
+    id:'Q37',topic:'GPU 記憶體優化',
+    stem:'某公司訓練大型語音合成模型，使用多台 GPU 但經常出現記憶體不足。由於模型架構固定且無法更換硬體，下列哪一種方法最有效降低單張 GPU 的記憶體壓力？',
+    opts:{A:'減少訓練資料量以降低記憶體使用',B:'採用較小的批次大小（Batch Size）並搭配資料分片（Data Sharding）分散訓練負載',C:'增加學習率（Learning Rate）以加快收斂速度',D:'改用測試資料集（Test Set）進行部分訓練以節省空間'},
+    answer:'B',
+    exps:{A:'❌ 減少訓練資料降低了模型品質，且 batch 不是造成大量記憶體使用的根本原因（模型參數才是）。',B:'✅ 正確。較小 batch size + 資料分片 + 梯度累積（Gradient Accumulation）是在不改變架構前提下降低單 GPU 記憶體的標準組合策略。',C:'❌ 增加學習率與記憶體使用量無關。',D:'❌ 用測試集訓練違背機器學習基本原則，會造成嚴重的資料洩漏。'}
+  },
+  {
+    id:'Q41',topic:'K-Fold 資料洩漏',
+    stem:'在進行超參數調校時，若直接在 K-Fold 交叉驗證的資料上同時調整模型參數並評估效能，最可能導致下列哪一種問題？',
+    opts:{A:'模型的交叉驗證結果出現過度樂觀偏差（Over-optimistic Bias），因測試摺資料間接參與參數選擇，造成資料洩漏（Data Leakage）',B:'模型會在每一摺（Fold）內反覆調整參數，導致訓練不穩與過度正則化',C:'因交叉驗證資料被重複使用，造成效能方差增大，無法獲得穩定估計',D:'K-Fold 交叉驗證的假設與超參數搜尋相衝突，導致驗證過程失效'},
+    answer:'A',
+    exps:{A:'✅ 正確。超參數是針對所有 fold 的分佈優化的，等於間接「看過」了測試集，造成 Over-optimistic Bias（過度樂觀偏差），需用 Nested CV 解決。',B:'❌ K-Fold 中不會「反覆調整參數」，每個 fold 只訓練一次；過度正則化是另一回事。',C:'❌ 重複使用資料不會造成方差增大，而是造成偏差（bias）問題。',D:'❌ K-Fold 的假設（各折獨立同分布）與超參數搜尋並不衝突，問題在於洩漏而非假設矛盾。'}
+  },
+  {
+    id:'Q11',topic:'DBSCAN 超參數',
+    stem:'企業資料分析團隊使用 DBSCAN 演算法進行顧客行為分群，並希望模型能自動區分主要群集與雜訊資料。在此演算法中，決定聚類結果的兩個主要超參數為下列何者？',
+    opts:{A:'特徵數與學習率',B:'K 值與距離閾值',C:'鄰域半徑（Epsilon ε）與最小點數（MinPts）',D:'交叉熵（Cross Entropy）與權重初始化'},
+    answer:'C',
+    exps:{A:'❌ 特徵數是資料維度，學習率是梯度下降參數，均非 DBSCAN 的超參數。',B:'❌ K 值是 K-means 的超參數，DBSCAN 不需要預設群數（自動確定群數是其優勢）。',C:'✅ 正確。DBSCAN 由 ε（鄰域半徑）和 MinPts（核心點條件：鄰域內最少點數）控制，這兩個值直接決定哪些點是核心點、邊界點或雜訊點。',D:'❌ 交叉熵是損失函數，權重初始化是神經網路參數，與 DBSCAN 完全無關。'}
+  }
+];
+
+let state = QUESTIONS.map(()=>({sel:null,confirmed:false,skipped:false}));
+
+function renderAll(){
+  const wrap = document.getElementById('qWrap');
+  wrap.innerHTML = '';
+  QUESTIONS.forEach((q,qi)=>{
+    const s = state[qi];
+    const div = document.createElement('div');
+    div.className = 'q-item';
+    div.id = 'qi'+qi;
+
+    const letters = ['A','B','C','D'];
+    const optsHTML = letters.map(l=>{
+      let cls = 'q-opt';
+      if(s.confirmed){
+        cls += ' locked';
+        if(l===q.answer) cls += ' correct';
+        else if(l===s.sel) cls += ' wrong';
+      } else if(s.sel===l) cls += ' sel';
+      return `<div class="${cls}" onclick="selectOpt(${qi},'${l}')">
+        <div class="q-letter">${l}</div>
+        <div class="q-opt-text">${q.opts[l]}</div>
+      </div>`;
+    }).join('');
+
+    let expHTML = '';
+    if(s.confirmed || s.skipped){
+      const isOk = s.sel===q.answer;
+      const hdrCls = s.skipped ? 'fail' : (isOk?'ok':'fail');
+      const hdrTxt = s.skipped ? '⏭ 已略過 — 正確答案：'+q.answer
+                   : (isOk ? '✅ 答對了！' : '❌ 答錯了，正確答案：'+q.answer);
+      expHTML = `<div class="exp-panel" style="display:block">
+        <div class="exp-hdr ${hdrCls}">${hdrTxt}</div>
+        <div class="exp-body">
+          ${letters.map(l=>`<div class="exp-row ${l===q.answer?'exp-ok':'exp-no'}">
+            <span class="exp-ltr">${l}.</span><span class="exp-txt">${q.exps[l]}</span>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    }
+
+    div.innerHTML = `
+      <div class="q-badge">${q.id} · ${q.topic}</div>
+      <div class="q-stem">${q.stem}</div>
+      <div class="q-opts">${optsHTML}</div>
+      <div class="q-ctrl">
+        <button class="btn btn-confirm" id="btnC${qi}" onclick="confirm_q(${qi})" ${s.sel&&!s.confirmed?'':'disabled'}>確認作答</button>
+        <button class="btn btn-skip" onclick="skip_q(${qi})" ${s.confirmed||s.skipped?'disabled':''}>略過</button>
+        ${qi<QUESTIONS.length-1?`<button class="btn btn-next" onclick="scrollTo(${qi+1})">下一題 →</button>`:''}
+      </div>
+      ${expHTML}
+    `;
+    wrap.appendChild(div);
+  });
+  updateProgress();
+}
+
+function selectOpt(qi,l){
+  if(state[qi].confirmed||state[qi].skipped) return;
+  state[qi].sel = l;
+  renderAll();
+  document.getElementById('btnC'+qi).disabled = false;
+}
+function confirm_q(qi){
+  if(!state[qi].sel) return;
+  state[qi].confirmed = true;
+  renderAll();
+  checkDone();
+}
+function skip_q(qi){
+  state[qi].skipped = true;
+  renderAll();
+  checkDone();
+}
+function scrollTo(qi){
+  const el = document.getElementById('qi'+qi);
+  if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function updateProgress(){
+  const done = state.filter(s=>s.confirmed||s.skipped).length;
+  const pct = Math.round(done/QUESTIONS.length*100);
+  document.getElementById('progFill').style.width = pct+'%';
+  document.getElementById('progLabel').textContent = `第 ${done} / ${QUESTIONS.length} 題已作答`;
+}
+function checkDone(){
+  const all = state.every(s=>s.confirmed||s.skipped);
+  if(!all) return;
+  const correct = state.filter((s,i)=>s.confirmed&&s.sel===QUESTIONS[i].answer).length;
+  const wrong = state.filter((s,i)=>s.confirmed&&s.sel!==QUESTIONS[i].answer).length;
+  const skipped = state.filter(s=>s.skipped).length;
+  const total = QUESTIONS.length;
+  const pct = Math.round(correct/total*100);
+  const banner = document.getElementById('scoreBanner');
+  document.getElementById('scoreNum').textContent = pct+'%';
+  document.getElementById('scoreNum').className = 'score-num '+(pct>=60?'pass':'fail');
+  document.getElementById('scoreLbl').textContent = `答對 ${correct}/${total} 題 ${pct>=60?'— 繼續加油！':'— 再複習一次！'}`;
+  document.getElementById('sgC').textContent = correct;
+  document.getElementById('sgW').textContent = wrong;
+  document.getElementById('sgS').textContent = skipped;
+  banner.style.display = 'block';
+  banner.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function restartQuiz(){
+  state = QUESTIONS.map(()=>({sel:null,confirmed:false,skipped:false}));
+  document.getElementById('scoreBanner').style.display='none';
+  renderAll();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+renderAll();
+</script>
+</body>
+</html>

@@ -1,0 +1,1088 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>計算題公式速查 — iPAS AI應用規劃師中級</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+*{font-family:'Calibri','Microsoft JhengHei','微軟正黑體',sans-serif;margin:0;padding:0;box-sizing:border-box;}
+code,.mono{font-family:'JetBrains Mono','Consolas',monospace!important;}
+:root{
+  --bg:#0F1117;--panel:#1A1D27;--panel2:#21253A;
+  --border:#2E3250;--text:#E8EAF6;--muted:#8892B0;
+  --accent:#FFD166;--accent2:#00FFB2;--accent3:#7C6FFF;
+  --blue:#00D4FF;--pink:#FF6B9D;--orange:#FF9B42;--red:#FF4D6D;
+  --r:14px;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);min-height:100vh;line-height:1.7;overflow-x:hidden;}
+
+.nav{position:sticky;top:0;z-index:200;background:rgba(15,17,23,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:12px 24px;flex-wrap:wrap;}
+.nav a{color:var(--accent);text-decoration:none;font-weight:700;font-size:.88rem;padding:5px 14px;border-radius:999px;border:1.5px solid var(--accent);transition:all .18s;}
+.nav a:hover{background:var(--accent);color:#000;}
+.nav-title{font-size:1rem;color:var(--text);font-weight:700;}
+.nav-tag{margin-left:auto;background:linear-gradient(135deg,var(--accent),var(--orange));padding:4px 14px;border-radius:999px;font-size:.75rem;font-weight:900;color:#000;}
+
+.hero{padding:56px 20px 40px;background:linear-gradient(160deg,#0F1117,#15110a,#0F1117);text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(255,209,102,.1),transparent);}
+.hero-badge{display:inline-block;margin-bottom:14px;padding:5px 18px;border-radius:999px;background:rgba(255,209,102,.1);border:1px solid var(--accent);font-size:.78rem;font-weight:900;color:var(--accent);letter-spacing:1px;}
+.hero-title{font-size:clamp(1.8rem,5vw,3rem);background:linear-gradient(135deg,var(--accent),var(--orange),var(--pink));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px;}
+.hero-sub{color:var(--muted);font-size:.95rem;max-width:640px;margin:0 auto 20px;}
+.tag-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.tag{padding:4px 14px;border-radius:999px;font-size:.75rem;font-weight:900;border:1px solid;}
+
+.toc{max-width:980px;margin:24px auto 0;padding:0 20px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;}
+.toc-btn{display:block;padding:12px 16px;background:var(--panel);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--muted);font-size:.84rem;font-weight:700;transition:all .18s;text-align:center;}
+.toc-btn:hover{border-color:var(--accent);color:var(--accent);background:rgba(255,209,102,.05);}
+.toc-num{font-size:1.1rem;display:block;margin-bottom:3px;}
+
+.wrap{max-width:980px;margin:0 auto;padding:8px 20px 100px;}
+
+.sec{margin-top:56px;}
+.sec-title{font-size:1.4rem;color:var(--text);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.sec-title::before{content:'';display:inline-block;width:4px;height:22px;border-radius:2px;background:linear-gradient(var(--accent),var(--orange));}
+.sec-badge{font-size:.72rem;padding:3px 10px;border-radius:999px;border:1px solid var(--accent);color:var(--accent);font-weight:900;margin-left:6px;}
+
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:16px;}
+.panel-title{font-weight:900;font-size:.96rem;color:var(--accent2);margin-bottom:12px;}
+
+/* ── Formula box ── */
+.fbox{background:#070a10;border:1.5px solid var(--border);border-radius:12px;padding:18px 22px;margin:12px 0;font-family:'JetBrains Mono','Consolas',monospace;font-size:.92rem;line-height:2.2;overflow-x:auto;position:relative;}
+.fbox .fn{color:var(--accent);}
+.fbox .vr{color:var(--pink);}
+.fbox .num{color:var(--accent2);}
+.fbox .cm{color:var(--muted);font-size:.8rem;font-style:italic;}
+.fbox .hl{color:var(--orange);font-weight:900;}
+.fbox .res{color:var(--accent2);font-weight:900;font-size:1.1rem;}
+.fbox .label{position:absolute;top:8px;right:12px;font-size:.68rem;font-weight:900;color:var(--muted);font-family:inherit;}
+
+/* ── Step-by-step ── */
+.steps{counter-reset:step;margin:12px 0;}
+.step{display:grid;grid-template-columns:32px 1fr;gap:10px;margin-bottom:12px;align-items:start;}
+.step::before{counter-increment:step;content:counter(step);width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--accent),var(--orange));color:#000;font-weight:900;font-size:.82rem;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.step-body{font-size:.88rem;color:var(--muted);line-height:1.7;}
+.step-body strong{color:var(--text);}
+.step-body .calc{color:var(--accent2);font-family:'JetBrains Mono',monospace;font-size:.88rem;}
+
+/* ── Tables ── */
+.tbl-wrap{overflow-x:auto;margin:12px 0;}
+table{width:100%;border-collapse:collapse;font-size:.85rem;}
+th{background:var(--panel2);padding:9px 14px;text-align:left;border-bottom:2px solid var(--border);color:var(--accent);font-weight:900;}
+td{padding:8px 14px;border-bottom:1px solid var(--border);color:var(--muted);}
+td:first-child{color:var(--text);font-weight:700;}
+tr:hover td{background:rgba(255,209,102,.03);}
+.td-ok{color:var(--accent2)!important;}
+.td-warn{color:var(--orange)!important;}
+.td-bad{color:var(--red)!important;}
+
+/* ── Confusion matrix ── */
+.cm-grid{display:grid;grid-template-columns:auto 1fr 1fr;gap:2px;margin:12px 0;max-width:360px;}
+.cm-cell{padding:10px 14px;text-align:center;border-radius:6px;font-size:.82rem;font-weight:700;}
+.cm-hdr{background:var(--panel2);color:var(--muted);font-size:.75rem;}
+.cm-tp{background:rgba(0,255,178,.12);color:var(--accent2);}
+.cm-fp{background:rgba(255,77,109,.12);color:var(--red);}
+.cm-fn{background:rgba(255,77,109,.12);color:var(--red);}
+.cm-tn{background:rgba(0,255,178,.12);color:var(--accent2);}
+
+/* ── Info boxes ── */
+.info-box{background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.3);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--blue);margin:10px 0;}
+.warn-box{background:rgba(255,77,109,.07);border:1px solid rgba(255,77,109,.3);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--red);margin:10px 0;}
+.tip-box{background:rgba(255,209,102,.07);border:1px solid rgba(255,209,102,.3);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--accent);margin:10px 0;}
+.ok-box{background:rgba(0,255,178,.07);border:1px solid rgba(0,255,178,.3);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--accent2);margin:10px 0;}
+
+/* ── Canvas ── */
+.c-wrap{background:#070a10;border:1px solid var(--border);border-radius:12px;margin:14px 0;overflow:hidden;}
+.c-wrap canvas{display:block;width:100%;}
+
+/* ── Quiz ── */
+.progress-bar{height:5px;background:var(--border);border-radius:3px;margin-bottom:18px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .5s;}
+.q-item{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:22px;margin-bottom:14px;}
+.q-badge{font-size:.68rem;font-weight:900;color:var(--accent);background:rgba(255,209,102,.1);border:1px solid rgba(255,209,102,.3);padding:2px 9px;border-radius:999px;display:inline-block;margin-bottom:8px;}
+.q-stem{font-weight:700;color:var(--text);font-size:.94rem;margin-bottom:14px;line-height:1.65;}
+.q-opts{display:flex;flex-direction:column;gap:7px;}
+.q-opt{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border:1px solid var(--border);border-radius:9px;cursor:pointer;transition:all .17s;background:rgba(255,255,255,.02);}
+.q-opt:hover:not(.locked){border-color:var(--accent);background:rgba(255,209,102,.05);}
+.q-opt.sel{border-color:var(--accent);background:rgba(255,209,102,.08);}
+.q-opt.correct{border-color:var(--accent2);background:rgba(0,255,178,.06);}
+.q-opt.wrong{border-color:var(--red);background:rgba(255,77,109,.06);}
+.q-opt.locked{cursor:default;}
+.q-letter{width:26px;height:26px;min-width:26px;border-radius:6px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:900;color:var(--muted);transition:all .17s;}
+.q-opt.sel .q-letter{background:var(--accent);color:#000;}
+.q-opt.correct .q-letter{background:var(--accent2);color:#0F1117;}
+.q-opt.wrong .q-letter{background:var(--red);color:#fff;}
+.q-opt-text{font-size:.9rem;color:var(--text);flex:1;line-height:1.55;}
+.q-ctrl{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap;}
+.btn{padding:9px 20px;border-radius:8px;border:1.5px solid;cursor:pointer;font-size:.86rem;font-weight:700;font-family:inherit;transition:all .17s;}
+.btn-confirm{border-color:var(--accent);background:rgba(255,209,102,.1);color:var(--accent);}
+.btn-confirm:hover:not(:disabled){background:rgba(255,209,102,.2);}
+.btn-confirm:disabled{opacity:.35;cursor:not-allowed;}
+.btn-skip{border-color:var(--blue);background:rgba(0,212,255,.08);color:var(--blue);}
+.btn-skip:hover:not(:disabled){background:rgba(0,212,255,.16);}
+.btn-next{border-color:var(--border);background:transparent;color:var(--muted);}
+.btn-next:hover{border-color:var(--accent3);color:var(--accent3);}
+.exp-panel{margin-top:14px;border-radius:10px;overflow:hidden;display:none;}
+.exp-hdr{padding:10px 16px;font-size:.8rem;font-weight:900;letter-spacing:.5px;}
+.exp-hdr.ok{background:rgba(0,255,178,.12);color:var(--accent2);border-bottom:1px solid rgba(0,255,178,.2);}
+.exp-hdr.fail{background:rgba(255,77,109,.12);color:var(--red);border-bottom:1px solid rgba(255,77,109,.2);}
+.exp-body{background:rgba(255,255,255,.03);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:14px;}
+.exp-row{margin-bottom:10px;padding:9px 12px;border-radius:8px;font-size:.86rem;line-height:1.65;}
+.exp-row:last-child{margin-bottom:0;}
+.exp-row.exp-ok{background:rgba(0,255,178,.05);border:1px solid rgba(0,255,178,.2);}
+.exp-row.exp-no{background:rgba(255,255,255,.02);border:1px solid var(--border);}
+.exp-ltr{font-weight:900;margin-right:5px;}
+.exp-row.exp-ok .exp-ltr{color:var(--accent2);}
+.exp-row.exp-no .exp-ltr{color:var(--muted);}
+.exp-txt{color:var(--muted);}
+
+.score-banner{background:var(--panel);border:2px solid var(--accent);border-radius:var(--r);padding:32px;text-align:center;display:none;margin:20px 0;}
+.score-num{font-size:3.5rem;font-weight:900;}
+.score-num.pass{color:var(--accent2);}
+.score-num.fail{color:var(--red);}
+.score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0;}
+.sg-item{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px;}
+.sg-val{font-size:1.5rem;font-weight:900;}
+.sg-val.c{color:var(--accent2);}
+.sg-val.w{color:var(--red);}
+.sg-val.s{color:var(--blue);}
+.sg-lbl{font-size:.72rem;color:var(--muted);margin-top:4px;}
+.btn-restart{padding:11px 30px;border-radius:8px;border:1.5px solid var(--accent);background:rgba(255,209,102,.1);color:var(--accent);cursor:pointer;font-size:.9rem;font-weight:700;font-family:inherit;transition:all .18s;margin-top:10px;}
+.btn-restart:hover{background:rgba(255,209,102,.2);}
+
+.back-fab{position:fixed;bottom:24px;right:24px;z-index:300;background:var(--accent);color:#000;border:none;border-radius:999px;padding:11px 20px;font-weight:900;font-size:.85rem;cursor:pointer;box-shadow:0 4px 20px rgba(255,209,102,.35);transition:all .18s;text-decoration:none;display:flex;align-items:center;gap:6px;}
+.back-fab:hover{transform:translateY(-3px);}
+
+.kv-row{display:flex;gap:8px;margin:6px 0;align-items:center;flex-wrap:wrap;}
+.kv-key{font-size:.8rem;color:var(--muted);width:160px;flex-shrink:0;}
+.kv-val{font-size:.88rem;color:var(--text);font-weight:700;font-family:'JetBrains Mono',monospace;}
+.kv-bar{flex:1;height:10px;background:var(--border);border-radius:5px;overflow:hidden;min-width:80px;}
+.kv-fill{height:100%;border-radius:5px;background:linear-gradient(90deg,var(--accent),var(--orange));}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html">← 首頁</a>
+  <span class="nav-title">計算題公式速查</span>
+  <span class="nav-tag">科一 + 科三 計算考點</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">iPAS AI 應用規劃師 · 中級 · 計算題強化</div>
+  <div class="hero-title">計算公式速查<br>案例教學 × 逐步拆解</div>
+  <div class="hero-sub">科一 + 科三 高頻計算考點一次掌握<br>每個公式附真實考古題案例，逐步代入數字演算</div>
+  <div class="tag-row">
+    <span class="tag" style="color:var(--accent);border-color:var(--accent);">F1 Score</span>
+    <span class="tag" style="color:var(--accent2);border-color:var(--accent2);">PCA 特徵值</span>
+    <span class="tag" style="color:var(--blue);border-color:var(--blue);">條件機率 Bayes</span>
+    <span class="tag" style="color:var(--orange);border-color:var(--orange);">IoU / mAP</span>
+    <span class="tag" style="color:var(--pink);border-color:var(--pink);">MSE / RMSE / R²</span>
+    <span class="tag" style="color:var(--accent3);border-color:var(--accent3);">熵 & 資訊增益</span>
+  </div>
+</div>
+
+<!-- TOC -->
+<div class="toc">
+  <div class="toc-grid">
+    <a class="toc-btn" href="#f1"><span class="toc-num">📊</span>F1 / Precision / Recall</a>
+    <a class="toc-btn" href="#pca"><span class="toc-num">📐</span>PCA 特徵值計算</a>
+    <a class="toc-btn" href="#bayes"><span class="toc-num">🎲</span>條件機率 & 貝氏</a>
+    <a class="toc-btn" href="#entropy"><span class="toc-num">🌳</span>熵 & 資訊增益</a>
+    <a class="toc-btn" href="#regression"><span class="toc-num">📉</span>MSE / RMSE / R²</a>
+    <a class="toc-btn" href="#iou"><span class="toc-num">🔲</span>IoU / mAP</a>
+    <a class="toc-btn" href="#softmax"><span class="toc-num">🔥</span>Softmax 函數</a>
+    <a class="toc-btn" href="#reg"><span class="toc-num">⚖️</span>L1 / L2 正則化</a>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ═══════════════════════════════════
+     1. F1 / Precision / Recall
+════════════════════════════════════ -->
+<div class="sec" id="f1">
+<div class="sec-title">① Precision / Recall / F1 Score <span class="sec-badge">科三 Q16 直接計算！</span></div>
+
+<div class="panel">
+  <div class="panel-title">混淆矩陣（Confusion Matrix）── 一切指標的源頭</div>
+  <div class="cm-grid">
+    <div class="cm-cell cm-hdr"></div>
+    <div class="cm-cell cm-hdr">預測 Positive</div>
+    <div class="cm-cell cm-hdr">預測 Negative</div>
+    <div class="cm-cell cm-hdr">實際 Positive</div>
+    <div class="cm-cell cm-tp">TP<br><small>真正例</small></div>
+    <div class="cm-cell cm-fn">FN<br><small>漏報（假負例）</small></div>
+    <div class="cm-cell cm-hdr">實際 Negative</div>
+    <div class="cm-cell cm-fp">FP<br><small>誤報（假正例）</small></div>
+    <div class="cm-cell cm-tn">TN<br><small>真負例</small></div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">四大公式</div>
+  <div class="fbox">
+    <span class="label">分類評估</span>
+    <span class="cm">// Precision：預測為正的有多少真的是正的（誤報率）</span><br>
+    <span class="fn">Precision</span> = <span class="vr">TP</span> / (<span class="vr">TP</span> + <span class="vr">FP</span>)<br><br>
+    <span class="cm">// Recall：實際為正的有多少被找出來（漏報率）</span><br>
+    <span class="fn">Recall</span> = <span class="vr">TP</span> / (<span class="vr">TP</span> + <span class="vr">FN</span>)<br><br>
+    <span class="cm">// Accuracy：整體答對率（類別不均衡時失效）</span><br>
+    <span class="fn">Accuracy</span> = (<span class="vr">TP</span> + <span class="vr">TN</span>) / (<span class="vr">TP</span> + <span class="vr">TN</span> + <span class="vr">FP</span> + <span class="vr">FN</span>)<br><br>
+    <span class="cm">// F1 Score：Precision 與 Recall 的調和平均數</span><br>
+    <span class="fn">F1</span> = <span class="num">2</span> × <span class="fn">P</span> × <span class="fn">R</span> / (<span class="fn">P</span> + <span class="fn">R</span>)
+  </div>
+
+  <div class="tip-box">💡 調和平均數（Harmonic Mean）對低值更敏感：若 P=1.0, R=0.01，算術平均 ≈ 0.505，但 F1 ≈ 0.02，能正確反映模型很差的狀況。</div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">🔢 真實考題逐步計算 ── 科三 Q16</div>
+  <div class="info-box">📋 題目：Precision = 0.8，Recall = 0.6，求 F1 Score？</div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-body">
+        <strong>代入分子：</strong>
+        <div class="calc">2 × P × R = 2 × 0.8 × 0.6 = <span style="color:var(--accent)">0.96</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <strong>計算分母：</strong>
+        <div class="calc">P + R = 0.8 + 0.6 = <span style="color:var(--accent)">1.4</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <strong>相除得 F1：</strong>
+        <div class="calc">F1 = 0.96 / 1.4 ≈ <span style="color:var(--accent2);font-size:1.1rem;font-weight:900">0.686</span></div>
+        <div style="margin-top:6px;color:var(--muted);font-size:.82rem;">注意：F1 介於 P(0.8) 和 R(0.6) 之間，且偏向較低的 Recall！</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="c-wrap">
+    <canvas id="f1Canvas" height="160"></canvas>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">考試速記：Precision vs Recall 的取捨</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>場景</th><th>優先重視</th><th>原因</th></tr></thead>
+      <tbody>
+        <tr><td>醫療診斷（癌症篩查）</td><td class="td-ok">Recall 高</td><td>寧可多報（FP），不能漏診（FN）</td></tr>
+        <tr><td>垃圾郵件過濾</td><td class="td-warn">Precision 高</td><td>不能把正常信誤標為垃圾（FP代價高）</td></tr>
+        <tr><td>法律文件搜尋</td><td class="td-ok">Recall 高</td><td>要確保不遺漏相關文件</td></tr>
+        <tr><td>推薦系統</td><td colspan="2">F1 平衡兩者</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     2. PCA
+════════════════════════════════════ -->
+<div class="sec" id="pca">
+<div class="sec-title">② PCA 特徵值計算 <span class="sec-badge">科三 Q35 直接計算！</span></div>
+
+<div class="panel">
+  <div class="panel-title">PCA 核心公式</div>
+  <div class="fbox">
+    <span class="label">降維計算</span>
+    <span class="cm">// 各主成分解釋的變異比例</span><br>
+    <span class="fn">Explained Variance Ratio</span>(PC<span class="vr">i</span>) = λ<span class="vr">i</span> / Σλ<br><br>
+    <span class="cm">// 累積解釋變異量（決定保留幾個主成分）</span><br>
+    <span class="fn">Cumulative Variance</span>(k) = Σ<span class="num">k</span> λ<span class="vr">i</span> / Σλ
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">🔢 真實考題逐步計算 ── 科三 Q35</div>
+  <div class="info-box">📋 題目：三個主成分特徵值 λ₁=6.0, λ₂=3.0, λ₃=1.0，保留能解釋 ≥80% 總變異量的主成分？</div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-body">
+        <strong>計算總特徵值：</strong>
+        <div class="calc">Σλ = 6.0 + 3.0 + 1.0 = <span style="color:var(--accent)">10.0</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <strong>各主成分解釋比例：</strong>
+        <div class="calc">
+          PC1: 6.0 / 10.0 = <span style="color:var(--accent)">60%</span><br>
+          PC2: 3.0 / 10.0 = <span style="color:var(--accent)">30%</span><br>
+          PC3: 1.0 / 10.0 = <span style="color:var(--accent)">10%</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <strong>累積至超過 80%：</strong>
+        <div class="calc">
+          PC1 累積 = 60%（未達 80%）<br>
+          PC1 + PC2 累積 = 60% + 30% = <span style="color:var(--accent2);font-weight:900">90% ≥ 80% ✅</span>
+        </div>
+        <div style="color:var(--muted);font-size:.82rem;margin-top:6px;">結論：保留前 2 個主成分即可，降至二維，保留 90% 資訊。</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="c-wrap">
+    <canvas id="pcaCanvas" height="180"></canvas>
+  </div>
+
+  <div class="warn-box">⚠️ 考試陷阱：
+  <br>• B 選項說「僅保留第1主成分」→ 60% &lt; 80%，不足！
+  <br>• C 選項說「第3主成分貢獻30%不宜捨棄」→ 錯！PC3=10%，不是30%
+  <br>• D 選項說「特徵值相差不大」→ 錯！6:3:1 差距明顯</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     3. Bayes / Conditional Probability
+════════════════════════════════════ -->
+<div class="sec" id="bayes">
+<div class="sec-title">③ 條件機率 & 貝氏定理 <span class="sec-badge">科三 Q22 / Q41</span></div>
+
+<div class="panel">
+  <div class="panel-title">核心公式</div>
+  <div class="fbox">
+    <span class="label">機率計算</span>
+    <span class="cm">// 條件機率：在 B 發生的前提下，A 發生的機率</span><br>
+    <span class="fn">P</span>(<span class="vr">A</span>|<span class="vr">B</span>) = <span class="fn">P</span>(<span class="vr">A</span> ∩ <span class="vr">B</span>) / <span class="fn">P</span>(<span class="vr">B</span>)<br><br>
+    <span class="cm">// 貝氏定理：由先驗機率推後驗機率</span><br>
+    <span class="fn">P</span>(<span class="vr">A</span>|<span class="vr">B</span>) = <span class="fn">P</span>(<span class="vr">B</span>|<span class="vr">A</span>) × <span class="fn">P</span>(<span class="vr">A</span>) / <span class="fn">P</span>(<span class="vr">B</span>)<br><br>
+    <span class="cm">// Monte Carlo 模擬版本（科三 Q41）</span><br>
+    <span class="fn">P</span>(<span class="vr">A</span>|<span class="vr">B</span>) ≈ <span class="fn">A_and_B</span>.sum() / <span class="fn">B</span>.sum()
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">🔢 真實考題 ── 科三 Q41：骰子條件機率</div>
+  <div class="info-box">📋 題目：擲骰子，A=偶數（2,4,6），B=大於3（4,5,6）<br>用 Monte Carlo 程式碼求 P(A|B)，正確公式為？</div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-body">
+        <strong>理論計算（驗證）：</strong>
+        <div class="calc">
+          P(B) = P(大於3) = 3/6 = 0.5<br>
+          P(A∩B) = P(偶數且大於3) = P(4,6) = 2/6 = 0.333
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <strong>條件機率：</strong>
+        <div class="calc">P(A|B) = P(A∩B)/P(B) = (2/6)/(3/6) = <span style="color:var(--accent2);font-weight:900">2/3 ≈ 0.667</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <strong>對應 Monte Carlo 程式碼：</strong>
+        <div class="calc" style="background:#070a10;padding:10px;border-radius:8px;margin-top:6px;font-size:.82rem;">
+          A_and_B.sum() = 事件 A∩B 發生次數<br>
+          B.sum() = 事件 B 發生次數<br>
+          ∴ <span style="color:var(--accent2);font-weight:900">P(A|B) = A_and_B.sum() / B.sum() → 答案 D</span>
+        </div>
+        <div style="color:var(--red);font-size:.82rem;margin-top:6px;">❌ 錯誤：A.sum()×B.sum() 在分母 → 計算的不是條件機率</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">🔢 真實考題 ── 科三 Q22：貝氏定理應用</div>
+  <div class="info-box">📋 題目：電商平台預測顧客購買機率，使用貝氏定理，核心機制是？</div>
+  <div class="fbox">
+    <span class="cm">// 貝氏分類器的後驗機率</span><br>
+    <span class="fn">P</span>(購買 | 行為特徵) = <span class="fn">P</span>(行為特徵 | 購買) × <span class="fn">P</span>(購買) / <span class="fn">P</span>(行為特徵)<br><br>
+    <span class="cm">// 先驗機率 P(購買) = 歷史購買率（如 20%）</span><br>
+    <span class="cm">// 似然度 P(行為|購買) = 購買者的行為分佈</span><br>
+    <span class="cm">// 後驗機率 = 觀察到此行為後，購買的概率</span>
+  </div>
+  <div class="ok-box">✅ 答案 B：「以條件機率方式計算顧客屬於會購買/不會購買的分類機率」<br>──這正是貝氏定理的後驗機率計算。</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     4. Entropy & Information Gain
+════════════════════════════════════ -->
+<div class="sec" id="entropy">
+<div class="sec-title">④ 熵 & 資訊增益（決策樹）<span class="sec-badge">科三 Q8</span></div>
+
+<div class="panel">
+  <div class="panel-title">公式定義</div>
+  <div class="fbox">
+    <span class="label">決策樹分裂</span>
+    <span class="cm">// Shannon 熵：不確定性的度量</span><br>
+    <span class="fn">H</span>(S) = -Σ <span class="vr">pᵢ</span> × <span class="fn">log₂</span>(<span class="vr">pᵢ</span>)<br><br>
+    <span class="cm">// 資訊增益：分裂後不確定性的減少量</span><br>
+    <span class="fn">IG</span>(S, A) = <span class="fn">H</span>(S) - Σ ( |Sᵥ| / |S| ) × <span class="fn">H</span>(Sᵥ)
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">🔢 案例計算：決策樹特徵選擇</div>
+  <div class="info-box">📋 場景：10 筆資料，5 個買（+）5 個不買（−），考慮用「年齡」特徵分裂</div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-body">
+        <strong>父節點熵：</strong>
+        <div class="calc">H(S) = -(5/10)×log₂(0.5) - (5/10)×log₂(0.5) = -(-0.5) - (-0.5) = <span style="color:var(--accent)">1.0 bit</span></div>
+        <div style="color:var(--muted);font-size:.8rem;">（50/50 分佈 → 最大熵 = 1.0）</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <strong>年齡特徵分裂後：</strong>
+        <div class="calc">
+          年輕（5人）：4買 1不買 → H = -(4/5)log₂(4/5)-(1/5)log₂(1/5) ≈ 0.722<br>
+          年長（5人）：1買 4不買 → H = -(1/5)log₂(1/5)-(4/5)log₂(4/5) ≈ 0.722
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <strong>資訊增益：</strong>
+        <div class="calc">IG = 1.0 - (5/10×0.722 + 5/10×0.722) = 1.0 - 0.722 = <span style="color:var(--accent2);font-weight:900">0.278 bit</span></div>
+        <div style="color:var(--muted);font-size:.82rem;">選擇 IG 最大的特徵進行分裂！</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tbl-wrap" style="margin-top:12px;">
+    <table>
+      <thead><tr><th>p（正例比例）</th><th>熵 H(p)</th><th>意義</th></tr></thead>
+      <tbody>
+        <tr><td>0 或 1（純節點）</td><td class="td-ok">0 bit</td><td>完全確定，無需再分裂</td></tr>
+        <tr><td>0.5（完全混亂）</td><td class="td-bad">1.0 bit</td><td>最不確定，最需要分裂</td></tr>
+        <tr><td>0.8</td><td class="td-warn">0.722 bit</td><td>部分確定</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     5. MSE / RMSE / MAE / R²
+════════════════════════════════════ -->
+<div class="sec" id="regression">
+<div class="sec-title">⑤ 迴歸評估指標：MSE / RMSE / MAE / R² <span class="sec-badge">科三 Q15 / Q38</span></div>
+
+<div class="panel">
+  <div class="panel-title">四個公式對比</div>
+  <div class="fbox">
+    <span class="label">迴歸評估</span>
+    <span class="cm">// MAE：平均絕對誤差（對異常值不敏感）</span><br>
+    <span class="fn">MAE</span> = (1/n) × Σ|<span class="vr">yᵢ</span> - <span class="vr">ŷᵢ</span>|<br><br>
+    <span class="cm">// MSE：均方誤差（懲罰大誤差）</span><br>
+    <span class="fn">MSE</span> = (1/n) × Σ(<span class="vr">yᵢ</span> - <span class="vr">ŷᵢ</span>)²<br><br>
+    <span class="cm">// RMSE：均方根誤差（與 y 同單位，易解讀）</span><br>
+    <span class="fn">RMSE</span> = √<span class="fn">MSE</span><br><br>
+    <span class="cm">// R²：決定係數（解釋變異比例）</span><br>
+    <span class="fn">R²</span> = 1 - <span class="fn">SS_res</span>/<span class="fn">SS_tot</span> = 1 - Σ(<span class="vr">yᵢ</span>-<span class="vr">ŷᵢ</span>)² / Σ(<span class="vr">yᵢ</span>-<span class="vr">ȳ</span>)²
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">🔢 案例計算：房價預測誤差</div>
+  <div class="info-box">📋 4 筆資料：實際房價 vs 預測房價（萬元）</div>
+
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>實際 yᵢ</th><th>預測 ŷᵢ</th><th>誤差 (y-ŷ)</th><th>|y-ŷ|</th><th>(y-ŷ)²</th></tr></thead>
+      <tbody>
+        <tr><td>1000</td><td>980</td><td>20</td><td>20</td><td>400</td></tr>
+        <tr><td>800</td><td>820</td><td>-20</td><td>20</td><td>400</td></tr>
+        <tr><td>1200</td><td>1150</td><td>50</td><td>50</td><td>2500</td></tr>
+        <tr><td>600</td><td>630</td><td>-30</td><td>30</td><td>900</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-body">
+        <strong>MAE：</strong>
+        <div class="calc">MAE = (20+20+50+30)/4 = 120/4 = <span style="color:var(--accent)">30 萬</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <strong>MSE：</strong>
+        <div class="calc">MSE = (400+400+2500+900)/4 = 4200/4 = <span style="color:var(--accent)">1050 萬²</span></div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <strong>RMSE：</strong>
+        <div class="calc">RMSE = √1050 ≈ <span style="color:var(--accent2);font-weight:900">32.4 萬</span>（與房價同單位，可直接解讀）</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip-box">💡 科三 Q15 考點：R² = 0.85 → 模型能解釋 85% 的目標變數變異（不是準確率85%！）</div>
+
+  <div class="tbl-wrap" style="margin-top:12px;">
+    <table>
+      <thead><tr><th>R² 值</th><th>解讀</th><th>模型品質</th></tr></thead>
+      <tbody>
+        <tr><td class="td-ok">≥ 0.9</td><td>模型解釋 ≥90% 變異</td><td class="td-ok">極佳</td></tr>
+        <tr><td class="td-warn">0.7 ~ 0.9</td><td>解釋 70~90% 變異</td><td class="td-warn">良好</td></tr>
+        <tr><td class="td-bad">&lt; 0.5</td><td>解釋不到一半</td><td class="td-bad">需改進</td></tr>
+        <tr><td class="td-bad">≤ 0</td><td>比平均值預測還差</td><td class="td-bad">模型無效</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     6. IoU / mAP
+════════════════════════════════════ -->
+<div class="sec" id="iou">
+<div class="sec-title">⑥ IoU / mAP（物件偵測）<span class="sec-badge">科一 Q7</span></div>
+
+<div class="panel">
+  <div class="panel-title">IoU 公式</div>
+  <div class="fbox">
+    <span class="label">物件偵測</span>
+    <span class="cm">// IoU = 交集面積 / 聯集面積</span><br>
+    <span class="fn">IoU</span> = <span class="fn">Intersection</span> / <span class="fn">Union</span><br><br>
+    <span class="cm">// 判斷預測框是否正確（TP）的閾值</span><br>
+    if <span class="fn">IoU</span> ≥ <span class="vr">threshold</span>: → <span class="num">True Positive</span><br>
+    if <span class="fn">IoU</span> &lt;  <span class="vr">threshold</span>: → <span class="num">False Positive</span>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">🔢 IoU 計算案例</div>
+  <div class="c-wrap">
+    <canvas id="iouCanvas" height="220"></canvas>
+  </div>
+  <div class="steps">
+    <div class="step">
+      <div class="step-body">
+        <strong>真實框（綠）：</strong>
+        <div class="calc">x=[100,200], y=[80,180] → 面積 = 100×100 = 10000</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <strong>預測框（藍）：</strong>
+        <div class="calc">x=[130,240], y=[100,200] → 面積 = 110×100 = 11000</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <strong>計算交集：</strong>
+        <div class="calc">x重疊=[130,200]=70，y重疊=[100,180]=80<br>交集面積 = 70×80 = 5600</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <strong>計算聯集：</strong>
+        <div class="calc">聯集 = 10000 + 11000 - 5600 = 15400<br>IoU = 5600 / 15400 ≈ <span style="color:var(--accent2);font-weight:900">0.364</span></div>
+        <div style="color:var(--muted);font-size:.82rem;">若閾值=0.5，此預測框為 FP（未達標準）</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tip-box">💡 科一 Q7 考點：IoU 閾值越高 → 判定標準越嚴格 → 模型偵測越精準（A正確）<br>高閾值 ≠ Precision降低（C錯誤）！高閾值通常使 Recall 降低（更多框被排除）</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     7. Softmax
+════════════════════════════════════ -->
+<div class="sec" id="softmax">
+<div class="sec-title">⑦ Softmax 函數 <span class="sec-badge">科一 Q8</span></div>
+
+<div class="panel">
+  <div class="panel-title">公式與特性</div>
+  <div class="fbox">
+    <span class="label">分類輸出層</span>
+    <span class="cm">// Softmax：將原始分數轉為機率分佈</span><br>
+    <span class="fn">σ</span>(<span class="vr">zᵢ</span>) = <span class="fn">exp</span>(<span class="vr">zᵢ</span>) / Σ <span class="fn">exp</span>(<span class="vr">zⱼ</span>)
+  </div>
+
+  <div class="panel-title" style="margin-top:14px;">🔢 計算案例</div>
+  <div class="info-box">📋 模型輸出：z = [2.0, 1.0, 0.1]（三個類別的 logit 分數）</div>
+
+  <div class="steps">
+    <div class="step">
+      <div class="step-body">
+        <strong>計算各類別的 exp：</strong>
+        <div class="calc">
+          exp(2.0) = 7.389<br>
+          exp(1.0) = 2.718<br>
+          exp(0.1) = 1.105<br>
+          總和 = 7.389 + 2.718 + 1.105 = <span style="color:var(--accent)">11.212</span>
+        </div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-body">
+        <strong>轉換為機率：</strong>
+        <div class="calc">
+          P(類別1) = 7.389/11.212 ≈ <span style="color:var(--accent2)">0.659（65.9%）</span><br>
+          P(類別2) = 2.718/11.212 ≈ <span style="color:var(--accent2)">0.242（24.2%）</span><br>
+          P(類別3) = 1.105/11.212 ≈ <span style="color:var(--accent2)">0.099（9.9%）</span><br>
+          <span style="color:var(--muted)">總和 = 1.000 ✅（所有輸入資訊都保留）</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="ok-box">✅ 科一 Q8 答案 C：「Softmax 會保留所有輸入資訊，但以比例表示」<br>──每個類別的分數都被轉換為機率，沒有資訊被丟棄。</div>
+  <div class="warn-box">❌ Max-Pooling 只保留最大值，丟棄其他資訊，兩者性質截然不同！</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     8. L1 / L2 Regularization
+════════════════════════════════════ -->
+<div class="sec" id="reg">
+<div class="sec-title">⑧ L1 / L2 正則化 <span class="sec-badge">科三 Q2 / Q32</span></div>
+
+<div class="panel">
+  <div class="panel-title">公式比較</div>
+  <div class="fbox">
+    <span class="label">正則化</span>
+    <span class="cm">// L1 Lasso：加入參數絕對值懲罰 → 產生稀疏模型</span><br>
+    <span class="fn">Loss_L1</span> = Loss + λ × Σ|<span class="vr">wᵢ</span>|<br><br>
+    <span class="cm">// L2 Ridge：加入參數平方懲罰 → 縮小參數值</span><br>
+    <span class="fn">Loss_L2</span> = Loss + λ × Σ<span class="vr">wᵢ</span>²<br><br>
+    <span class="cm">// Elastic Net：L1 + L2 混合</span><br>
+    <span class="fn">Loss_EN</span> = Loss + λ₁×Σ|<span class="vr">wᵢ</span>| + λ₂×Σ<span class="vr">wᵢ</span>²
+  </div>
+
+  <div class="tbl-wrap" style="margin-top:14px;">
+    <table>
+      <thead><tr><th></th><th>L1（Lasso）</th><th>L2（Ridge）</th></tr></thead>
+      <tbody>
+        <tr><td>懲罰形式</td><td>|w|（絕對值）</td><td>w²（平方）</td></tr>
+        <tr><td>效果</td><td class="td-ok">使部分 w → 0（稀疏）</td><td class="td-warn">使所有 w 變小</td></tr>
+        <tr><td>特徵選擇</td><td class="td-ok">✅ 自動特徵選擇</td><td>❌ 保留所有特徵</td></tr>
+        <tr><td>解釋性</td><td class="td-ok">高（剩餘特徵少）</td><td>中</td></tr>
+        <tr><td>適用場景</td><td>高維稀疏特徵、特徵選擇</td><td>特徵共線性問題</td></tr>
+        <tr><td>考試關鍵字</td><td class="td-ok">「稀疏」「壓縮為零」「特徵選擇」</td><td class="td-warn">「縮小」「共線性」「穩定」</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="tip-box">💡 科三 Q2 考點：L1（Lasso）→「產生稀疏模型，使部分參數收斂為零」= 自動特徵選擇<br>
+  💡 科三 Q32 考點：特徵有多重共線性 → 用 L1 Lasso 讓不重要特徵係數縮為零</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     QUIZ SECTION
+════════════════════════════════════ -->
+<div class="sec">
+<div class="sec-title">📝 計算題練習（10 題）</div>
+<p style="color:var(--muted);font-size:.86rem;margin-bottom:18px;">綜合科一 + 科三 計算考點，包含真實考古題與延伸應用題。</p>
+
+<div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+<div id="progLabel" style="font-size:.78rem;color:var(--muted);margin-bottom:16px;text-align:right;">第 0 / 10 題已作答</div>
+<div id="qWrap"></div>
+<div class="score-banner" id="scoreBanner">
+  <div class="score-num" id="scoreNum"></div>
+  <div style="color:var(--muted);font-size:1rem;margin-bottom:16px;" id="scoreLbl"></div>
+  <div class="score-grid">
+    <div class="sg-item"><div class="sg-val c" id="sgC">0</div><div class="sg-lbl">答對</div></div>
+    <div class="sg-item"><div class="sg-val w" id="sgW">0</div><div class="sg-lbl">答錯</div></div>
+    <div class="sg-item"><div class="sg-val s" id="sgS">0</div><div class="sg-lbl">略過</div></div>
+  </div>
+  <button class="btn-restart" onclick="restartQuiz()">🔄 重新練習</button>
+</div>
+</div>
+
+</div><!-- /wrap -->
+<a class="back-fab" href="index.html">🏠 返回首頁</a>
+
+<script>
+/* ─── Canvas: F1 Visualization ─── */
+(function(){
+  const c = document.getElementById('f1Canvas');
+  if(!c) return;
+  const W = c.parentElement.clientWidth||700; c.width=W; c.height=160;
+  const ctx = c.getContext('2d');
+  const col = {bg:'#070a10',panel:'#1A1D27',border:'#2E3250',acc:'#FFD166',grn:'#00FFB2',org:'#FF9B42',muted:'#8892B0',text:'#E8EAF6',red:'#FF4D6D'};
+  ctx.fillStyle=col.bg; ctx.fillRect(0,0,W,160);
+
+  // Draw number line showing P=0.8, R=0.6, F1=0.686
+  const pad=40, bw=W-pad*2, y=80;
+  ctx.strokeStyle=col.border; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(W-pad,y); ctx.stroke();
+
+  // Ticks at 0, 0.5, 1.0
+  [0, 0.5, 1.0].forEach(v=>{
+    const x = pad + v*bw;
+    ctx.strokeStyle=col.muted; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(x,y-8); ctx.lineTo(x,y+8); ctx.stroke();
+    ctx.fillStyle=col.muted; ctx.font='11px Calibri'; ctx.textAlign='center';
+    ctx.fillText(v.toFixed(1), x, y+22);
+  });
+
+  const vals = [{v:0.6,label:'Recall=0.6',col:col.org},{v:0.686,label:'F1=0.686',col:col.grn},{v:0.8,label:'Precision=0.8',col:col.acc}];
+  vals.forEach(({v,label,col:c2},i)=>{
+    const x = pad+v*bw;
+    ctx.strokeStyle=c2; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(x,y-30+i*8); ctx.lineTo(x,y); ctx.stroke();
+    ctx.beginPath(); ctx.arc(x,y,6,0,Math.PI*2); ctx.fillStyle=c2; ctx.fill();
+    ctx.fillStyle=c2; ctx.font='700 11px Calibri'; ctx.textAlign='center';
+    ctx.fillText(label, x, y-35+i*8);
+  });
+
+  ctx.fillStyle=col.muted; ctx.font='10px Calibri'; ctx.textAlign='left';
+  ctx.fillText('F1 介於 P 和 R 之間，偏向較低的 Recall（0.686 < 0.7）', pad, 148);
+})();
+
+/* ─── Canvas: PCA ─── */
+(function(){
+  const c = document.getElementById('pcaCanvas');
+  if(!c) return;
+  const W = c.parentElement.clientWidth||700; c.width=W; c.height=180;
+  const ctx = c.getContext('2d');
+  const col = {bg:'#070a10',acc:'#FFD166',grn:'#00FFB2',org:'#FF9B42',red:'#FF4D6D',muted:'#8892B0',text:'#E8EAF6',border:'#2E3250'};
+  ctx.fillStyle=col.bg; ctx.fillRect(0,0,W,180);
+
+  const lambdas=[{v:6,label:'PC1 λ₁=6.0',pct:60},{v:3,label:'PC2 λ₂=3.0',pct:30},{v:1,label:'PC3 λ₃=1.0',pct:10}];
+  const barH=32, gap=14, startY=20, startX=20, labelW=140;
+  const barW = W - startX - labelW - 80;
+
+  ctx.fillStyle=col.muted; ctx.font='700 11px Calibri';
+  ctx.fillText('PCA 特徵值分解：λ₁=6, λ₂=3, λ₃=1（總和=10）', startX, 14);
+
+  let cumPct=0;
+  lambdas.forEach(({v,label,pct},i)=>{
+    const y = startY + 10 + i*(barH+gap);
+    // Label
+    ctx.fillStyle=col.text; ctx.font='700 11px Calibri'; ctx.textAlign='left';
+    ctx.fillText(label, startX, y+barH/2+4);
+    // Bar
+    const bx = startX+labelW;
+    ctx.fillStyle=col.border; ctx.beginPath(); ctx.roundRect(bx,y,barW,barH,4); ctx.fill();
+    const fillColor = i===0?col.acc : i===1?col.grn : col.red;
+    ctx.fillStyle=fillColor+'cc';
+    const fw = barW*pct/100;
+    ctx.beginPath(); ctx.roundRect(bx,y,fw,barH,4); ctx.fill();
+    // Pct text
+    ctx.fillStyle=fillColor; ctx.font='700 12px Calibri';
+    ctx.fillText(pct+'%', bx+fw+6, y+barH/2+4);
+    // Cumulative
+    cumPct+=pct;
+    ctx.fillStyle=col.muted; ctx.font='10px Calibri';
+    ctx.fillText('累積:'+cumPct+'%'+(cumPct>=80?' ✅':''), bx+barW+40, y+barH/2+4);
+  });
+
+  ctx.fillStyle=col.grn; ctx.font='700 11px Calibri';
+  ctx.fillText('→ 保留 PC1+PC2 = 90% ≥ 80% 閾值，降至二維！', startX, 168);
+})();
+
+/* ─── Canvas: IoU ─── */
+(function(){
+  const c = document.getElementById('iouCanvas');
+  if(!c) return;
+  const W = c.parentElement.clientWidth||700; c.width=W; c.height=220;
+  const ctx = c.getContext('2d');
+  const scale = Math.min(W/400, 1.8);
+  ctx.fillStyle='#070a10'; ctx.fillRect(0,0,W,220);
+  ctx.save(); ctx.translate(W/2-80*scale, 10); ctx.scale(scale,scale);
+
+  // GT box
+  ctx.strokeStyle='#00FFB2'; ctx.lineWidth=2.5; ctx.fillStyle='rgba(0,255,178,0.08)';
+  ctx.beginPath(); ctx.roundRect(0,0,100,100,3); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#00FFB2'; ctx.font='700 11px Calibri';
+  ctx.fillText('真實框(GT)', 5, -6);
+  ctx.fillStyle='rgba(0,255,178,0.6)'; ctx.font='10px Calibri';
+  ctx.fillText('面積=10000', 5, 90);
+
+  // Pred box
+  ctx.strokeStyle='#00D4FF'; ctx.lineWidth=2.5; ctx.fillStyle='rgba(0,212,255,0.08)';
+  ctx.beginPath(); ctx.roundRect(30,20,110,100,3); ctx.fill(); ctx.stroke();
+  ctx.fillStyle='#00D4FF'; ctx.font='700 11px Calibri';
+  ctx.fillText('預測框(Pred)', 30, 14);
+  ctx.fillStyle='rgba(0,212,255,0.6)'; ctx.font='10px Calibri';
+  ctx.fillText('面積=11000', 80, 114);
+
+  // Intersection
+  ctx.fillStyle='rgba(255,209,102,0.25)';
+  ctx.beginPath(); ctx.roundRect(30,20,70,80,3); ctx.fill();
+  ctx.strokeStyle='#FFD166'; ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
+  ctx.beginPath(); ctx.roundRect(30,20,70,80,3); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle='#FFD166'; ctx.font='700 11px Calibri';
+  ctx.fillText('交集=5600', 32, 66);
+
+  ctx.restore();
+
+  // Formula result
+  ctx.fillStyle='#8892B0'; ctx.font='12px Calibri'; ctx.textAlign='left';
+  ctx.fillText('IoU = 5600 / (10000 + 11000 - 5600) = 5600 / 15400 ≈', 16, 192);
+  ctx.fillStyle='#00FFB2'; ctx.font='700 13px Calibri';
+  ctx.fillText('0.364', W-60, 192);
+  ctx.fillStyle='#8892B0'; ctx.font='10px Calibri';
+  ctx.fillText('（若 threshold=0.5，此預測框為 FP）', 16, 210);
+})();
+
+/* ─── Quiz ─── */
+const QUESTIONS = [
+  {
+    topic:'科三 Q16 · F1計算',
+    stem:'在二元分類問題中，若精確率（Precision）為 0.8，召回率（Recall）為 0.6，則 F1 分數（F1 Score）為何？',
+    opts:{A:'0.686',B:'0.700',C:'0.720',D:'0.750'},
+    answer:'A',
+    exps:{
+      A:'✅ 正確。F1 = 2×P×R/(P+R) = 2×0.8×0.6/(0.8+0.6) = 0.96/1.4 ≈ 0.686。調和平均數偏向較低的值，故結果低於算術平均數 0.7。',
+      B:'❌ 0.700 是 Precision 和 Recall 的算術平均數 (0.8+0.6)/2，不是 F1。F1 使用調和平均，對低值更敏感。',
+      C:'❌ 錯誤計算。注意分母是 P+R=1.4，不是其他值。',
+      D:'❌ 錯誤。0.75 不是任何標準公式的結果。'
+    }
+  },
+  {
+    topic:'科三 Q35 · PCA特徵值',
+    stem:'三個主成分特徵值 λ₁=6.0, λ₂=3.0, λ₃=1.0。若保留能解釋 ≥80% 總變異量的主成分，下列哪項敘述最合理？',
+    opts:{
+      A:'前兩個主成分合計解釋 90% 的總變異量，可安全降維至二維',
+      B:'第一主成分解釋 60%，僅保留一維即可',
+      C:'前兩個雖超過 80%，但 PC2 貢獻 30% 不宜捨棄 PC3',
+      D:'三個特徵值相差不大，降維可能造成資訊損失'
+    },
+    answer:'A',
+    exps:{
+      A:'✅ 正確。Σλ=10，PC1=60%，PC2=30%，累積=90%≥80%，可降至二維保留 90% 資訊。',
+      B:'❌ PC1 只有 60%，未達 80% 閾值，需加入 PC2。',
+      C:'❌ C 選項本身邏輯矛盾：既然超過 80% 就不需要 PC3（只有 10%），且說法混淆了 PC2 的貢獻（30%）和 PC3（10%）。',
+      D:'❌ 6:3:1 差距明顯，PC1 是 PC3 的六倍，並非「相差不大」。'
+    }
+  },
+  {
+    topic:'科三 Q41 · 條件機率 Monte Carlo',
+    stem:'擲骰子：事件 A=偶數（2,4,6）、事件 B=大於3（4,5,6）。用 Monte Carlo 程式估算 P(A|B)，下列哪個程式碼片段正確？',
+    opts:{
+      A:'A_and_B.sum() / (A.sum() * B.sum())',
+      B:'A_and_B.sum() / (A.sum() + B.sum())',
+      C:'A_and_B.sum() / A.sum()',
+      D:'A_and_B.sum() / B.sum()'
+    },
+    answer:'D',
+    exps:{
+      A:'❌ 分母為 A×B 次數乘積，這不是任何標準機率公式。',
+      B:'❌ 分母為 A+B 次數之和，也不是條件機率公式。',
+      C:'❌ C 選項計算的是 P(B|A)（在 A 發生前提下 B 的機率），公式顛倒了。',
+      D:'✅ 正確。P(A|B) = P(A∩B)/P(B)，用次數估計：A_and_B.sum()/B.sum()。實際結果：P(A|B) = 2/3（{4,6}在{4,5,6}中）。'
+    }
+  },
+  {
+    topic:'F1 陷阱題',
+    stem:'某詐欺偵測模型：1000筆資料中 10 筆真實詐欺。模型預測 100 筆為詐欺，其中 8 筆正確。Precision 和 Recall 分別為？',
+    opts:{
+      A:'Precision=0.8，Recall=0.08',
+      B:'Precision=0.08，Recall=0.8',
+      C:'Precision=0.8，Recall=0.8',
+      D:'Precision=0.008，Recall=0.08'
+    },
+    answer:'B',
+    exps:{
+      A:'❌ 計算顛倒了。Precision = TP/預測正例數 = 8/100 = 0.08，Recall = TP/實際正例數 = 8/10 = 0.8。',
+      B:'✅ 正確。Precision = 8/100 = 0.08（預測為詐欺的100筆，只有8筆真的是）；Recall = 8/10 = 0.8（10筆真實詐欺，找出了8筆）。',
+      C:'❌ 兩個都不可能同時是 0.8。',
+      D:'❌ Precision 計算錯誤。'
+    }
+  },
+  {
+    topic:'MSE vs RMSE vs R²',
+    stem:'在線性迴歸模型中，若 R²值為 0.85，其最準確的解讀是？',
+    opts:{
+      A:'模型準確率為 85%',
+      B:'85% 的目標變數變異可被模型解釋',
+      C:'預測誤差為 15%',
+      D:'模型有 85% 的信心水準'
+    },
+    answer:'B',
+    exps:{
+      A:'❌ R² 不等於「準確率」。準確率是分類指標，R² 是迴歸的解釋力指標。',
+      B:'✅ 正確。R² = 1 - SS_res/SS_tot，表示模型能解釋多少比例的目標變數變異。R²=0.85 → 模型解釋了 85% 的 y 變異，剩餘 15% 是模型無法捕捉的隨機誤差。',
+      C:'❌ 「預測誤差15%」沒有意義，誤差需要用 MAE/RMSE 表達，且需有量綱。',
+      D:'❌ 信心水準是假設檢定的概念（如 95% CI），與 R² 無關。'
+    }
+  },
+  {
+    topic:'IoU 計算',
+    stem:'物件偵測評估中，若 IoU 閾值從 0.5 提高到 0.75，對 Precision 和 Recall 的影響是？',
+    opts:{
+      A:'Precision 提高，Recall 提高',
+      B:'Precision 可能提高，Recall 通常降低',
+      C:'Precision 降低，Recall 提高',
+      D:'兩者都不受閾值影響'
+    },
+    answer:'B',
+    exps:{
+      A:'❌ 提高 IoU 閾值使判定 TP 更嚴格，許多原本的 TP 變成 FP，不會同時提高兩者。',
+      B:'✅ 正確。IoU 閾值提高 → 更嚴格的 TP 判定標準 → 許多框從 TP 變 FP（Precision 可能提高，因為剩下的 TP 更精準）；同時更多實際物件無法被偵測到（Recall 降低）。',
+      C:'❌ 方向錯誤，Precision 不會降低（更嚴格的標準會讓留下來的 TP 更精確）。',
+      D:'❌ IoU 閾值直接決定哪些預測算 TP，必定影響 Precision 和 Recall。'
+    }
+  },
+  {
+    topic:'熵計算',
+    stem:'某資料集有 4 筆正例和 4 筆負例（共8筆），其 Shannon 熵 H 約為？',
+    opts:{
+      A:'H = 0 bit',
+      B:'H = 0.5 bit',
+      C:'H = 1.0 bit',
+      D:'H = 2.0 bit'
+    },
+    answer:'C',
+    exps:{
+      A:'❌ H=0 代表純節點（全正或全負），4+4 完全混亂不可能是0。',
+      B:'❌ H=0.5 對應約 85/15 的分佈，不是 50/50。',
+      C:'✅ 正確。H = -(4/8)×log₂(4/8) - (4/8)×log₂(4/8) = -(0.5)×(-1) - (0.5)×(-1) = 0.5 + 0.5 = 1.0 bit。50/50 分佈的熵最大，為 1.0 bit。',
+      D:'❌ 二元分類的最大熵為 1.0 bit，不會達到 2.0 bit（需要 4 個等概率類別才能達到 2 bit）。'
+    }
+  },
+  {
+    topic:'L1 vs L2 正則化',
+    stem:'在房價預測任務中，「房間數」與「坪數」存在高度多重共線性。為降低共線性對模型參數估計的負面影響，應優先選擇？',
+    opts:{
+      A:'不受多重共線性影響的決策樹模型',
+      B:'傳統線性迴歸，不含正則化',
+      C:'支持向量機搭配線性核函數',
+      D:'含 L1 正則化的 LASSO 迴歸模型'
+    },
+    answer:'D',
+    exps:{
+      A:'❌ 題目要求解決「多重共線性對模型參數估計的影響」，決策樹雖不受共線性影響，但無法提供穩定的線性係數估計。',
+      B:'❌ 傳統線性迴歸對共線性非常敏感，係數估計不穩定，正是問題根源。',
+      C:'❌ SVM 線性核本質也是線性模型，同樣受共線性影響。',
+      D:'✅ 正確。LASSO（L1 正則化）將不重要的特徵係數縮為 0，自動進行特徵選擇，消除共線性特徵的影響，使係數估計更穩定。'
+    }
+  },
+  {
+    topic:'Softmax 計算',
+    stem:'模型輸出 logits = [3, 1, 0]，Softmax 後第一個類別的機率最接近？',
+    opts:{
+      A:'0.500',
+      B:'0.665',
+      C:'0.844',
+      D:'1.000'
+    },
+    answer:'C',
+    exps:{
+      A:'❌ 0.5 是 exp(3)/(exp(3)+exp(3)) 的結果，忽略了其他類別。',
+      B:'❌ 計算不正確。',
+      C:'✅ 正確。exp(3)=20.09, exp(1)=2.72, exp(0)=1.00。總和=23.81。P₁ = 20.09/23.81 ≈ 0.844。',
+      D:'❌ Softmax 不會輸出 1.0（除非只有一個類別）。'
+    }
+  },
+  {
+    topic:'PCA 綜合判斷',
+    stem:'某 PCA 分析得特徵值：λ₁=8, λ₂=4, λ₃=2, λ₄=1。若要保留 80% 以上的總變異量，至少需要保留幾個主成分？',
+    opts:{
+      A:'1 個',
+      B:'2 個',
+      C:'3 個',
+      D:'4 個全部保留'
+    },
+    answer:'B',
+    exps:{
+      A:'❌ PC1 = 8/(8+4+2+1) = 8/15 ≈ 53.3%，未達 80%。',
+      B:'✅ 正確。Σλ=15。PC1=53.3%，PC1+PC2=(8+4)/15=12/15=80.0%，剛好達到 80% 閾值，保留前 2 個主成分即可。',
+      C:'❌ 前 2 個已達到 80%，不需要第 3 個。',
+      D:'❌ 完全不降維就失去了 PCA 的意義。'
+    }
+  }
+];
+
+let state = QUESTIONS.map(()=>({sel:null,confirmed:false,skipped:false}));
+
+function renderAll(){
+  const wrap=document.getElementById('qWrap');
+  wrap.innerHTML='';
+  QUESTIONS.forEach((q,qi)=>{
+    const s=state[qi];
+    const div=document.createElement('div');
+    div.className='q-item'; div.id='qi'+qi;
+    const letters=['A','B','C','D'];
+    const optsHTML=letters.map(l=>{
+      let cls='q-opt';
+      if(s.confirmed){cls+=' locked'; if(l===q.answer)cls+=' correct'; else if(l===s.sel)cls+=' wrong';}
+      else if(s.sel===l) cls+=' sel';
+      return `<div class="${cls}" onclick="selectOpt(${qi},'${l}')">
+        <div class="q-letter">${l}</div>
+        <div class="q-opt-text">${q.opts[l]}</div>
+      </div>`;
+    }).join('');
+    let expHTML='';
+    if(s.confirmed||s.skipped){
+      const isOk=s.sel===q.answer;
+      const hdrCls=s.skipped?'fail':(isOk?'ok':'fail');
+      const hdrTxt=s.skipped?'⏭ 略過 — 正確答案：'+q.answer:(isOk?'✅ 答對了！':'❌ 答錯了，正確答案：'+q.answer);
+      expHTML=`<div class="exp-panel" style="display:block">
+        <div class="exp-hdr ${hdrCls}">${hdrTxt}</div>
+        <div class="exp-body">${letters.map(l=>`
+          <div class="exp-row ${l===q.answer?'exp-ok':'exp-no'}">
+            <span class="exp-ltr">${l}.</span><span class="exp-txt">${q.exps[l]}</span>
+          </div>`).join('')}
+        </div>
+      </div>`;
+    }
+    div.innerHTML=`
+      <div class="q-badge">${q.topic}</div>
+      <div class="q-stem">${q.stem}</div>
+      <div class="q-opts">${optsHTML}</div>
+      <div class="q-ctrl">
+        <button class="btn btn-confirm" id="btnC${qi}" onclick="confirmQ(${qi})" ${s.sel&&!s.confirmed?'':'disabled'}>確認作答</button>
+        <button class="btn btn-skip" onclick="skipQ(${qi})" ${s.confirmed||s.skipped?'disabled':''}>略過</button>
+        ${qi<QUESTIONS.length-1?`<button class="btn btn-next" onclick="goTo(${qi+1})">下一題 →</button>`:''}
+      </div>${expHTML}`;
+    wrap.appendChild(div);
+  });
+  updateProg();
+}
+function selectOpt(qi,l){if(state[qi].confirmed||state[qi].skipped)return;state[qi].sel=l;renderAll();document.getElementById('btnC'+qi).disabled=false;}
+function confirmQ(qi){if(!state[qi].sel)return;state[qi].confirmed=true;renderAll();checkDone();}
+function skipQ(qi){state[qi].skipped=true;renderAll();checkDone();}
+function goTo(qi){const el=document.getElementById('qi'+qi);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+function updateProg(){
+  const done=state.filter(s=>s.confirmed||s.skipped).length;
+  const pct=Math.round(done/QUESTIONS.length*100);
+  document.getElementById('progFill').style.width=pct+'%';
+  document.getElementById('progLabel').textContent=`第 ${done} / ${QUESTIONS.length} 題已作答`;
+}
+function checkDone(){
+  if(!state.every(s=>s.confirmed||s.skipped))return;
+  const correct=state.filter((s,i)=>s.confirmed&&s.sel===QUESTIONS[i].answer).length;
+  const wrong=state.filter((s,i)=>s.confirmed&&s.sel!==QUESTIONS[i].answer).length;
+  const skipped=state.filter(s=>s.skipped).length;
+  const pct=Math.round(correct/QUESTIONS.length*100);
+  document.getElementById('scoreNum').textContent=pct+'%';
+  document.getElementById('scoreNum').className='score-num '+(pct>=60?'pass':'fail');
+  document.getElementById('scoreLbl').textContent=`答對 ${correct}/${QUESTIONS.length} 題 — ${pct>=80?'🎉 非常優秀！':pct>=60?'加油繼續練習！':'建議重看公式再練習'}`;
+  document.getElementById('sgC').textContent=correct;
+  document.getElementById('sgW').textContent=wrong;
+  document.getElementById('sgS').textContent=skipped;
+  document.getElementById('scoreBanner').style.display='block';
+  document.getElementById('scoreBanner').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function restartQuiz(){
+  state=QUESTIONS.map(()=>({sel:null,confirmed:false,skipped:false}));
+  document.getElementById('scoreBanner').style.display='none';
+  renderAll();
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+renderAll();
+</script>
+</body>
+</html>
