@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>特徵工程與資料前處理 — iPAS AI應用規劃師中級考試</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+* { font-family: 'Calibri', 'Microsoft JhengHei', '微軟正黑體', sans-serif; }
+code, .formula { font-family: 'JetBrains Mono', 'Consolas', monospace !important; }
+:root{
+  --bg:#0F1117;--panel:#1A1D27;--panel2:#21253A;
+  --border:#2E3250;--text:#E8EAF6;--muted:#8892B0;
+  --accent:#00D4FF;--accent2:#00FFB2;--accent3:#7C6FFF;
+  --yellow:#FFD166;--orange:#FF9B42;--pink:#FF6B9D;--blue:#00D4FF;--purple:#9B5DE5;
+  --r:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Calibri','Microsoft JhengHei','微軟正黑體',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.7;}
+
+.nav{position:sticky;top:0;z-index:200;background:rgba(15,17,23,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:12px 24px;}
+.nav a{color:var(--accent);text-decoration:none;font-weight:700;font-size:.9rem;padding:5px 14px;border-radius:999px;border:1.5px solid var(--accent);transition:all .18s;}
+.nav a:hover{background:var(--accent);color:#0F1117;}
+.nav-title{font-size:1.05rem;}
+.nav-tag{margin-left:auto;background:linear-gradient(135deg,var(--accent),var(--accent3));padding:4px 14px;border-radius:999px;font-size:.78rem;font-weight:900;color:#fff;}
+
+.hero{padding:60px 20px 40px;background:linear-gradient(160deg,#0F1117,#0a1520,#0F1117);text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(0,212,255,.10),transparent);}
+.hero-badge{display:inline-block;margin-bottom:16px;padding:5px 18px;border-radius:999px;background:rgba(0,212,255,.10);border:1px solid var(--accent);font-size:.8rem;font-weight:900;color:var(--accent);letter-spacing:1px;}
+.hero-title{font-size:clamp(1.8rem,5vw,3.2rem);background:linear-gradient(135deg,var(--accent),var(--accent3),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px;}
+.hero-sub{color:var(--muted);font-size:1rem;max-width:640px;margin:0 auto 24px;}
+.tag-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.tag{padding:4px 12px;border-radius:999px;font-size:.75rem;font-weight:900;border:1px solid;}
+
+.wrap{max-width:980px;margin:0 auto;padding:16px 20px 80px;}
+
+.sec-title{font-size:1.5rem;color:var(--text);margin:44px 0 16px;display:flex;align-items:center;gap:10px;}
+.sec-title::before{content:'';display:inline-block;width:4px;height:24px;border-radius:2px;background:linear-gradient(var(--accent),var(--yellow));}
+
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:20px;}
+.panel-title{font-weight:900;font-size:1rem;color:var(--accent2);margin-bottom:12px;}
+
+.formula{background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin:12px 0;font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--accent2);line-height:2;overflow-x:auto;}
+.formula .cm{color:var(--muted);font-style:italic;}
+.formula .hl{color:var(--yellow);}
+.formula .fn{color:var(--blue);}
+.formula .vr{color:var(--pink);}
+
+.tbl-wrap{overflow-x:auto;margin:12px 0;}
+table{width:100%;border-collapse:collapse;font-size:.88rem;}
+th{background:var(--panel2);padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);color:var(--accent2);font-weight:900;}
+td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--muted);}
+td:first-child{color:var(--text);font-weight:700;}
+tr:hover td{background:rgba(0,212,255,.03);}
+
+.kp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:12px 0;}
+.kp-card{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:16px;border-left:3px solid var(--accent);transition:transform .18s,border-color .18s;}
+.kp-card:hover{transform:translateY(-4px);border-left-color:var(--accent2);}
+.kp-card .kp-title{font-weight:900;font-size:.95rem;color:var(--text);margin-bottom:6px;}
+.kp-card .kp-body{font-size:.83rem;color:var(--muted);line-height:1.6;}
+.kp-card .kp-tag{font-size:.7rem;font-weight:900;color:var(--accent);margin-top:8px;}
+
+.warn-box{background:rgba(0,212,255,.06);border:1px solid var(--accent);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--accent);margin:10px 0;}
+.info-box{background:rgba(0,255,178,.07);border:1px solid var(--accent2);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--accent2);margin:10px 0;}
+
+.seg-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.seg-tab{padding:7px 16px;border-radius:999px;border:1.5px solid var(--border);font-size:.83rem;font-weight:900;cursor:pointer;color:var(--muted);background:transparent;transition:all .18s;}
+.seg-tab.active{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,.09);}
+.seg-box{background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:16px;font-size:.88rem;line-height:1.8;color:var(--muted);}
+.seg-box .hl{color:var(--accent);}
+.seg-box .hl2{color:var(--yellow);}
+.seg-box .hl3{color:var(--accent2);}
+
+.c3d-wrap{background:#0a0c14;border:1px solid var(--border);border-radius:var(--r);position:relative;overflow:hidden;margin:12px 0;}
+.c3d{display:block;width:100%;height:380px;cursor:grab;}
+.c3d:active{cursor:grabbing;}
+.c3d-lbl{position:absolute;top:10px;left:12px;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);padding:4px 12px;border-radius:999px;font-size:.72rem;font-weight:900;color:var(--accent);border:1px solid rgba(0,212,255,.4);}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;padding:10px 12px;background:rgba(0,0,0,.3);}
+.ctrl button{padding:5px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.18);font-size:.72rem;font-weight:900;color:rgba(255,255,255,.6);background:transparent;cursor:pointer;transition:all .18s;}
+.ctrl button:hover,.ctrl button.on{border-color:var(--accent);color:var(--accent);background:rgba(0,212,255,.12);}
+
+.canvas2d-wrap{background:#0a0c14;border:1px solid var(--border);border-radius:10px;margin:12px 0;overflow:hidden;}
+.canvas2d-wrap canvas{display:block;width:100%;}
+
+.progress-bar{height:6px;background:var(--border);border-radius:3px;margin-bottom:20px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent3));transition:width .5s;}
+.q-item{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;}
+.q-num{font-size:.75rem;font-weight:900;color:var(--accent);margin-bottom:6px;}
+.q-stem{font-weight:700;color:var(--text);font-size:.95rem;margin-bottom:12px;line-height:1.6;}
+.q-opts{display:flex;flex-direction:column;gap:7px;}
+.q-opt{padding:10px 14px;border-radius:8px;cursor:pointer;border:1px solid var(--border);font-size:.88rem;color:var(--muted);transition:all .18s;display:flex;align-items:flex-start;gap:8px;}
+.q-opt:hover{border-color:var(--accent);color:var(--text);background:rgba(0,212,255,.06);}
+.q-opt.correct{border-color:var(--accent2);background:rgba(0,255,178,.07);color:var(--accent2);}
+.q-opt.wrong{border-color:var(--pink);background:rgba(255,107,157,.07);color:var(--pink);}
+.q-opt .opt-label{font-weight:900;min-width:18px;}
+.q-explain{margin-top:12px;padding:10px 14px;background:rgba(0,212,255,.05);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;font-size:.84rem;color:var(--accent);display:none;line-height:1.65;}
+.q-explain.show{display:block;}
+
+#score-banner{position:fixed;bottom:20px;right:20px;z-index:300;background:var(--panel);border:1px solid var(--accent);border-radius:12px;padding:10px 18px;font-weight:900;font-size:.9rem;color:var(--accent);box-shadow:0 4px 20px rgba(0,212,255,.25);}
+
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .5s ease,transform .5s ease;}
+.reveal.vis{opacity:1;transform:translateY(0);}
+footer{text-align:center;padding:28px;font-size:.75rem;color:rgba(232,234,246,.2);}
+</style>
+</head>
+<body>
+
+<div id="score-banner">⭐ 答題得分：<span id="score">0</span> / <span id="total">0</span></div>
+
+<nav class="nav">
+  <a href="index.html">← 返回</a>
+  <span class="nav-title">特徵工程與資料前處理</span>
+  <span class="nav-tag">iPAS 中級 · 科目三 L232 + 科目一 L21301</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">L232 建模 · 特徵工程與資料前處理</div>
+  <div class="hero-title">特徵工程與資料前處理</div>
+  <div class="hero-sub">缺失值處理、異常值偵測、特徵縮放（Min-Max / Z-score / Robust）、類別編碼（One-Hot / Target / Frequency）、特徵選擇、不平衡資料 SMOTE 策略</div>
+  <div class="tag-row">
+    <span class="tag" style="color:var(--accent);border-color:var(--accent)">特徵空間 3D</span>
+    <span class="tag" style="color:var(--yellow);border-color:var(--yellow)">One-Hot Encoding</span>
+    <span class="tag" style="color:var(--accent2);border-color:var(--accent2)">SMOTE</span>
+    <span class="tag" style="color:var(--pink);border-color:var(--pink)">Robust Scaling</span>
+    <span class="tag" style="color:var(--orange);border-color:var(--orange)">IQR 異常值</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- 1. 缺失值處理 -->
+<div class="sec-title reveal">🔍 缺失值處理策略</div>
+<div class="panel reveal">
+  <div class="panel-title">缺失值處理方法比較：從簡單刪除到多重插補</div>
+  <div class="seg-tabs">
+    <button class="seg-tab active" onclick="showMissing(this,'drop')">🗑️ 刪除法</button>
+    <button class="seg-tab" onclick="showMissing(this,'mean')">📊 均值/中位數填補</button>
+    <button class="seg-tab" onclick="showMissing(this,'knn')">🤝 KNN 填補</button>
+    <button class="seg-tab" onclick="showMissing(this,'mi')">🔁 多重插補</button>
+  </div>
+  <div class="seg-box" id="missing-display"></div>
+  <div class="kp-grid" style="margin-top:14px;">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">缺失值類型（MCAR / MAR / MNAR）</div>
+      <div class="kp-body"><strong>MCAR</strong>（完全隨機缺失）：與任何變數無關，可直接刪除<br><strong>MAR</strong>（隨機缺失）：與其他可觀測變數相關，用填補法<br><strong>MNAR</strong>（非隨機缺失）：與缺失值本身相關，最難處理</div>
+      <div class="kp-tag">▶ 考點：MNAR 最難處理</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">均值 vs 中位數填補選擇</div>
+      <div class="kp-body">資料<strong>對稱分佈</strong>→使用均值填補<br>資料<strong>偏態/有離群值</strong>→使用中位數填補（更穩健）<br>類別變數→使用眾數填補<br>填補後標準差會<strong>人為縮小</strong></div>
+      <div class="kp-tag">▶ 考點：偏態資料用中位數</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--pink)">
+      <div class="kp-title">KNN 填補原理</div>
+      <div class="kp-body">找 K 個最相似的完整樣本，取其平均值填補<br>優點：考慮特徵間相關性<br>缺點：計算成本高 O(n²)，大資料集慢<br>K 值選擇影響填補品質</div>
+      <div class="kp-tag">▶ 考點：KNN 考慮特徵相關性</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 必記：</strong>缺失率 &gt; 40% 考慮刪除整欄、中位數填補對偏態/離群值更穩健、KNN 填補計算成本 O(n²)、MNAR 缺失最難處理（需領域知識）</div>
+</div>
+
+<!-- 2. 異常值偵測 -->
+<div class="sec-title reveal">⚠️ 異常值偵測（IQR & Z-score）</div>
+<div class="panel reveal">
+  <div class="panel-title">IQR 法與 Z-score 法：核心公式與適用情境</div>
+  <div class="formula">
+    <span class="cm">// IQR（四分位距）異常值偵測</span><br>
+    <span class="fn">IQR</span> = Q3 - Q1<br>
+    下界 = Q1 - <span class="hl">1.5</span> × IQR<br>
+    上界 = Q3 + <span class="hl">1.5</span> × IQR<br>
+    超出範圍者 → 異常值<br><br>
+    <span class="cm">// Z-score 標準化異常值偵測</span><br>
+    <span class="fn">z</span> = (<span class="vr">x</span> - μ) / σ<br>
+    |z| &gt; <span class="hl">3</span> → 異常值（±3σ 之外，約佔 0.3%）<br><br>
+    <span class="cm">// 修正 Z-score（對離群值更穩健）</span><br>
+    <span class="fn">MAD</span> = median(|xᵢ - median(X)|)<br>
+    修正 z = 0.6745 × (<span class="vr">x</span> - median) / MAD
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">IQR 法優勢</div>
+      <div class="kp-body">不假設資料分佈（非參數法）<br>對偏態分佈仍有效<br>箱形圖（Box Plot）直觀呈現<br>1.5×IQR 為標準閾值<br>3×IQR 更寬鬆（極端異常值）</div>
+      <div class="kp-tag">▶ 考點：IQR 不假設常態分佈</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">Z-score 法限制</div>
+      <div class="kp-body">假設資料近似常態分佈<br>對非常態資料效果差<br>閾值 |z|&gt;3 對應 99.7% 範圍<br>Masking 問題：多個異常值會影響均值/標準差計算<br>小樣本不適合使用</div>
+      <div class="kp-tag">▶ 考點：Z-score 假設常態分佈</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--orange)">
+      <div class="kp-title">異常值處理策略</div>
+      <div class="kp-body">1. <strong>刪除</strong>：確定是測量誤差<br>2. <strong>截尾（Winsorizing）</strong>：替換為閾值<br>3. <strong>對數轉換</strong>：壓縮偏態分佈<br>4. <strong>保留</strong>：詐欺偵測中異常值本身是目標<br>5. <strong>Robust 縮放</strong>：降低異常值影響</div>
+      <div class="kp-tag">▶ 考點：詐欺偵測保留異常值</div>
+    </div>
+  </div>
+</div>
+
+<!-- 3. 特徵縮放互動 -->
+<div class="sec-title reveal">📏 特徵縮放方法（互動比較）</div>
+<div class="panel reveal">
+  <div class="panel-title">三大縮放方法：Min-Max、Z-score 標準化、Robust Scaling</div>
+  <div class="formula">
+    <span class="cm">// Min-Max 正規化（MinMaxScaler）</span><br>
+    x' = (<span class="vr">x</span> - x_min) / (x_max - x_min)   <span class="cm">→ 範圍 [0, 1]</span><br><br>
+    <span class="cm">// Z-score 標準化（StandardScaler）</span><br>
+    x' = (<span class="vr">x</span> - <span class="hl">μ</span>) / <span class="hl">σ</span>   <span class="cm">→ 均值=0，標準差=1</span><br><br>
+    <span class="cm">// Robust Scaling（對離群值穩健）</span><br>
+    x' = (<span class="vr">x</span> - <span class="fn">median</span>) / <span class="fn">IQR</span>   <span class="cm">→ 使用中位數與四分位距</span>
+  </div>
+  <div class="canvas2d-wrap" style="margin:16px 0;">
+    <canvas id="scalingCanvas" width="900" height="260"></canvas>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">Min-Max 正規化</div>
+      <div class="kp-body">保留原始分佈形狀<br>輸出嚴格在 [0,1]<br>對神經網路激活函數友好<br><strong>缺點：對離群值敏感</strong>（一個極端值壓縮其他值）</div>
+      <div class="kp-tag">▶ 考點：神經網路/影像像素常用</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">Z-score 標準化</div>
+      <div class="kp-body">標準化後：<strong>均值=0、標準差=1</strong><br>假設特徵近似常態分佈<br>SVM、PCA、線性迴歸適合<br><strong>輸出無固定範圍</strong>（可超過±1）</div>
+      <div class="kp-tag">▶ 考點：標準化後 σ=1, μ=0</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--pink)">
+      <div class="kp-title">Robust Scaling</div>
+      <div class="kp-body">使用中位數與 IQR 取代均值與標準差<br><strong>對離群值最穩健</strong><br>資料含大量異常值時優選<br>不保證輸出範圍</div>
+      <div class="kp-tag">▶ 考點：含離群值→Robust Scaling</div>
+    </div>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>縮放方法</th><th>公式</th><th>輸出範圍</th><th>對離群值</th><th>適用情境</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Min-Max</td><td>(x-min)/(max-min)</td><td>[0, 1]</td><td style="color:var(--pink)">敏感</td><td>神經網路、影像</td></tr>
+        <tr><td>Z-score 標準化</td><td>(x-μ)/σ</td><td>無固定範圍</td><td style="color:var(--orange)">中等</td><td>SVM、PCA、線性模型</td></tr>
+        <tr><td style="color:var(--accent)">Robust Scaling</td><td>(x-median)/IQR</td><td>無固定範圍</td><td style="color:var(--accent2)">最穩健</td><td style="color:var(--yellow)">含離群值資料集</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- 4. Three.js 3D 特徵空間 -->
+<div class="sec-title reveal">🌐 3D 特徵空間轉換（標準化前後對比）</div>
+<div class="panel reveal">
+  <div class="panel-title">觀察特徵縮放如何改變資料點在空間中的分佈（可拖曳旋轉）</div>
+  <div class="c3d-wrap">
+    <canvas id="c3d" class="c3d"></canvas>
+    <div class="c3d-lbl">🌐 特徵空間 3D · 拖曳旋轉</div>
+    <div class="ctrl">
+      <button id="btnAuto" class="on" onclick="toggleAuto3d()">⟳ 自動旋轉</button>
+      <button onclick="resetView3d()">↺ 重置視角</button>
+      <button id="btnBefore" class="on" onclick="toggleBefore()">🔴 原始分佈</button>
+      <button id="btnAfter" class="on" onclick="toggleAfter()">🟢 標準化後</button>
+    </div>
+  </div>
+  <div class="info-box">💡 <strong>觀察：</strong>標準化前（紅色）各特徵尺度差異大（X軸0-1000，Y軸0-1，Z軸0-100），標準化後（綠色）所有特徵集中在相同尺度，SVM 和 KNN 等基於距離的模型更能公平比較各特徵貢獻</div>
+</div>
+
+<!-- 5. 類別編碼 -->
+<div class="sec-title reveal">🏷️ 類別特徵編碼方法</div>
+<div class="panel reveal">
+  <div class="panel-title">One-Hot / Label / Target / Frequency Encoding — 選擇策略與考試重點</div>
+  <div class="formula">
+    <span class="cm">// One-Hot Encoding（虛擬變數）</span><br>
+    顏色 = ['紅','藍','綠']<br>
+    紅 → [<span class="hl">1</span>, 0, 0],  藍 → [0, <span class="hl">1</span>, 0],  綠 → [0, 0, <span class="hl">1</span>]<br>
+    <span class="cm">// 注意：k 個類別 → k-1 個虛擬變數（避免完全共線性）</span><br><br>
+    <span class="cm">// Label Encoding（序號編碼）</span><br>
+    低=<span class="vr">0</span>, 中=<span class="vr">1</span>, 高=<span class="vr">2</span>   <span class="cm">→ 適合有序類別（Ordinal）</span><br><br>
+    <span class="cm">// Target Encoding（目標編碼）</span><br>
+    城市 = mean(<span class="fn">target</span> | 城市='台北')   <span class="cm">→ 用目標均值替換類別</span><br><br>
+    <span class="cm">// Frequency Encoding（頻率編碼）</span><br>
+    城市編碼 = count(城市) / total   <span class="cm">→ 用出現頻率替換</span>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">One-Hot 編碼</div>
+      <div class="kp-body">無序類別首選（顏色、城市）<br><strong>高基數問題</strong>：1000 個城市→1000 列，特徵爆炸<br>需刪除一列避免完全共線性（drop_first=True）<br>樹模型不需要 One-Hot（可直接處理類別）</div>
+      <div class="kp-tag">▶ 考點：高基數→特徵爆炸</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">Target Encoding</div>
+      <div class="kp-body">用目標均值替換類別，保留類別-目標相關性<br>高基數特徵（城市、郵遞區號）適用<br><strong>目標洩漏風險</strong>：需在 CV 每折內計算<br>加平滑：α/(α+count)×global_mean 防止過擬合</div>
+      <div class="kp-tag">▶ 考點：Target Encoding 需防洩漏</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--orange)">
+      <div class="kp-title">Label vs Ordinal Encoding</div>
+      <div class="kp-body">Label Encoding：任意序號，引入人工序關係<br><strong>誤用情境</strong>：無序類別用 Label → 模型誤認距離<br>Ordinal Encoding：有序類別必選（低/中/高）<br>樹模型：Label Encoding 可行（不假設線性關係）</div>
+      <div class="kp-tag">▶ 考點：無序類別不能用 Label</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 必記：</strong>One-Hot 高基數→特徵爆炸（維度詛咒）、Label Encoding 給無序類別→引入假序關係、Target Encoding 需在 CV 每折內計算（防目標洩漏）</div>
+</div>
+
+<!-- 6. 特徵選擇 -->
+<div class="sec-title reveal">🔬 特徵選擇方法（Filter / Wrapper / Embedded）</div>
+<div class="panel reveal">
+  <div class="panel-title">三大特徵選擇流派：統計過濾、包裝法、嵌入法</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead>
+        <tr><th>方法類別</th><th>代表算法</th><th>原理</th><th>計算成本</th><th>過擬合風險</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Filter（過濾法）</td><td>卡方檢定、互信息、相關係數</td><td>統計指標評分，獨立於模型</td><td style="color:var(--accent2)">低 O(p)</td><td style="color:var(--accent2)">低</td></tr>
+        <tr><td>Wrapper（包裝法）</td><td>RFE、前向/後向選擇</td><td>用模型評估特徵子集效能</td><td style="color:var(--pink)">高 O(2ᵖ)</td><td style="color:var(--pink)">高</td></tr>
+        <tr><td style="color:var(--accent)">Embedded（嵌入法）</td><td>L1 Lasso、RandomForest 重要性</td><td>訓練時內建特徵選擇</td><td style="color:var(--yellow)">中</td><td style="color:var(--yellow)">中</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">卡方檢定（SelectKBest）</div>
+      <div class="kp-body">適用：非負特徵（計數、頻率）與類別目標<br>H₀：特徵與目標<strong>相互獨立</strong><br>p-value &lt; 0.05 → 拒絕 H₀ → 特徵顯著<br>χ² 值越大 → 特徵與目標關聯越強</div>
+      <div class="kp-tag">▶ 考點：卡方→非負特徵分類問題</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">Lasso L1 正則化特徵選擇</div>
+      <div class="kp-body">L1 懲罰項將不重要特徵係數壓縮為<strong>精確 0</strong><br>自動特徵選擇（稀疏解）<br>λ（正則化強度）↑ → 更多特徵被置零<br>比 Filter 更考慮特徵間相互作用</div>
+      <div class="kp-tag">▶ 考點：Lasso 產生稀疏解</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--orange)">
+      <div class="kp-title">Random Forest 特徵重要性</div>
+      <div class="kp-body">基於每個特徵在所有樹中的<strong>平均不純度降低量</strong><br>（Gini 重要性 / Mean Decrease Impurity）<br>置換重要性（Permutation Importance）：打亂特徵後性能降幅<br>可處理非線性交互效果</div>
+      <div class="kp-tag">▶ 考點：RF 重要性 = Gini 下降量</div>
+    </div>
+  </div>
+</div>
+
+<!-- 7. 不平衡資料 -->
+<div class="sec-title reveal">⚖️ 不平衡資料處理（SMOTE / Class Weight）</div>
+<div class="panel reveal">
+  <div class="panel-title">類別不平衡問題：詐欺偵測、疾病診斷常見挑戰</div>
+  <div class="formula">
+    <span class="cm">// SMOTE（合成少數類過採樣技術）</span><br>
+    <span class="fn">SMOTE</span> 原理：<br>  1. 對每個少數類樣本，找 K 個最近鄰<br>  2. 隨機選一個鄰居，在連線上生成<span class="hl">合成樣本</span><br>  新樣本 = x + λ × (x_neighbor - x),  λ ∈ [0,1]<br><br>
+    <span class="cm">// 類別不平衡評估指標（不用 Accuracy！）</span><br>
+    <span class="fn">Precision</span> = TP / (TP + FP)   <span class="cm">→ 預測正確率</span><br>
+    <span class="fn">Recall</span>    = TP / (TP + FN)   <span class="cm">→ 真實召回率（不漏報）</span><br>
+    <span class="fn">F1</span>        = 2 × P × R / (P + R)   <span class="cm">→ 平衡精準與召回</span><br>
+    <span class="vr">AUC-ROC</span>：面積越大 → 模型區分能力越強
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">SMOTE 過採樣</div>
+      <div class="kp-body">生成少數類<strong>合成樣本</strong>（非複製）<br>SMOTE-NC：混合型數值+類別特徵<br>SMOTE-Tomek：過採樣後再清理邊界<br><strong>注意</strong>：SMOTE 只在訓練集使用，不能洩漏到測試集</div>
+      <div class="kp-tag">▶ 考點：SMOTE=合成少數類樣本</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">Class Weight 類別權重</div>
+      <div class="kp-body">在損失函數中給少數類更大懲罰<br>sklearn: class_weight='balanced'<br>balanced: w_i = n_samples/(n_classes × n_i)<br>不增加資料量，計算成本低<br>適合樣本極度不平衡（1:1000）</div>
+      <div class="kp-tag">▶ 考點：class_weight 不增加資料</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--orange)">
+      <div class="kp-title">欠採樣（Undersampling）</div>
+      <div class="kp-body">隨機刪除多數類樣本<br>TomekLinks：刪除兩類邊界樣本<br>NearMiss：選邊界附近的多數類<br><strong>缺點</strong>：丟失多數類有用資訊<br>適合資料量充足且多數類資訊冗餘</div>
+      <div class="kp-tag">▶ 考點：欠採樣丟失資訊</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 必記：</strong>不平衡資料→不能用 Accuracy（用 F1/AUC）、SMOTE 合成新樣本非複製、SMOTE 只用在訓練集、Class Weight 比 SMOTE 更快（無額外樣本）</div>
+</div>
+
+<!-- 8. 資料增強 -->
+<div class="sec-title reveal">🔄 資料增強與 Pipeline 設計</div>
+<div class="panel reveal">
+  <div class="panel-title">影像/文字資料增強策略及 sklearn Pipeline 避免資料洩漏</div>
+  <div class="formula">
+    <span class="cm">// sklearn Pipeline 正確做法（防資料洩漏）</span><br>
+    <span class="fn">from</span> sklearn.pipeline <span class="fn">import</span> Pipeline<br>
+    <span class="fn">from</span> sklearn.preprocessing <span class="fn">import</span> StandardScaler<br>
+    <span class="fn">from</span> sklearn.linear_model <span class="fn">import</span> LogisticRegression<br><br>
+    pipe = Pipeline([<br>
+      &nbsp;&nbsp;(<span class="hl">'scaler'</span>, StandardScaler()),      <span class="cm">// 僅在訓練集 fit</span><br>
+      &nbsp;&nbsp;(<span class="hl">'clf'</span>,    LogisticRegression())<br>
+    ])<br>
+    pipe.<span class="fn">fit</span>(<span class="vr">X_train</span>, y_train)   <span class="cm">// scaler.fit 在這裡執行</span><br>
+    pipe.<span class="fn">score</span>(<span class="vr">X_test</span>, y_test)   <span class="cm">// scaler.transform 使用訓練統計</span>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">影像資料增強</div>
+      <div class="kp-body">幾何變換：翻轉、旋轉、裁剪、縮放<br>像素變換：亮度/對比度/色彩抖動<br>Cutout/Mixup：隨機遮蔽或混合<br>AutoAugment：自動搜尋最優增強策略<br>目的：防止過擬合、提升泛化</div>
+      <div class="kp-tag">▶ 考點：增強防過擬合</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">文字資料增強</div>
+      <div class="kp-body">同義詞替換（WordNet）<br>回譯（Back Translation）：英→法→英<br>EDA（Easy Data Augmentation）：插入/刪除/交換/替換<br>GPT 生成同義句<br>適合低資源語言/少量標注場景</div>
+      <div class="kp-tag">▶ 考點：回譯增強 NLP 訓練資料</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--pink)">
+      <div class="kp-title">資料洩漏（Data Leakage）</div>
+      <div class="kp-body">在整個資料集上 fit scaler → 測試集均值/標準差流入訓練<br><strong>正確</strong>：只在訓練集 fit，transform 所有集<br>Pipeline 自動管理，是最佳實踐<br>交叉驗證時每折分別 fit scaler</div>
+      <div class="kp-tag">▶ 考點：Pipeline 防資料洩漏</div>
+    </div>
+  </div>
+</div>
+
+<!-- 9. 程式碼考點 -->
+<div class="sec-title reveal">💻 程式碼考點（pandas + sklearn + imblearn）</div>
+
+<div class="panel reveal">
+  <div class="panel-title">pandas 資料清洗核心 API</div>
+  <div class="formula">
+    <span class="cm"># 缺失值處理</span><br>
+    df.<span class="fn">isnull</span>().<span class="fn">sum</span>()              <span class="cm"># 統計每欄缺失數量</span><br>
+    df.<span class="fn">fillna</span>(<span class="vr">df</span>.mean())          <span class="cm"># 均值填補（數值欄）</span><br>
+    df.<span class="fn">fillna</span>(method=<span class="hl">'ffill'</span>)     <span class="cm"># 前向填補（時序資料）</span><br>
+    df.<span class="fn">dropna</span>(thresh=<span class="vr">0.6</span>*len(df)) <span class="cm"># 刪除非空值&lt;60%的欄位</span><br><br>
+    <span class="cm"># 類別編碼</span><br>
+    pd.<span class="fn">get_dummies</span>(df[<span class="hl">'city'</span>], drop_first=<span class="vr">True</span>)  <span class="cm"># One-Hot，刪除第一列</span><br>
+    df[<span class="hl">'grade'</span>] = df[<span class="hl">'grade'</span>].<span class="fn">map</span>({<span class="hl">'低'</span>:<span class="vr">0</span>,<span class="hl">'中'</span>:<span class="vr">1</span>,<span class="hl">'高'</span>:<span class="vr">2</span>})  <span class="cm"># 序號編碼</span><br><br>
+    <span class="cm"># 異常值偵測（IQR）</span><br>
+    Q1 = df.<span class="fn">quantile</span>(<span class="vr">0.25</span>);  Q3 = df.<span class="fn">quantile</span>(<span class="vr">0.75</span>)<br>
+    IQR = Q3 - Q1<br>
+    mask = ~((df &lt; Q1 - <span class="vr">1.5</span>*IQR) | (df &gt; Q3 + <span class="vr">1.5</span>*IQR)).any(axis=<span class="vr">1</span>)
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">fillna 核心參數</div>
+      <div class="kp-body">fillna(value)：固定值填補<br>fillna(df.mean())：均值填補<br>fillna(df.median())：中位數填補<br>fillna(method='ffill')：前向填補（時序）<br>fillna(method='bfill')：後向填補</div>
+      <div class="kp-tag">▶ 偏態用 median，時序用 ffill</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">get_dummies 注意點</div>
+      <div class="kp-body">drop_first=True：刪除第一個虛擬變數防共線<br>k 類別 → k 列（不設）或 k-1 列（設 drop_first）<br>dtype 參數控制輸出類型（bool/int）<br>columns 參數指定要編碼的欄位名</div>
+      <div class="kp-tag">▶ 線性模型需 drop_first=True</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--orange)">
+      <div class="kp-title">quantile 分位數計算</div>
+      <div class="kp-body">df.quantile(0.25)：Q1 第一四分位數<br>df.quantile(0.75)：Q3 第三四分位數<br>df.quantile([0.25,0.5,0.75])：一次計算多個<br>IQR = Q3 - Q1<br>異常值：小於 Q1-1.5×IQR 或大於 Q3+1.5×IQR</div>
+      <div class="kp-tag">▶ IQR 閾值 1.5 需記住</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel reveal">
+  <div class="panel-title">sklearn 特徵縮放與選擇 API</div>
+  <div class="formula">
+    <span class="cm"># 特徵縮放</span><br>
+    <span class="fn">from</span> sklearn.preprocessing <span class="fn">import</span> StandardScaler, MinMaxScaler, RobustScaler<br><br>
+    scaler = <span class="fn">StandardScaler</span>()<br>
+    X_train_scaled = scaler.<span class="fn">fit_transform</span>(<span class="vr">X_train</span>)  <span class="cm"># fit + transform</span><br>
+    X_test_scaled  = scaler.<span class="fn">transform</span>(<span class="vr">X_test</span>)       <span class="cm"># 只 transform（防洩漏）</span><br><br>
+    <span class="cm"># 特徵選擇</span><br>
+    <span class="fn">from</span> sklearn.feature_selection <span class="fn">import</span> SelectKBest, chi2, f_classif<br>
+    selector = <span class="fn">SelectKBest</span>(score_func=<span class="fn">chi2</span>, k=<span class="vr">10</span>)<br>
+    X_new = selector.<span class="fn">fit_transform</span>(<span class="vr">X</span>, <span class="vr">y</span>)  <span class="cm"># 選出最佳 10 個特徵</span><br>
+    selector.scores_   <span class="cm"># 各特徵的卡方分數</span><br>
+    selector.pvalues_  <span class="cm"># p 值（&lt;0.05 表示顯著）</span>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">fit_transform vs transform</div>
+      <div class="kp-body">fit_transform(X_train)：學習統計量並轉換<br>transform(X_test)：用訓練統計量轉換<br><strong>錯誤</strong>：在 X_test 上 fit_transform → 資料洩漏<br>scaler.mean_ 存儲訓練集均值<br>scaler.scale_ 存儲訓練集標準差</div>
+      <div class="kp-tag">▶ 測試集只能用 transform</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">SelectKBest 參數</div>
+      <div class="kp-body">chi2：非負數值 + 類別目標（非負數！）<br>f_classif：ANOVA F 統計（連續特徵）<br>mutual_info_classif：互信息（非線性關係）<br>k：選擇前 k 個特徵<br>k='all'：計算分數但不過濾</div>
+      <div class="kp-tag">▶ chi2 要求非負輸入</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--pink)">
+      <div class="kp-title">RobustScaler 適用情境</div>
+      <div class="kp-body">RobustScaler(quantile_range=(25,75))：預設<br>with_centering=True：減去中位數<br>with_scaling=True：除以 IQR<br>離群值高占比（>5%）時優於 StandardScaler<br>不保證輸出範圍在 [0,1]</div>
+      <div class="kp-tag">▶ 離群值多→RobustScaler</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel reveal">
+  <div class="panel-title">imblearn 不平衡資料處理 API</div>
+  <div class="formula">
+    <span class="cm"># SMOTE 過採樣</span><br>
+    <span class="fn">from</span> imblearn.over_sampling <span class="fn">import</span> SMOTE<br>
+    <span class="fn">from</span> imblearn.combine <span class="fn">import</span> SMOTETomek<br><br>
+    sm = <span class="fn">SMOTE</span>(k_neighbors=<span class="vr">5</span>, random_state=<span class="vr">42</span>)<br>
+    X_res, y_res = sm.<span class="fn">fit_resample</span>(<span class="vr">X_train</span>, <span class="vr">y_train</span>)  <span class="cm"># 只在訓練集！</span><br><br>
+    <span class="cm"># 評估不平衡分類</span><br>
+    <span class="fn">from</span> sklearn.metrics <span class="fn">import</span> classification_report, roc_auc_score<br>
+    print(<span class="fn">classification_report</span>(<span class="vr">y_test</span>, <span class="vr">y_pred</span>))  <span class="cm"># 含 Precision/Recall/F1</span><br>
+    auc = <span class="fn">roc_auc_score</span>(<span class="vr">y_test</span>, <span class="vr">y_prob</span>[:,1])  <span class="cm"># AUC-ROC 分數</span>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">SMOTE 參數與變體</div>
+      <div class="kp-body">k_neighbors=5：默認 KNN 鄰居數<br>sampling_strategy：過採樣比例（如 0.5=少數:多數=1:2）<br>SMOTE-NC：處理數值+類別混合<br>BorderlineSMOTE：只合成邊界附近樣本</div>
+      <div class="kp-tag">▶ 合成非複製，生成新樣本</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">classification_report 解讀</div>
+      <div class="kp-body">precision：預測為正樣本中真正正樣本比例<br>recall：所有正樣本中被正確找到的比例<br>f1-score：精準率與召回率調和均值<br>macro avg：各類別平均（不加權）<br>weighted avg：按樣本數加權平均</div>
+      <div class="kp-tag">▶ 不平衡看 weighted avg</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--orange)">
+      <div class="kp-title">class_weight 使用方法</div>
+      <div class="kp-body">LogisticRegression(class_weight='balanced')<br>balanced：自動計算各類別權重<br>= n_samples/(n_classes × bincount(y))<br>自定義：{0: 1, 1: 10}（少數類權重10）<br>XGBoost: scale_pos_weight=neg/pos</div>
+      <div class="kp-tag">▶ 不改資料，調整損失權重</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel reveal" style="border-left:3px solid var(--yellow)">
+  <div class="panel-title">🧪 歷屆考題程式題型</div>
+  <div style="margin-bottom:14px;">
+    <div style="font-weight:700;margin-bottom:8px;font-size:.9rem;">Q1：以下 sklearn 程式碼中，哪行會導致資料洩漏？</div>
+    <div class="formula" style="margin-bottom:8px;font-size:.82rem;">
+      <span style="color:var(--muted)">scaler = StandardScaler()</span><br>
+      <span style="color:var(--muted)">(A) X_train_scaled = scaler.fit_transform(X_train)</span><br>
+      <span style="color:var(--accent2)">✓ (B) X_test_scaled = scaler.fit_transform(X_test)</span><br>
+      <span style="color:var(--muted)">(C) X_test_scaled = scaler.transform(X_test)</span><br>
+      <span style="color:var(--muted)">(D) pipe = Pipeline([('scaler', scaler), ('clf', clf)])</span>
+    </div>
+    <div style="font-size:.8rem;color:var(--accent2);">✓ 解析：測試集不能 fit_transform，應只 transform（使用訓練集統計量），否則測試集的均值/標準差資訊流入模型評估，導致過於樂觀的效果</div>
+  </div>
+  <div>
+    <div style="font-weight:700;margin-bottom:8px;font-size:.9rem;">Q2：使用 SMOTE 時，以下哪個操作是正確的？</div>
+    <div class="formula" style="margin-bottom:8px;font-size:.82rem;">
+      <span style="color:var(--muted)">(A) sm.fit_resample(X, y)（整個資料集）</span><br>
+      <span style="color:var(--muted)">(B) sm.fit_resample(X_test, y_test)（測試集）</span><br>
+      <span style="color:var(--accent2)">✓ (C) sm.fit_resample(X_train, y_train)（僅訓練集）</span><br>
+      <span style="color:var(--muted)">(D) 在 train_test_split 之前執行 SMOTE</span>
+    </div>
+    <div style="font-size:.8rem;color:var(--accent2);">✓ 解析：SMOTE 必須只在訓練集上執行，若在完整資料集或測試集上執行，合成樣本可能出現在測試集，導致評估失真（資料洩漏）</div>
+  </div>
+</div>
+
+<!-- 10. 仿真考題 -->
+<div class="sec-title reveal">🎯 仿真考題（8 題）</div>
+<div class="progress-bar"><div class="progress-fill" id="pbar" style="width:0%"></div></div>
+<div id="quiz"></div>
+
+</div><!-- end .wrap -->
+
+<footer>iPAS AI 應用規劃師中級考試學習站 · 特徵工程與資料前處理 · 內容依據官方評鑑範圍整理</footer>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ── Reveal ──
+const obs=new IntersectionObserver(e=>e.forEach(x=>x.isIntersecting&&x.target.classList.add('vis')),{threshold:.08});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// ── Score ──
+let score=0;const answered=new Set();const TOTAL=8;
+function addScore(correct,idx){
+  if(answered.has(idx))return;
+  answered.add(idx);
+  if(correct)score++;
+  document.getElementById('score').textContent=score;
+  document.getElementById('total').textContent=answered.size;
+  document.getElementById('pbar').style.width=(answered.size/TOTAL*100)+'%';
+}
+document.getElementById('total').textContent='0';
+
+// ── Missing Value Tabs ──
+const missingData={
+  drop:{
+    title:'刪除法（Listwise / Pairwise Deletion）',
+    content:`<span class="hl">適用情境：</span>缺失率低（&lt;5%）且為 MCAR 時<br><br>
+<span class="hl2">Listwise（行刪除）：</span>刪除含任何缺失值的整行樣本<br>
+→ 優點：簡單直接；缺點：大量資料損失<br><br>
+<span class="hl2">Pairwise（成對刪除）：</span>只在需要該變數時才刪除<br>
+→ 保留更多資料，但樣本數不一致<br><br>
+<span class="hl3">df.dropna()：刪除任一欄有缺失的行</span><br>
+<span class="hl3">df.dropna(subset=['age'])：只刪除 age 欄缺失的行</span><br>
+<span class="hl3">df.dropna(thresh=3)：保留至少有3個非空值的行</span><br><br>
+📌 缺失率 &gt;40% 的整欄通常直接刪除`
+  },
+  mean:{
+    title:'均值 / 中位數 / 眾數填補',
+    content:`<span class="hl">數值型特徵：</span><br>
+<span class="hl2">均值填補：</span>適合對稱分佈、無明顯離群值<br>
+  df.fillna(df.mean())  →  填補後標準差<strong>人為縮小</strong><br><br>
+<span class="hl2">中位數填補：</span>偏態分佈或含離群值時更穩健<br>
+  df.fillna(df.median())  →  對偏態資料不受極端值影響<br><br>
+<span class="hl">類別型特徵：</span><br>
+<span class="hl3">眾數填補：</span>df.fillna(df.mode()[0])  →  最常見類別<br><br>
+📌 <span class="hl3">填補後統計特性改變，填補值過多會降低資料多樣性</span><br>
+📌 缺失指示特徵：可加新欄 'age_missing'（0/1）記錄缺失位置`
+  },
+  knn:{
+    title:'KNN 填補（KNNImputer）',
+    content:`<span class="hl">原理：</span>找 K 個特徵最相似的完整樣本，用其平均值填補<br><br>
+<span class="hl2">相似度計算：</span>歐氏距離（數值型特徵），忽略缺失維度<br><br>
+<span class="hl3">from sklearn.impute import KNNImputer</span><br>
+imputer = KNNImputer(n_neighbors=5)<br>
+X_filled = imputer.fit_transform(X)<br><br>
+<span class="hl">優點：</span>考慮特徵間相關性，填補品質通常優於均值填補<br>
+<span class="hl2">缺點：</span>時間複雜度 O(n²)，大資料集很慢<br><br>
+📌 K 越大→填補越平滑但計算越慢<br>
+📌 KNN 填補前應先標準化（避免大尺度特徵主導距離計算）`
+  },
+  mi:{
+    title:'多重插補（Multiple Imputation）',
+    content:`<span class="hl">MICE（多元插補鏈式方程）：</span><br>
+1. 對每個缺失特徵建立迴歸模型（以其他特徵為自變數）<br>
+2. 從後驗分佈中採樣填補值（而非點估計）<br>
+3. 重複 m 次生成 m 個完整資料集<br>
+4. 分析 m 個資料集後合併結果（Rubin's Rules）<br><br>
+<span class="hl3">from sklearn.impute import IterativeImputer</span><br>
+imputer = IterativeImputer(max_iter=10, random_state=0)<br><br>
+<span class="hl">優點：</span>保留缺失的不確定性，統計推斷更準確<br>
+<span class="hl2">缺點：</span>計算最複雜，適合統計分析而非機器學習預測<br><br>
+📌 學術論文/臨床研究常用多重插補（反映缺失不確定性）`
+  }
+};
+
+function showMissing(btn,key){
+  document.querySelectorAll('.seg-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const d=missingData[key];
+  document.getElementById('missing-display').innerHTML=`<strong style="color:var(--accent)">${d.title}</strong><br><br>${d.content}`;
+}
+showMissing(document.querySelector('.seg-tab'),'drop');
+
+// ── Scaling Canvas 2D ──
+(function(){
+  const canvas=document.getElementById('scalingCanvas');
+  if(!canvas)return;
+  const ctx=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  const raw=[120,85,200,95,800,110,150,90,175,300];
+  const minR=Math.min(...raw),maxR=Math.max(...raw);
+  const meanR=raw.reduce((a,b)=>a+b)/raw.length;
+  const stdR=Math.sqrt(raw.map(x=>(x-meanR)**2).reduce((a,b)=>a+b)/raw.length);
+  const q1=105,q3=200,iqrR=q3-q1;
+  const mm=raw.map(x=>(x-minR)/(maxR-minR));
+  const zs=raw.map(x=>(x-meanR)/stdR);
+  const rb=raw.map(x=>(x-q1)/iqrR);
+  function norm(arr){const mn=Math.min(...arr),mx=Math.max(...arr);return arr.map(x=>(x-mn)/(mx-mn));}
+  const mmN=mm,zsN=norm(zs),rbN=norm(rb);
+  ctx.fillStyle='#0a0c14';ctx.fillRect(0,0,W,H);
+  const rows=[
+    {label:'原始資料',data:raw.map(x=>x/maxR),color:'#FF6B9D'},
+    {label:'Min-Max [0,1]',data:mmN,color:'#00D4FF'},
+    {label:'Z-score 標準化',data:zsN,color:'#FFD166'},
+    {label:'Robust Scaling',data:rbN,color:'#00FFB2'},
+  ];
+  const padL=130,padR=20,padT=20,rowH=55;
+  ctx.font='bold 12px Consolas,monospace';
+  rows.forEach((r,ri)=>{
+    const y=padT+ri*rowH+rowH/2;
+    ctx.fillStyle=r.color;ctx.globalAlpha=.9;
+    ctx.fillText(r.label,8,y+5);
+    ctx.globalAlpha=1;
+    const bw=(W-padL-padR)/r.data.length-4;
+    r.data.forEach((v,i)=>{
+      const x=padL+i*(bw+4);
+      const bh=Math.max(4,v*40);
+      ctx.fillStyle=r.color;ctx.globalAlpha=.7;
+      ctx.fillRect(x,y-bh/2,bw,bh);
+      ctx.globalAlpha=.4;
+      ctx.strokeStyle=r.color;ctx.strokeRect(x,y-bh/2,bw,bh);
+      ctx.globalAlpha=1;
+    });
+  });
+  ctx.fillStyle='rgba(255,255,255,.15)';ctx.fillRect(0,H-30,W,30);
+  ctx.fillStyle='#8892B0';ctx.font='11px sans-serif';ctx.textAlign='center';
+  ctx.fillText('原始資料含離群值（800），Min-Max 受壓縮，Robust Scaling 最穩健',W/2,H-10);
+  ctx.textAlign='left';
+})();
+
+// ── Three.js 3D ──
+let scene,camera,renderer,autoRot=true;
+let showBefore=true,showAfter=true;
+let beforeGroup,afterGroup;
+const rot={x:.3,y:.6};
+let isDragging=false,prevMouse={x:0,y:0};
+
+(function init3d(){
+  const canvas=document.getElementById('c3d');
+  renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setSize(canvas.clientWidth,380);
+  scene=new THREE.Scene();
+  camera=new THREE.PerspectiveCamera(50,canvas.clientWidth/380,0.1,1000);
+  camera.position.set(0,0,5);
+
+  const al=new THREE.AmbientLight(0xffffff,.7);scene.add(al);
+  const dl=new THREE.DirectionalLight(0x00d4ff,.5);dl.position.set(5,5,5);scene.add(dl);
+
+  // 生成資料點
+  const N=60;
+  beforeGroup=new THREE.Group();
+  afterGroup=new THREE.Group();
+
+  // 原始資料（各維度尺度差異大）
+  const rawData=[];
+  for(let i=0;i<N;i++){
+    rawData.push([
+      Math.random()*100+10,   // X: 10-110
+      Math.random()*0.9+0.1,  // Y: 0.1-1.0
+      Math.random()*50+5,     // Z: 5-55
+    ]);
+  }
+  // 標準化
+  function mean(arr){return arr.reduce((a,b)=>a+b)/arr.length;}
+  function std(arr){const m=mean(arr);return Math.sqrt(arr.map(x=>(x-m)**2).reduce((a,b)=>a+b)/arr.length);}
+  const mx=mean(rawData.map(d=>d[0])),sx=std(rawData.map(d=>d[0]));
+  const my=mean(rawData.map(d=>d[1])),sy=std(rawData.map(d=>d[1]));
+  const mz=mean(rawData.map(d=>d[2])),sz=std(rawData.map(d=>d[2]));
+
+  rawData.forEach(([x,y,z])=>{
+    // 原始（縮放到可見範圍）
+    const sx2=1.5,sy2=1.5,sz2=1.5;
+    const bx=(x-60)/40*sx2,by=(y-.55)/.45*sy2,bz=(z-30)/25*sz2;
+    const geo=new THREE.SphereGeometry(.07,8,8);
+    const mat=new THREE.MeshPhongMaterial({color:0xff6b9d,transparent:true,opacity:.8});
+    const mesh=new THREE.Mesh(geo,mat);
+    mesh.position.set(bx,by,bz);
+    beforeGroup.add(mesh);
+
+    // 標準化後
+    const ax=(x-mx)/sx*1.2,ay=(y-my)/sy*1.2,az=(z-mz)/sz*1.2;
+    const geo2=new THREE.SphereGeometry(.07,8,8);
+    const mat2=new THREE.MeshPhongMaterial({color:0x00ffb2,transparent:true,opacity:.8});
+    const mesh2=new THREE.Mesh(geo2,mat2);
+    mesh2.position.set(ax,ay,az);
+    afterGroup.add(mesh2);
+  });
+
+  // 座標軸
+  function addAxis(dir,color,len=2.5){
+    const mat=new THREE.LineBasicMaterial({color});
+    const geo=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0,0,0),dir.clone().multiplyScalar(len)]);
+    return new THREE.Line(geo,mat);
+  }
+  [addAxis(new THREE.Vector3(1,0,0),0xff4444),
+   addAxis(new THREE.Vector3(0,1,0),0x44ff44),
+   addAxis(new THREE.Vector3(0,0,1),0x4444ff)].forEach(a=>scene.add(a));
+
+  scene.add(beforeGroup);scene.add(afterGroup);
+  addDrag3d(canvas);
+  render3d();
+})();
+
+function render3d(){
+  requestAnimationFrame(render3d);
+  if(autoRot)rot.y+=.008;
+  camPos3d();
+  renderer.render(scene,camera);
+}
+function camPos3d(){
+  const r=5;
+  camera.position.x=r*Math.sin(rot.y)*Math.cos(rot.x);
+  camera.position.y=r*Math.sin(rot.x);
+  camera.position.z=r*Math.cos(rot.y)*Math.cos(rot.x);
+  camera.lookAt(0,0,0);
+}
+function addDrag3d(canvas){
+  canvas.addEventListener('mousedown',e=>{isDragging=true;prevMouse={x:e.clientX,y:e.clientY};autoRot=false;document.getElementById('btnAuto').classList.remove('on');});
+  window.addEventListener('mousemove',e=>{if(!isDragging)return;rot.y+=(e.clientX-prevMouse.x)*.008;rot.x+=(e.clientY-prevMouse.y)*.008;prevMouse={x:e.clientX,y:e.clientY};});
+  window.addEventListener('mouseup',()=>{isDragging=false;});
+  canvas.addEventListener('touchstart',e=>{e.preventDefault();isDragging=true;prevMouse={x:e.touches[0].clientX,y:e.touches[0].clientY};autoRot=false;},{passive:false});
+  canvas.addEventListener('touchmove',e=>{e.preventDefault();if(!isDragging)return;rot.y+=(e.touches[0].clientX-prevMouse.x)*.008;rot.x+=(e.touches[0].clientY-prevMouse.y)*.008;prevMouse={x:e.touches[0].clientX,y:e.touches[0].clientY};},{passive:false});
+  canvas.addEventListener('touchend',()=>{isDragging=false;});
+}
+function toggleAuto3d(){const b=document.getElementById('btnAuto');autoRot=!autoRot;b.classList.toggle('on',autoRot);}
+function resetView3d(){rot.x=.3;rot.y=.6;}
+function toggleBefore(){showBefore=!showBefore;beforeGroup.visible=showBefore;document.getElementById('btnBefore').classList.toggle('on',showBefore);}
+function toggleAfter(){showAfter=!showAfter;afterGroup.visible=showAfter;document.getElementById('btnAfter').classList.toggle('on',showAfter);}
+
+// ── Quiz ──
+const questions=[
+  {
+    stem:'資料集某特徵含有大量離群值（outliers），在進行特徵縮放時，應優先選擇哪種方法？',
+    opts:['Min-Max 正規化（MinMaxScaler）','Z-score 標準化（StandardScaler）','Robust Scaling（使用中位數和 IQR）','對數轉換（Log Transform）'],
+    ans:2,
+    exp:'Robust Scaling 使用中位數（而非均值）和 IQR（而非標準差）進行縮放，對離群值最不敏感。Min-Max 受極端值壓縮最嚴重，Z-score 也受離群值影響均值和標準差。'
+  },
+  {
+    stem:'在特徵工程中，對高基數（high cardinality）類別特徵（如城市名稱有 500 個），使用 One-Hot Encoding 會導致什麼問題？',
+    opts:['資料洩漏（Data Leakage）','維度詛咒（Curse of Dimensionality）/特徵爆炸','目標洩漏（Target Leakage）','梯度消失問題'],
+    ans:1,
+    exp:'One-Hot Encoding 會將 500 個城市轉為 500（或 499）個二元特徵，導致特徵空間急劇擴張（維度詛咒），增加計算成本和過擬合風險。應考慮 Target Encoding 或 Frequency Encoding 處理高基數類別。'
+  },
+  {
+    stem:'使用 SMOTE 處理類別不平衡問題時，以下哪個敘述是正確的？',
+    opts:['SMOTE 直接複製少數類樣本以增加數量','SMOTE 應在 train_test_split 之前對全資料集執行','SMOTE 透過插值合成新的少數類樣本，且只應用於訓練集','SMOTE 主要用於減少多數類樣本數量'],
+    ans:2,
+    exp:'SMOTE 是過採樣方法，在少數類樣本鄰居之間插值生成合成樣本（非複製）。關鍵是必須只在訓練集執行，若在整個資料集執行，測試集中可能出現合成樣本，導致評估失真。'
+  },
+  {
+    stem:'sklearn 中，以下哪個程式碼片段能正確避免資料洩漏？',
+    opts:['在全部資料 fit scaler 後分割訓練/測試集','在測試集上執行 scaler.fit_transform(X_test)','使用 Pipeline 將 scaler 和模型封裝，fit 時僅在訓練集學習統計量','在每次預測前重新對訓練集和測試集分別 fit scaler'],
+    ans:2,
+    exp:'sklearn Pipeline 是防止資料洩漏的最佳實踐。Pipeline.fit() 時只在訓練集執行 scaler.fit_transform()，Pipeline.predict/score() 時只執行 scaler.transform()（使用訓練統計量），確保測試集資訊不流入訓練過程。'
+  },
+  {
+    stem:'特徵選擇的 Wrapper 方法（如遞迴特徵消除 RFE）相較於 Filter 方法的主要缺點是什麼？',
+    opts:['無法處理非線性特徵關係','計算成本高，需要多次訓練模型','不考慮特徵與目標變數的關係','只能用於線性模型'],
+    ans:1,
+    exp:'Wrapper 方法需要反覆訓練模型評估不同特徵子集，計算複雜度為 O(2^p)（p 為特徵數），計算成本遠高於 Filter 方法（O(p)）。但 Wrapper 方法考慮特徵間交互作用，通常能找到更好的特徵子集。'
+  },
+  {
+    stem:'在資料前處理時，對某數值特徵使用 Z-score 標準化後，該特徵的統計特性會如何改變？',
+    opts:['均值=0，標準差=1，範圍嚴格在 [-1,1]','均值=0，標準差=1，範圍無固定限制','均值=0.5，標準差=0.5，範圍在 [0,1]','均值不變，標準差=1'],
+    ans:1,
+    exp:'Z-score 標準化（Standardization）的結果是均值=0，標準差=1，但輸出範圍沒有固定限制（離群值可能產生 |z|>3 的值）。這與 Min-Max 正規化不同，後者強制將範圍限制在 [0,1]。'
+  },
+  {
+    stem:'下列關於缺失值處理的敘述，哪個是正確的？',
+    opts:['均值填補後，特徵的標準差會增加','中位數填補適合對稱分佈、無離群值的資料','KNN 填補的時間複雜度約為 O(n²)，大資料集計算成本高','多重插補是最簡單快速的缺失值處理方法'],
+    ans:2,
+    exp:'KNN 填補需要計算每個缺失樣本與所有完整樣本的距離，時間複雜度約為 O(n²)，在大資料集上非常耗時。均值填補會讓標準差縮小（而非增加）；中位數填補適合偏態/含離群值的資料（而非對稱分佈）；多重插補是最複雜而非最簡單的方法。'
+  },
+  {
+    stem:'在不平衡資料（正負類比例為 1:99）的分類問題中，模型預測所有樣本為負類，準確率（Accuracy）高達 99%。這個結果說明了什麼？',
+    opts:['模型訓練非常成功，已達到高準確率','Accuracy 不適合評估不平衡資料，應使用 F1-Score 或 AUC-ROC','需要增加訓練資料量以提升模型效能','應該使用更複雜的模型架構'],
+    ans:1,
+    exp:'這是不平衡資料的經典陷阱。模型預測全部為負類，Accuracy=99% 但 Recall=0%（完全無法識別正類）。評估不平衡資料應使用 F1-Score（考慮 Precision 和 Recall）或 AUC-ROC（不受類別分佈影響），而非 Accuracy。'
+  }
+];
+
+const qContainer=document.getElementById('quiz');
+questions.forEach((q,qi)=>{
+  const div=document.createElement('div');
+  div.className='q-item reveal';
+  div.innerHTML=`
+    <div class="q-num">第 ${qi+1} 題 / 共 ${TOTAL} 題</div>
+    <div class="q-stem">${q.stem}</div>
+    <div class="q-opts">
+      ${q.opts.map((o,oi)=>`
+        <div class="q-opt" onclick="answer(this,${qi},${oi},${q.ans})">
+          <span class="opt-label">${['A','B','C','D'][oi]}</span>
+          <span>${o}</span>
+        </div>`).join('')}
+    </div>
+    <div class="q-explain" id="exp-${qi}">${q.exp}</div>
+  `;
+  qContainer.appendChild(div);
+  obs.observe(div);
+});
+
+function answer(el,qi,chosen,correct){
+  const item=el.closest('.q-item');
+  if(item.dataset.done)return;
+  item.dataset.done='1';
+  item.querySelectorAll('.q-opt').forEach((o,i)=>{
+    o.style.pointerEvents='none';
+    if(i===correct)o.classList.add('correct');
+    else if(i===chosen)o.classList.add('wrong');
+  });
+  document.getElementById('exp-'+qi).classList.add('show');
+  addScore(chosen===correct,qi);
+}
+</script>
+</body>
+</html>
