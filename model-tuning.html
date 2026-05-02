@@ -1,0 +1,1254 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>模型調校與集成學習 — iPAS AI應用規劃師中級考試</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+* { font-family: 'Calibri', 'Microsoft JhengHei', '微軟正黑體', sans-serif; }
+code, .formula { font-family: 'JetBrains Mono', 'Consolas', monospace !important; }
+:root{
+  --bg:#0F1117;--panel:#1A1D27;--panel2:#21253A;
+  --border:#2E3250;--text:#E8EAF6;--muted:#8892B0;
+  --accent:#FF9B42;--accent2:#00FFB2;--accent3:#7C6FFF;
+  --yellow:#FFD166;--orange:#FF9B42;--pink:#FF6B9D;--blue:#00D4FF;--purple:#9B5DE5;
+  --r:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Calibri','Microsoft JhengHei','微軟正黑體',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.7;}
+
+.nav{position:sticky;top:0;z-index:200;background:rgba(15,17,23,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:12px 24px;}
+.nav a{color:var(--accent);text-decoration:none;font-weight:700;font-size:.9rem;padding:5px 14px;border-radius:999px;border:1.5px solid var(--accent);transition:all .18s;}
+.nav a:hover{background:var(--accent);color:#0F1117;}
+.nav-title{font-size:1.05rem;}
+.nav-tag{margin-left:auto;background:linear-gradient(135deg,var(--orange),var(--accent3));padding:4px 14px;border-radius:999px;font-size:.78rem;font-weight:900;color:#fff;}
+
+.hero{padding:60px 20px 40px;background:linear-gradient(160deg,#0F1117,#160a00,#0F1117);text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(255,155,66,.10),transparent);}
+.hero-badge{display:inline-block;margin-bottom:16px;padding:5px 18px;border-radius:999px;background:rgba(255,155,66,.10);border:1px solid var(--accent);font-size:.8rem;font-weight:900;color:var(--accent);letter-spacing:1px;}
+.hero-title{font-size:clamp(1.8rem,5vw,3.2rem);background:linear-gradient(135deg,var(--orange),var(--yellow),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px;}
+.hero-sub{color:var(--muted);font-size:1rem;max-width:640px;margin:0 auto 24px;}
+.tag-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.tag{padding:4px 12px;border-radius:999px;font-size:.75rem;font-weight:900;border:1px solid;}
+
+.wrap{max-width:980px;margin:0 auto;padding:16px 20px 80px;}
+
+.sec-title{font-size:1.5rem;color:var(--text);margin:44px 0 16px;display:flex;align-items:center;gap:10px;}
+.sec-title::before{content:'';display:inline-block;width:4px;height:24px;border-radius:2px;background:linear-gradient(var(--accent),var(--yellow));}
+
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:20px;}
+.panel-title{font-weight:900;font-size:1rem;color:var(--accent2);margin-bottom:12px;}
+
+.formula{background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin:12px 0;font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--accent2);line-height:2;overflow-x:auto;}
+.formula .cm{color:var(--muted);font-style:italic;}
+.formula .hl{color:var(--yellow);}
+.formula .fn{color:var(--blue);}
+.formula .vr{color:var(--pink);}
+.formula .kw{color:var(--orange);}
+
+.tbl-wrap{overflow-x:auto;margin:12px 0;}
+table{width:100%;border-collapse:collapse;font-size:.88rem;}
+th{background:var(--panel2);padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);color:var(--accent2);font-weight:900;}
+td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--muted);}
+td:first-child{color:var(--text);font-weight:700;}
+tr:hover td{background:rgba(255,155,66,.03);}
+
+.kp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:12px 0;}
+.kp-card{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:16px;border-left:3px solid var(--accent);transition:transform .18s,border-color .18s;}
+.kp-card:hover{transform:translateY(-4px);border-left-color:var(--accent2);}
+.kp-card .kp-title{font-weight:900;font-size:.95rem;color:var(--text);margin-bottom:6px;}
+.kp-card .kp-body{font-size:.83rem;color:var(--muted);line-height:1.6;}
+.kp-card .kp-tag{font-size:.7rem;font-weight:900;color:var(--accent);margin-top:8px;}
+
+.warn-box{background:rgba(255,155,66,.06);border:1px solid var(--accent);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--accent);margin:10px 0;}
+.info-box{background:rgba(0,255,178,.07);border:1px solid var(--accent2);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--accent2);margin:10px 0;}
+
+.seg-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.seg-tab{padding:7px 16px;border-radius:999px;border:1.5px solid var(--border);font-size:.83rem;font-weight:900;cursor:pointer;color:var(--muted);background:transparent;transition:all .18s;}
+.seg-tab.active{border-color:var(--accent);color:var(--accent);background:rgba(255,155,66,.09);}
+.seg-box{background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:16px;font-size:.88rem;line-height:1.8;color:var(--muted);}
+.seg-box .hl{color:var(--accent);}
+.seg-box .hl2{color:var(--yellow);}
+.seg-box .hl3{color:var(--accent2);}
+
+.c3d-wrap{background:#0a0c14;border:1px solid var(--border);border-radius:var(--r);position:relative;overflow:hidden;margin:12px 0;}
+.c3d{display:block;width:100%;height:400px;cursor:grab;}
+.c3d:active{cursor:grabbing;}
+.c3d-lbl{position:absolute;top:10px;left:12px;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);padding:4px 12px;border-radius:999px;font-size:.72rem;font-weight:900;color:var(--accent);border:1px solid rgba(255,155,66,.4);}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;padding:10px 12px;background:rgba(0,0,0,.3);}
+.ctrl button{padding:5px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.18);font-size:.72rem;font-weight:900;color:rgba(255,255,255,.6);background:transparent;cursor:pointer;transition:all .18s;}
+.ctrl button:hover,.ctrl button.on{border-color:var(--accent);color:var(--accent);background:rgba(255,155,66,.12);}
+
+.canvas2d-wrap{background:#0a0c14;border:1px solid var(--border);border-radius:10px;margin:12px 0;overflow:hidden;}
+.canvas2d-wrap canvas{display:block;width:100%;}
+
+.progress-bar{height:6px;background:var(--border);border-radius:3px;margin-bottom:20px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent3));transition:width .5s;}
+.q-item{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;}
+.q-num{font-size:.75rem;font-weight:900;color:var(--accent);margin-bottom:6px;}
+.q-stem{font-weight:700;color:var(--text);font-size:.95rem;margin-bottom:12px;line-height:1.6;}
+.q-opts{display:flex;flex-direction:column;gap:7px;}
+.q-opt{padding:10px 14px;border-radius:8px;cursor:pointer;border:1px solid var(--border);font-size:.88rem;color:var(--muted);transition:all .18s;display:flex;align-items:flex-start;gap:8px;}
+.q-opt:hover{border-color:var(--accent);color:var(--text);background:rgba(255,155,66,.06);}
+.q-opt.correct{border-color:var(--accent2);background:rgba(0,255,178,.07);color:var(--accent2);}
+.q-opt.wrong{border-color:var(--pink);background:rgba(255,107,157,.07);color:var(--pink);}
+.q-opt .opt-label{font-weight:900;min-width:18px;}
+.q-explain{margin-top:12px;padding:10px 14px;background:rgba(255,155,66,.05);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;font-size:.84rem;color:var(--accent);display:none;line-height:1.65;}
+.q-explain.show{display:block;}
+
+#score-banner{position:fixed;bottom:20px;right:20px;z-index:300;background:var(--panel);border:1px solid var(--accent);border-radius:12px;padding:10px 18px;font-weight:900;font-size:.9rem;color:var(--accent);box-shadow:0 4px 20px rgba(255,155,66,.25);}
+
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .5s ease,transform .5s ease;}
+.reveal.vis{opacity:1;transform:translateY(0);}
+footer{text-align:center;padding:28px;font-size:.75rem;color:rgba(232,234,246,.2);}
+</style>
+</head>
+<body>
+
+<div id="score-banner">⭐ 答題得分：<span id="score">0</span> / <span id="total">0</span></div>
+
+<nav class="nav">
+  <a href="index.html">← 返回</a>
+  <span class="nav-title">模型調校與集成學習</span>
+  <span class="nav-tag">iPAS 中級 · 科目三 L232 建模</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">L232 建模 · 模型訓練評估與驗證</div>
+  <div class="hero-title">模型調校與集成學習</div>
+  <div class="hero-sub">Bias-Variance Tradeoff、正則化 L1/L2/Dropout、k-fold 交叉驗證、Grid/Random/Bayesian 超參數調校、Bagging 隨機森林、Boosting XGBoost、Stacking 集成</div>
+  <div class="tag-row">
+    <span class="tag" style="color:var(--orange);border-color:var(--orange)">集成投票 3D</span>
+    <span class="tag" style="color:var(--yellow);border-color:var(--yellow)">Bias-Variance</span>
+    <span class="tag" style="color:var(--accent2);border-color:var(--accent2)">XGBoost</span>
+    <span class="tag" style="color:var(--pink);border-color:var(--pink)">k-fold 驗證</span>
+    <span class="tag" style="color:var(--blue);border-color:var(--blue)">L1 / L2 正則化</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- 1. Bias-Variance Tradeoff -->
+<div class="sec-title reveal">⚖️ Bias-Variance Tradeoff（偏差-方差權衡）</div>
+<div class="panel reveal">
+  <div class="panel-title">欠擬合 vs 過擬合：偏差與方差的拉鋸</div>
+  <div class="formula">
+    <span class="cm">// 模型泛化誤差分解（EPE）</span><br>
+    <span class="fn">Error</span>(<span class="vr">x</span>) = Bias² + Variance + Irreducible Noise<br><br>
+    <span class="cm">// Bias（偏差）：模型假設過於簡單，無法捕捉資料規律</span><br>
+    <span class="kw">Bias</span> = E[ŷ] - y<br>
+    <span class="cm">// Variance（方差）：模型對訓練資料過度敏感，泛化差</span><br>
+    <span class="kw">Variance</span> = E[(ŷ - E[ŷ])²]<br><br>
+    <span class="cm">// 模型複雜度 ↑ → Bias ↓、Variance ↑（Tradeoff 存在）</span><br>
+    <span class="hl">Sweet Spot</span> = 最小化 Bias² + Variance 的模型複雜度
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">欠擬合（High Bias）</div>
+      <div class="kp-body">訓練誤差高、測試誤差高<br>模型太簡單（如線性模型擬合非線性資料）<br>解法：增加模型複雜度、增加特徵、減少正則化強度<br>診斷：學習曲線中訓練分數持續偏低</div>
+      <div class="kp-tag">▶ 考點：High Bias = 欠擬合 = 訓練誤差高</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--pink)">
+      <div class="kp-title">過擬合（High Variance）</div>
+      <div class="kp-body">訓練誤差低、測試誤差高（兩者差距大）<br>模型記憶訓練資料噪聲<br>解法：增加資料、正則化、Dropout、減少特徵<br>診斷：學習曲線中訓練與驗證分數差距大</div>
+      <div class="kp-tag">▶ 考點：High Variance = 過擬合 = 訓練vs測試誤差差距大</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">診斷策略</div>
+      <div class="kp-body">學習曲線（Learning Curve）：隨訓練樣本增加觀察誤差變化<br>驗證曲線（Validation Curve）：隨超參數變化觀察誤差<br>兩者都高 → 欠擬合；差距大 → 過擬合</div>
+      <div class="kp-tag">▶ 考點：學習曲線診斷欠/過擬合</div>
+    </div>
+  </div>
+  <!-- Interactive Bias-Variance Canvas -->
+  <div style="margin-top:14px;">
+    <div style="font-size:.85rem;color:var(--muted);margin-bottom:8px;">互動圖：拖動滑桿調整模型複雜度，觀察偏差²與方差的變化</div>
+    <input type="range" id="complexSlider" min="1" max="10" value="4" style="width:100%;accent-color:var(--accent);margin-bottom:8px;">
+    <div style="display:flex;gap:10px;font-size:.8rem;color:var(--muted);margin-bottom:6px;">
+      <span style="color:var(--accent)">● 偏差²（Bias²）</span>
+      <span style="color:var(--pink)">● 方差（Variance）</span>
+      <span style="color:var(--accent2)">● 總誤差（Error）</span>
+    </div>
+    <div class="canvas2d-wrap">
+      <canvas id="bvCanvas" height="220"></canvas>
+    </div>
+    <div id="bvInfo" style="font-size:.82rem;color:var(--muted);text-align:center;margin-top:6px;"></div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 必記：</strong>欠擬合→High Bias→訓練誤差也高；過擬合→High Variance→訓練誤差低但測試誤差高；最佳點在 Bias²+Variance 最小處</div>
+</div>
+
+<!-- 2. 正則化 -->
+<div class="sec-title reveal">🔒 正則化（Regularization）</div>
+<div class="panel reveal">
+  <div class="panel-title">L1（Lasso）、L2（Ridge）、Elastic Net 與 Dropout 比較</div>
+  <div class="seg-tabs">
+    <button class="seg-tab active" onclick="showReg(this,'l1')">L1 Lasso</button>
+    <button class="seg-tab" onclick="showReg(this,'l2')">L2 Ridge</button>
+    <button class="seg-tab" onclick="showReg(this,'elastic')">Elastic Net</button>
+    <button class="seg-tab" onclick="showReg(this,'dropout')">Dropout</button>
+  </div>
+  <div class="seg-box" id="reg-display"></div>
+  <div class="formula" style="margin-top:14px;">
+    <span class="cm">// L1 Lasso：損失函數加絕對值懲罰</span><br>
+    <span class="fn">Loss_L1</span> = MSE + λ × Σ|<span class="vr">wᵢ</span>|<br>
+    效果：部分權重變 <span class="hl">0</span>（稀疏解），自動<strong>特徵選擇</strong><br><br>
+    <span class="cm">// L2 Ridge：損失函數加平方懲罰</span><br>
+    <span class="fn">Loss_L2</span> = MSE + λ × Σ<span class="vr">wᵢ</span>²<br>
+    效果：所有權重均勻縮小，不會變 0，適合<strong>多重共線性</strong><br><br>
+    <span class="cm">// Elastic Net：L1 + L2 線性組合</span><br>
+    <span class="fn">Loss_EN</span> = MSE + λ₁Σ|<span class="vr">wᵢ</span>| + λ₂Σ<span class="vr">wᵢ</span>²<br>
+    效果：兼具稀疏性與穩定性，適合<strong>高維稀疏</strong>資料
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">L1 vs L2 幾何直覺</div>
+      <div class="kp-body"><strong>L1</strong>：約束區域為菱形，最優解常落在頂點（稀疏）<br><strong>L2</strong>：約束區域為圓形，最優解均勻分布在圓上<br>λ 越大 → 懲罰越強 → 欠擬合風險增加</div>
+      <div class="kp-tag">▶ 考點：L1 稀疏=特徵選擇；L2 均勻縮小</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">Dropout 正則化</div>
+      <div class="kp-body">訓練時隨機關閉比例 p 的神經元<br>測試時使用全部神經元，輸出乘以 (1-p) 或訓練時縮放<br>效果：防止神經元之間的共同適應（co-adaptation）<br>p = 0.5 常見於全連接層</div>
+      <div class="kp-tag">▶ 考點：Dropout 防過擬合，測試時不 Dropout</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--pink)">
+      <div class="kp-title">正則化強度 λ 選擇</div>
+      <div class="kp-body">λ 過小：正則化效果弱，仍過擬合<br>λ 過大：模型過於簡單，欠擬合<br>最佳 λ 通過交叉驗證搜索<br>Ridge regression 有解析解，計算效率高</div>
+      <div class="kp-tag">▶ 考點：λ 需交叉驗證調整</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 必記：</strong>L1 產生稀疏解（部分係數=0）可做特徵選擇；L2 係數均勻縮小不會為零；Dropout 隨機關閉神經元防過擬合；Elastic Net = L1+L2</div>
+</div>
+
+<!-- 3. 交叉驗證 -->
+<div class="sec-title reveal">🔁 交叉驗證（Cross-Validation）</div>
+<div class="panel reveal">
+  <div class="panel-title">k-fold、Stratified k-fold、Leave-One-Out：選擇策略與計算成本</div>
+  <div class="tbl-wrap">
+    <table>
+      <tr>
+        <th>方法</th><th>原理</th><th>計算成本</th><th>適用情境</th><th>考點</th>
+      </tr>
+      <tr>
+        <td>k-fold CV</td>
+        <td>資料分 k 折，輪流用 1 折驗證、k-1 折訓練</td>
+        <td>k 倍訓練成本</td>
+        <td>一般情境，k=5 或 k=10 最常用</td>
+        <td>結果取 k 次平均，更穩定</td>
+      </tr>
+      <tr>
+        <td>Stratified k-fold</td>
+        <td>每折保持各類別比例與原始分布一致</td>
+        <td>k 倍訓練成本</td>
+        <td>分類問題、資料不平衡</td>
+        <td>防止某折缺少少數類樣本</td>
+      </tr>
+      <tr>
+        <td>Leave-One-Out（LOO）</td>
+        <td>每次只用 1 個樣本驗證，其餘訓練（k=n）</td>
+        <td>n 倍訓練成本（最高）</td>
+        <td>樣本量極少（n&lt;50）</td>
+        <td>方差高、計算成本最大</td>
+      </tr>
+      <tr>
+        <td>Time Series CV</td>
+        <td>保持時間順序，訓練集不能包含未來資料</td>
+        <td>k 倍訓練成本</td>
+        <td>時間序列預測</td>
+        <td>禁止隨機 shuffle（避免資料洩漏）</td>
+      </tr>
+    </table>
+  </div>
+  <div class="formula">
+    <span class="cm">// k-fold CV 評估流程</span><br>
+    <span class="kw">for</span> i <span class="fn">in</span> range(<span class="hl">k</span>):<br>
+    &nbsp;&nbsp;val_fold = data[<span class="vr">i</span>th fold]<br>
+    &nbsp;&nbsp;train_fold = data[<span class="fn">remaining</span> k-1 folds]<br>
+    &nbsp;&nbsp;model.<span class="fn">fit</span>(train_fold)<br>
+    &nbsp;&nbsp;scores[<span class="vr">i</span>] = model.<span class="fn">score</span>(val_fold)<br>
+    cv_score = <span class="fn">mean</span>(scores) ± <span class="fn">std</span>(scores) <span class="cm">// ±std 反映穩定性</span>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">k 值選擇策略</div>
+      <div class="kp-body">k=5：計算成本低、方差稍高<br>k=10：最常用黃金標準、偏差與方差均衡<br>k=n（LOO）：無偏估計但計算昂貴、方差極大<br>資料越少 → 建議用更大的 k 值</div>
+      <div class="kp-tag">▶ 考點：k=5 or 10 最常用</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">資料洩漏防範</div>
+      <div class="kp-body">Scaler/PCA 等前處理必須在每折訓練集上 fit<br>不能在整個資料集上 fit 再 transform（資料洩漏）<br>使用 sklearn Pipeline 自動防止洩漏<br>測試集一律不能在驗證前接觸</div>
+      <div class="kp-tag">▶ 考點：前處理必須只用訓練集 fit</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">驗證集 vs 測試集</div>
+      <div class="kp-body"><strong>驗證集</strong>：用於超參數調校（參與模型選擇）<br><strong>測試集</strong>：最終評估，只用一次（不參與任何調校）<br>Nested CV：外層評估模型、內層選超參數<br>避免「測試集污染」導致性能高估</div>
+      <div class="kp-tag">▶ 考點：測試集只用一次</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 必記：</strong>k-fold 計算成本為 k 倍；Stratified k-fold 保持類別比例，適合不平衡資料；LOO 計算成本最高（n 倍）；前處理 fit 必須在訓練集做</div>
+</div>
+
+<!-- 4. 超參數調校 -->
+<div class="sec-title reveal">🔧 超參數調校（Hyperparameter Tuning）</div>
+<div class="panel reveal">
+  <div class="panel-title">Grid Search、Random Search 與 Bayesian Optimization 比較</div>
+  <div class="seg-tabs">
+    <button class="seg-tab active" onclick="showHPO(this,'grid')">🔲 Grid Search</button>
+    <button class="seg-tab" onclick="showHPO(this,'random')">🎲 Random Search</button>
+    <button class="seg-tab" onclick="showHPO(this,'bayesian')">🧠 Bayesian Opt.</button>
+    <button class="seg-tab" onclick="showHPO(this,'early')">⏹️ Early Stopping</button>
+  </div>
+  <div class="seg-box" id="hpo-display"></div>
+  <div class="kp-grid" style="margin-top:14px;">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">Grid Search 窮舉搜索</div>
+      <div class="kp-body">對所有參數組合逐一評估<br>組合數 = Π（各參數候選值數量）<br>優點：找到最優解（若在搜索空間內）<br>缺點：維度詛咒，高維度時計算爆炸</div>
+      <div class="kp-tag">▶ 考點：計算成本 = 組合數 × k-fold 次數</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">Random Search 隨機搜索</div>
+      <div class="kp-body">從參數空間隨機採樣 n 個組合評估<br>Bergstra 2012：高維空間中隨機搜索往往優於 Grid<br>原因：每個參數不一定都重要，隨機覆蓋更廣<br>計算成本可控，適合初步探索</div>
+      <div class="kp-tag">▶ 考點：高維空間 Random Search 常優於 Grid</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">Bayesian Optimization</div>
+      <div class="kp-body">建立代理模型（如高斯過程）模擬目標函數<br>利用 Acquisition Function（期望改進）決定下一個候選點<br>優點：採樣效率高，適合昂貴的評估<br>工具：Optuna、Hyperopt、Ray Tune</div>
+      <div class="kp-tag">▶ 考點：採樣效率最高，適合深度學習調參</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 必記：</strong>Grid Search 穷舉但計算成本高；Random Search 高維空間更有效；Bayesian Optimization 採樣效率最高；Early Stopping 監測驗證損失自動停止訓練</div>
+</div>
+
+<!-- 5. 集成學習 3D -->
+<div class="sec-title reveal">🧩 集成學習（Ensemble Learning）— 3D 投票視覺化</div>
+<div class="panel reveal">
+  <div class="panel-title">Bagging、Boosting、Stacking — 多模型集成投票動態展示</div>
+  <div class="c3d-wrap">
+    <canvas id="c3d" class="c3d"></canvas>
+    <div class="c3d-lbl">集成學習投票模型（拖動旋轉）</div>
+    <div class="ctrl">
+      <button id="btnBagging" class="on" onclick="setMode('bagging')">🌲 Bagging（隨機森林）</button>
+      <button id="btnBoosting" onclick="setMode('boosting')">🚀 Boosting（XGBoost）</button>
+      <button id="btnStacking" onclick="setMode('stacking')">📚 Stacking</button>
+      <button onclick="toggleAnim()" id="btnAnim">⏸ 暫停</button>
+    </div>
+  </div>
+  <div class="kp-grid" style="margin-top:14px;">
+    <div class="kp-card" style="border-left-color:var(--accent2)">
+      <div class="kp-title">Bagging（Bootstrap Aggregating）</div>
+      <div class="kp-body">從訓練集有放回抽樣（Bootstrap）訓練多個基模型<br>預測結果取<strong>多數投票</strong>（分類）或<strong>平均</strong>（迴歸）<br>代表：<strong>隨機森林</strong>（額外加入特徵隨機選擇）<br>減少 Variance，對過擬合有效</div>
+      <div class="kp-tag">▶ 考點：Bagging 減少方差，Random Forest 額外隨機特徵</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">Boosting（提升法）</div>
+      <div class="kp-body">順序訓練弱學習器，每個新模型聚焦前一個模型的<strong>錯誤樣本</strong><br>AdaBoost：調整樣本權重<br>Gradient Boosting：擬合殘差梯度<br><strong>XGBoost</strong>：加入正則化 + 二階梯度 + 並行計算，最強</div>
+      <div class="kp-tag">▶ 考點：Boosting 減少偏差；XGBoost=梯度提升+正則化</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">Stacking（堆疊泛化）</div>
+      <div class="kp-body">第一層：多個不同類型的基模型（meta-learner 輸入）<br>第二層：元學習器（Meta-Learner）整合第一層預測<br>優點：充分利用不同模型的多樣性<br>需用 out-of-fold 預測避免資料洩漏</div>
+      <div class="kp-tag">▶ 考點：Stacking 需防止資料洩漏；out-of-fold 是關鍵</div>
+    </div>
+  </div>
+</div>
+
+<!-- 6. Boosting 演進詳解 -->
+<div class="sec-title reveal">🚀 Boosting 演進：AdaBoost → GBM → XGBoost</div>
+<div class="panel reveal">
+  <div class="panel-title">Boosting 家族演進與 XGBoost 核心技術</div>
+  <div class="tbl-wrap">
+    <table>
+      <tr>
+        <th>演算法</th><th>核心思想</th><th>特點</th><th>考試重點</th>
+      </tr>
+      <tr>
+        <td>AdaBoost</td>
+        <td>調整樣本權重，讓新樹聚焦錯誤樣本</td>
+        <td>對噪聲敏感，容易過擬合</td>
+        <td>弱學習器組合為強學習器，樣本加權</td>
+      </tr>
+      <tr>
+        <td>Gradient Boosting（GBM）</td>
+        <td>擬合前一個模型的殘差梯度</td>
+        <td>計算慢（串行），但性能強</td>
+        <td>每棵樹擬合殘差，學習率控制步長</td>
+      </tr>
+      <tr>
+        <td>XGBoost</td>
+        <td>GBM + L1/L2 正則化 + 二階梯度 + 並行</td>
+        <td>速度快、精度高、Kaggle 神器</td>
+        <td>正則化防過擬合、Column Subsampling</td>
+      </tr>
+      <tr>
+        <td>LightGBM</td>
+        <td>Leaf-wise 生長 + 直方圖特徵分桶</td>
+        <td>速度比 XGBoost 快，適合大資料</td>
+        <td>Leaf-wise vs Level-wise 生長策略</td>
+      </tr>
+    </table>
+  </div>
+  <div class="formula">
+    <span class="cm">// XGBoost 目標函數（帶正則項）</span><br>
+    Obj = Σ <span class="fn">L</span>(yᵢ, ŷᵢ) + Σ <span class="kw">Ω</span>(fₖ)<br>
+    <span class="kw">Ω</span>(f) = γT + <span class="hl">½</span>λΣwⱼ²  <span class="cm">// T=葉節點數，w=葉節點值，γ=剪枝閾值</span><br><br>
+    <span class="cm">// 二階 Taylor 展開近似損失函數</span><br>
+    Obj ≈ Σ [<span class="vr">gᵢ</span>f(xᵢ) + <span class="hl">½</span><span class="vr">hᵢ</span>f²(xᵢ)] + <span class="kw">Ω</span>(f)<br>
+    <span class="vr">gᵢ</span> = ∂L/∂ŷᵢ  <span class="cm">// 一階梯度</span><br>
+    <span class="vr">hᵢ</span> = ∂²L/∂ŷᵢ²  <span class="cm">// 二階梯度（Hessian）</span>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">XGBoost 關鍵超參數</div>
+      <div class="kp-body"><strong>n_estimators</strong>：樹的數量（越多越慢）<br><strong>learning_rate (eta)</strong>：每棵樹的貢獻縮放（0.01~0.3）<br><strong>max_depth</strong>：樹深（控制複雜度）<br><strong>subsample</strong>：行採樣比例（0.6~0.9）<br><strong>colsample_bytree</strong>：列採樣比例</div>
+      <div class="kp-tag">▶ 考點：learning_rate + n_estimators 相互制衡</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--pink)">
+      <div class="kp-title">Random Forest vs XGBoost</div>
+      <div class="kp-body"><strong>Random Forest</strong>（Bagging）：並行訓練、對噪聲穩健<br><strong>XGBoost</strong>（Boosting）：串行訓練、精度通常更高<br>RF 訓練快（可並行）；XGB 需 Early Stopping<br>XGB 對超參數更敏感，需仔細調校</div>
+      <div class="kp-tag">▶ 考點：RF 並行訓練；XGB 串行（但內部計算並行）</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">集成多樣性原則</div>
+      <div class="kp-body">集成效果好的條件：<br>①基模型準確率 &gt; 50%（優於隨機）<br>②基模型之間的錯誤相互獨立（多樣性）<br>多樣性來源：不同算法、不同特徵子集、不同訓練資料</div>
+      <div class="kp-tag">▶ 考點：基模型需獨立且準確率&gt;50%</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 必記：</strong>XGBoost = 梯度提升 + L1/L2 正則化 + 二階梯度 + 並行；Bagging 減少方差；Boosting 減少偏差；集成需基模型多樣性</div>
+</div>
+
+<!-- 7. 評估指標 -->
+<div class="sec-title reveal">📊 模型評估指標（互動比較）</div>
+<div class="panel reveal">
+  <div class="panel-title">分類 vs 迴歸評估指標核心考點</div>
+  <div class="canvas2d-wrap">
+    <canvas id="metricsCanvas" height="260"></canvas>
+  </div>
+  <div class="kp-grid" style="margin-top:14px;">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">精確率 Precision vs 召回率 Recall</div>
+      <div class="kp-body"><strong>Precision</strong> = TP / (TP + FP)：預測為正的有多少真的是正<br><strong>Recall</strong> = TP / (TP + FN)：所有真正例有多少被找到<br>F1 = 2×(P×R)/(P+R)：調和平均<br>Precision-Recall Tradeoff：閾值升高→P↑ R↓</div>
+      <div class="kp-tag">▶ 考點：F1 = 2PR/(P+R)，P-R 有 Tradeoff</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">AUC-ROC 曲線</div>
+      <div class="kp-body"><strong>ROC</strong>：以 TPR vs FPR 繪圖（不同閾值）<br><strong>AUC</strong>：ROC 曲線下面積，越接近 1 越好<br>AUC=0.5 相當於隨機猜測<br>優點：不受不平衡資料影響</div>
+      <div class="kp-tag">▶ 考點：AUC=1 完美；=0.5 隨機猜</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">迴歸評估指標</div>
+      <div class="kp-body"><strong>MSE</strong> = Σ(y-ŷ)²/n：對離群值敏感<br><strong>MAE</strong> = Σ|y-ŷ|/n：對離群值穩健<br><strong>RMSE</strong> = √MSE：與目標同量綱<br><strong>R²</strong>：解釋方差比例，1=完美，0=只預測均值</div>
+      <div class="kp-tag">▶ 考點：MSE 懲罰大誤差；MAE 穩健；R² 越接近 1 越好</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 必記：</strong>不平衡資料用 F1/AUC 而非 Accuracy；Precision 關注誤報率；Recall 關注漏報率；R² 可為負（模型比均值還差）</div>
+</div>
+
+<!-- 8. 程式碼考點 -->
+<div class="sec-title reveal">💻 程式碼考點（sklearn + XGBoost）</div>
+
+<div class="panel reveal">
+  <div class="panel-title">🔲 sklearn 交叉驗證與超參數搜索</div>
+  <div class="formula">
+<span class="cm"># k-fold 交叉驗證</span><br>
+<span class="fn">from</span> sklearn.model_selection <span class="fn">import</span> <span class="kw">cross_val_score</span>, <span class="kw">KFold</span>, <span class="kw">StratifiedKFold</span><br>
+<span class="fn">from</span> sklearn.ensemble <span class="fn">import</span> <span class="kw">RandomForestClassifier</span><br><br>
+kf = <span class="kw">KFold</span>(n_splits=<span class="hl">10</span>, shuffle=<span class="fn">True</span>, random_state=<span class="hl">42</span>)<br>
+scores = <span class="kw">cross_val_score</span>(model, X, y, cv=kf, scoring=<span class="vr">'f1_macro'</span>)<br>
+<span class="fn">print</span>(<span class="vr">f"CV F1: {scores.mean():.3f} ± {scores.std():.3f}"</span>)<br><br>
+<span class="cm"># Grid Search 超參數調校</span><br>
+<span class="fn">from</span> sklearn.model_selection <span class="fn">import</span> <span class="kw">GridSearchCV</span><br>
+param_grid = {<span class="vr">'n_estimators'</span>: [<span class="hl">100</span>, <span class="hl">200</span>], <span class="vr">'max_depth'</span>: [<span class="hl">3</span>, <span class="hl">5</span>, <span class="hl">7</span>]}<br>
+gs = <span class="kw">GridSearchCV</span>(RandomForestClassifier(), param_grid, cv=<span class="hl">5</span>, n_jobs=<span class="hl">-1</span>)<br>
+gs.<span class="fn">fit</span>(X_train, y_train)<br>
+<span class="fn">print</span>(gs.<span class="kw">best_params_</span>, gs.<span class="kw">best_score_</span>)
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card">
+      <div class="kp-title">cross_val_score</div>
+      <div class="kp-body">scoring 支援 'accuracy', 'f1_macro', 'roc_auc' 等<br>回傳每折的分數陣列，用 mean±std 報告結果<br>cv 可傳入 KFold 物件或整數（整數=StratifiedKFold）</div>
+      <div class="kp-tag">▶ cv=整數→分類用StratifiedKFold</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">GridSearchCV</div>
+      <div class="kp-body">n_jobs=-1：使用所有 CPU 核心並行<br>best_params_ / best_score_ / best_estimator_<br>refit=True（預設）：用最佳參數重新訓練全部資料</div>
+      <div class="kp-tag">▶ 考點：n_jobs=-1 加速</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">RandomizedSearchCV</div>
+      <div class="kp-body">from sklearn.model_selection import RandomizedSearchCV<br>param_distributions 支援 scipy.stats 分布（如 randint）<br>n_iter=50：只採樣 50 個組合，大幅節省計算</div>
+      <div class="kp-tag">▶ 考點：高維用 Random 替代 Grid</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel reveal">
+  <div class="panel-title">🌲 正則化模型：Ridge、Lasso、RandomForest</div>
+  <div class="formula">
+<span class="cm"># L1 Lasso 正則化迴歸</span><br>
+<span class="fn">from</span> sklearn.linear_model <span class="fn">import</span> <span class="kw">Lasso</span>, <span class="kw">Ridge</span>, <span class="kw">ElasticNet</span><br>
+<span class="fn">from</span> sklearn.preprocessing <span class="fn">import</span> <span class="kw">StandardScaler</span><br>
+<span class="fn">from</span> sklearn.pipeline <span class="fn">import</span> <span class="kw">Pipeline</span><br><br>
+pipe = <span class="kw">Pipeline</span>([<br>
+&nbsp;&nbsp;(<span class="vr">'scaler'</span>, <span class="kw">StandardScaler</span>()),  <span class="cm"># 正則化前必須標準化</span><br>
+&nbsp;&nbsp;(<span class="vr">'lasso'</span>, <span class="kw">Lasso</span>(alpha=<span class="hl">0.01</span>))   <span class="cm"># alpha=λ 正則化強度</span><br>
+])<br>
+pipe.<span class="fn">fit</span>(X_train, y_train)<br>
+<span class="fn">print</span>(<span class="vr">"非零係數："</span>, (pipe[<span class="vr">'lasso'</span>].coef_ != <span class="hl">0</span>).<span class="fn">sum</span>())  <span class="cm"># L1稀疏特性</span><br><br>
+<span class="cm"># Random Forest 特徵重要性</span><br>
+rf = <span class="kw">RandomForestClassifier</span>(n_estimators=<span class="hl">200</span>, max_features=<span class="vr">'sqrt'</span>)<br>
+rf.<span class="fn">fit</span>(X_train, y_train)<br>
+importances = rf.<span class="kw">feature_importances_</span>  <span class="cm"># Gini impurity 降低量</span>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card">
+      <div class="kp-title">Lasso alpha 選擇</div>
+      <div class="kp-body">alpha 越大 → 越多係數變 0 → 更稀疏<br>用 LassoCV 自動選擇最佳 alpha（內建 CV）<br>Lasso 不能處理高度相關特徵（會隨機選其一）</div>
+      <div class="kp-tag">▶ LassoCV 自動調 alpha</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">Pipeline 防洩漏</div>
+      <div class="kp-body">Pipeline 中的 fit 只在訓練集執行<br>cross_val_score(pipe, X, y) 自動在每折正確 fit<br>避免在整個資料集 fit Scaler 後再 CV（資料洩漏）</div>
+      <div class="kp-tag">▶ 考點：Pipeline 是防洩漏的標準做法</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">max_features 參數</div>
+      <div class="kp-body">'sqrt'：每棵樹隨機選 √n 個特徵（分類預設）<br>'log2'：每棵樹隨機選 log₂n 個特徵<br>None：使用全部特徵（退化為普通Bagging）<br>特徵隨機性是 RF 降低相關性的核心</div>
+      <div class="kp-tag">▶ 考點：RF 特徵隨機選 √n</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel reveal">
+  <div class="panel-title">🚀 XGBoost 核心用法與 Early Stopping</div>
+  <div class="formula">
+<span class="cm"># XGBoost 訓練與 Early Stopping</span><br>
+<span class="fn">import</span> <span class="kw">xgboost</span> <span class="fn">as</span> xgb<br>
+<span class="fn">from</span> sklearn.metrics <span class="fn">import</span> <span class="kw">roc_auc_score</span><br><br>
+model = xgb.<span class="kw">XGBClassifier</span>(<br>
+&nbsp;&nbsp;n_estimators=<span class="hl">500</span>,<br>
+&nbsp;&nbsp;learning_rate=<span class="hl">0.05</span>,<br>
+&nbsp;&nbsp;max_depth=<span class="hl">6</span>,<br>
+&nbsp;&nbsp;subsample=<span class="hl">0.8</span>,<br>
+&nbsp;&nbsp;colsample_bytree=<span class="hl">0.8</span>,<br>
+&nbsp;&nbsp;reg_alpha=<span class="hl">0.1</span>,   <span class="cm"># L1 正則化</span><br>
+&nbsp;&nbsp;reg_lambda=<span class="hl">1.0</span>,  <span class="cm"># L2 正則化</span><br>
+&nbsp;&nbsp;use_label_encoder=<span class="fn">False</span>, eval_metric=<span class="vr">'auc'</span><br>
+)<br>
+model.<span class="fn">fit</span>(X_train, y_train,<br>
+&nbsp;&nbsp;eval_set=[(X_val, y_val)],<br>
+&nbsp;&nbsp;early_stopping_rounds=<span class="hl">50</span>,  <span class="cm"># 50 輪無改善則停止</span><br>
+&nbsp;&nbsp;verbose=<span class="fn">False</span>)<br>
+<span class="fn">print</span>(<span class="vr">f"AUC: {roc_auc_score(y_test, model.predict_proba(X_test)[:,1]):.4f}"</span>)
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card">
+      <div class="kp-title">Early Stopping</div>
+      <div class="kp-body">早停機制：驗證指標連續 n 輪無改善時停止<br>防止過擬合，自動決定最佳樹的數量<br>best_iteration_ 屬性記錄最佳輪數</div>
+      <div class="kp-tag">▶ 考點：Early Stopping 防止過擬合</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">XGBoost 正則化參數</div>
+      <div class="kp-body">reg_alpha（α）= L1 正則化（稀疏葉節點值）<br>reg_lambda（λ）= L2 正則化（均勻縮小葉節點值）<br>gamma（min_split_loss）= 最小分割增益，相當於剪枝</div>
+      <div class="kp-tag">▶ 考點：reg_alpha=L1，reg_lambda=L2</div>
+    </div>
+    <div class="kp-card">
+      <div class="kp-title">特徵重要性</div>
+      <div class="kp-body">importance_type='weight'：特徵被用來分裂的次數<br>importance_type='gain'：特徵帶來的平均增益（更準）<br>importance_type='cover'：特徵覆蓋的樣本數<br>xgb.plot_importance(model) 直接繪圖</div>
+      <div class="kp-tag">▶ 考點：gain 反映特徵貢獻度最準確</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel reveal" style="border-left:3px solid var(--yellow)">
+  <div class="panel-title">🧪 歷屆考題程式題型</div>
+  <p style="color:var(--muted);font-size:.88rem;margin-bottom:16px;">以下為 iPAS 程式相關選擇題型（點選答案）：</p>
+
+  <div style="background:var(--panel2);border-radius:10px;padding:16px;margin-bottom:14px;">
+    <div style="font-weight:700;color:var(--text);margin-bottom:10px;">程式題 1：下列 sklearn 程式碼有何問題？<br><code style="font-size:.8rem;color:var(--muted)">scaler.fit(X) ; X_scaled = scaler.transform(X) ; cross_val_score(model, X_scaled, y, cv=5)</code></div>
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:.88rem;">
+      <div style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;color:var(--muted);" onclick="this.style.borderColor='var(--pink)';this.style.color='var(--pink)'">A. cross_val_score 的 cv 應設為 10 而不是 5</div>
+      <div style="padding:8px 12px;border-radius:8px;border:1px solid var(--accent2);cursor:pointer;color:var(--accent2);">B. ✓ scaler 在整個 X 上 fit，導致驗證集資訊洩漏到訓練集（應用 Pipeline）</div>
+      <div style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;color:var(--muted);" onclick="this.style.borderColor='var(--pink)';this.style.color='var(--pink)'">C. cross_val_score 無法與 scaler 一起使用</div>
+      <div style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;color:var(--muted);" onclick="this.style.borderColor='var(--pink)';this.style.color='var(--pink)'">D. StandardScaler 不能用於分類問題</div>
+    </div>
+    <div style="margin-top:10px;font-size:.8rem;color:var(--accent);">解析：在完整 X 上 fit Scaler，驗證集的統計量（均值/標準差）已洩漏進 Scaler，等於驗證集間接「看過」訓練集。正確做法是用 Pipeline 確保 Scaler 只在訓練折 fit。</div>
+  </div>
+
+  <div style="background:var(--panel2);border-radius:10px;padding:16px;">
+    <div style="font-weight:700;color:var(--text);margin-bottom:10px;">程式題 2：XGBoost 中 <code style="font-size:.8rem;color:var(--muted)">early_stopping_rounds=50</code> 的作用是？</div>
+    <div style="display:flex;flex-direction:column;gap:8px;font-size:.88rem;">
+      <div style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;color:var(--muted);" onclick="this.style.borderColor='var(--pink)';this.style.color='var(--pink)'">A. 訓練 50 棵樹後強制停止，不管驗證集表現</div>
+      <div style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;color:var(--muted);" onclick="this.style.borderColor='var(--pink)';this.style.color='var(--pink)'">B. 每 50 輪儲存一次模型 checkpoint</div>
+      <div style="padding:8px 12px;border-radius:8px;border:1px solid var(--accent2);cursor:pointer;color:var(--accent2);">C. ✓ 驗證集指標連續 50 輪未改善則停止，自動防止過擬合</div>
+      <div style="padding:8px 12px;border-radius:8px;border:1px solid var(--border);cursor:pointer;color:var(--muted);" onclick="this.style.borderColor='var(--pink)';this.style.color='var(--pink)'">D. 僅適用於 n_estimators&gt;500 時</div>
+    </div>
+    <div style="margin-top:10px;font-size:.8rem;color:var(--accent);">解析：early_stopping_rounds 監測 eval_set 上的指標，連續 50 輪無改善自動停止並保留最佳模型（best_iteration_），有效防止過擬合且節省計算時間。</div>
+  </div>
+</div>
+
+<!-- 9. 仿真考題 -->
+<div class="sec-title reveal">🎯 仿真考題（8 題）</div>
+<div class="progress-bar"><div class="progress-fill" id="pbar" style="width:0%"></div></div>
+<div id="quiz"></div>
+
+<footer>iPAS AI 應用規劃師中級 — 模型調校與集成學習 · 科目三 L232 · 2025</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ─── Reveal Observer ───────────────────────────────────────────────────
+const obs = new IntersectionObserver(e => e.forEach(x => x.isIntersecting && x.target.classList.add('vis')), {threshold: .08});
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// ─── Score ─────────────────────────────────────────────────────────────
+let score = 0;
+const answered = new Set();
+const TOTAL = 8;
+document.getElementById('total').textContent = TOTAL;
+function addScore(qIdx, correct) {
+  if (answered.has(qIdx)) return;
+  answered.add(qIdx);
+  if (correct) score++;
+  document.getElementById('score').textContent = score;
+  document.getElementById('pbar').style.width = (answered.size / TOTAL * 100) + '%';
+}
+
+// ─── Seg Tab Helpers ────────────────────────────────────────────────────
+const regData = {
+  l1: `<strong class="hl">L1 Lasso 正則化</strong>：在損失函數中加入 λΣ|wᵢ|<br>
+        → 部分係數收縮至 <strong class="hl2">0</strong>（稀疏解），自動執行<strong>特徵選擇</strong><br>
+        → 幾何上約束區域為菱形，最優解常落在角點（wⱼ=0）<br>
+        → 適合特徵數量 >> 樣本數的高維情境（如基因資料）<br>
+        → λ=0 時退化為普通線性迴歸；λ→∞ 所有係數趨零<br>
+        → 缺點：對高度相關特徵會隨機選其一，不穩定`,
+  l2: `<strong class="hl">L2 Ridge 正則化</strong>：在損失函數中加入 λΣwᵢ²<br>
+        → 所有係數均勻縮小，<strong>不會變 0</strong>（非稀疏）<br>
+        → 幾何上約束區域為球形，最優解在圓上分布<br>
+        → 有解析解：w* = (XᵀX + λI)⁻¹Xᵀy（計算效率高）<br>
+        → 適合處理<strong>多重共線性</strong>（特徵高度相關）問題<br>
+        → 缺點：無法做特徵選擇`,
+  elastic: `<strong class="hl">Elastic Net</strong>：L1 + L2 的線性組合<br>
+        Loss = MSE + λ₁Σ|wᵢ| + λ₂Σwᵢ²<br>
+        → <strong>兼具稀疏性</strong>（L1 特性）與<strong>穩定性</strong>（L2 特性）<br>
+        → 適合：特徵高度相關 + 高維稀疏（如文字資料）<br>
+        → 超參數 l1_ratio：0=Ridge，1=Lasso，中間=ElasticNet<br>
+        → sklearn: <span class="hl2">ElasticNet(alpha=0.01, l1_ratio=0.5)</span>`,
+  dropout: `<strong class="hl">Dropout 正則化</strong>（深度學習專用）<br>
+        → 訓練時隨機「關閉」比例 p 的神經元（輸出設為 0）<br>
+        → 每次前向傳播使用不同的「子網路」，等效於集成<br>
+        → 測試時使用全部神經元，輸出乘以 (1-p)（inverted dropout 則訓練時縮放）<br>
+        → 防止神經元之間的<strong>協同適應</strong>（co-adaptation）<br>
+        → p=0.5 常用於全連接層；p=0.2 常用於卷積層<br>
+        → 注意：<strong>測試時不啟用 Dropout</strong>（model.eval() in PyTorch）`
+};
+function showReg(btn, key) {
+  document.querySelectorAll('.seg-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('reg-display').innerHTML = regData[key];
+}
+showReg(document.querySelector('.seg-tab'), 'l1');
+
+const hpoData = {
+  grid: `<strong class="hl">Grid Search（窮舉網格搜索）</strong><br>
+        → 對所有超參數值的笛卡兒積逐一評估<br>
+        → 組合數 = n1 × n2 × n3 × ... × cv（每個組合都做 k-fold）<br>
+        → 優點：不會遺漏搜索空間內的最優解<br>
+        → 缺點：組合爆炸，4個參數各4個值 = 256種，×5折 = 1280次訓練<br>
+        → 適用：超參數少（1~2個）且可能值有限時<br>
+        → <span class="hl2">GridSearchCV(model, param_grid, cv=5, n_jobs=-1)</span>`,
+  random: `<strong class="hl">Random Search（隨機搜索）</strong><br>
+        → 從參數分布中隨機採樣 n_iter 個組合進行評估<br>
+        → 每個參數可以是連續分布（如 scipy.stats.uniform）<br>
+        → <strong>Bergstra & Bengio 2012</strong>：高維空間中隨機搜索往往優於 Grid<br>
+        → 原因：每個參數不一定都重要，隨機採樣能覆蓋重要維度更廣的範圍<br>
+        → 適用：超參數多、搜索空間大<br>
+        → <span class="hl2">RandomizedSearchCV(model, param_dist, n_iter=50, cv=5)</span>`,
+  bayesian: `<strong class="hl">Bayesian Optimization（貝葉斯最佳化）</strong><br>
+        → 建立目標函數的代理模型（Surrogate Model，如高斯過程）<br>
+        → 利用 Acquisition Function（EI/UCB）決定下一個最有希望的候選點<br>
+        → 每次評估後更新代理模型，越來越聰明<br>
+        → 優點：採樣效率最高，適合昂貴評估（深度學習、大資料）<br>
+        → 工具：<span class="hl2">Optuna</span>（最流行）、Hyperopt、Ray Tune、Scikit-Optimize<br>
+        → 缺點：比 Grid/Random 更複雜，並行化較難`,
+  early: `<strong class="hl">Early Stopping（早停機制）</strong><br>
+        → 訓練時監測驗證集指標，連續 n 輪無改善則停止<br>
+        → 核心思想：驗證誤差開始上升意味著過擬合開始<br>
+        → 同時決定最佳 epoch/n_estimators，無需手動設定<br>
+        → XGBoost：<span class="hl2">early_stopping_rounds=50</span>（驗證集 AUC 連續50輪未升）<br>
+        → Keras：<span class="hl2">EarlyStopping(patience=10, restore_best_weights=True)</span><br>
+        → 搭配模型 checkpoint 儲存最佳模型`
+};
+function showHPO(btn, key) {
+  document.querySelectorAll('.seg-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('hpo-display').innerHTML = hpoData[key];
+}
+showHPO(document.querySelector('.seg-tab'), 'grid');
+
+const missingData = {
+  drop: `<strong class="hl">刪除法（Listwise Deletion）</strong><br>
+        → 刪除含缺失值的整列（dropna()）或整欄（thresh 參數）<br>
+        → 適用：缺失比例 &lt; 5%，且資料為 MCAR<br>
+        → 缺點：樣本量減少，可能引入選擇偏差<br>
+        → 考點：缺失率 &gt; 40% 可考慮刪除整欄特徵`,
+  mean: `<strong class="hl">均值/中位數/眾數填補</strong><br>
+        → 數值型：對稱分布用均值；偏態/離群值用中位數<br>
+        → 類別型：用眾數（最常見值）填補<br>
+        → 缺點：填補後該特徵方差人為縮小，可能低估相關性<br>
+        → sklearn: <span class="hl2">SimpleImputer(strategy='median')</span>`,
+  knn: `<strong class="hl">KNN 填補</strong><br>
+        → 找 K 個特徵最相似的完整樣本，取其均值/眾數填補缺失值<br>
+        → 優點：考慮特徵間的相關性，比均值填補更準確<br>
+        → 缺點：計算成本 O(n²)，大資料集計算慢<br>
+        → sklearn: <span class="hl2">KNNImputer(n_neighbors=5)</span>`,
+  mi: `<strong class="hl">多重插補（Multiple Imputation）</strong><br>
+        → 多次填補生成 m 個完整資料集，分別建模後結合結果<br>
+        → 正確反映缺失值的不確定性（比單次填補更準）<br>
+        → MICE（Multivariate Imputation by Chained Equations）：迭代每個特徵<br>
+        → 適合：MAR 缺失機制，統計推論場景<br>
+        → sklearn: <span class="hl2">IterativeImputer()</span>（MICE 實作）`
+};
+function showMissing(btn, key) {
+  const tabs = btn.closest('.panel').querySelectorAll('.seg-tab');
+  tabs.forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  btn.closest('.panel').querySelector('#missing-display').innerHTML = missingData[key];
+}
+// init missing display if present
+const md = document.getElementById('missing-display');
+if(md) md.innerHTML = missingData['drop'];
+
+// ─── Bias-Variance Interactive Canvas ──────────────────────────────────
+(function() {
+  const canvas = document.getElementById('bvCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const slider = document.getElementById('complexSlider');
+  const info = document.getElementById('bvInfo');
+
+  function resize() {
+    canvas.width = canvas.parentElement.offsetWidth;
+    draw(parseInt(slider.value));
+  }
+
+  function draw(v) {
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+    const pad = 50;
+    const pw = W - pad * 2, ph = H - pad * 2;
+
+    // Background
+    ctx.fillStyle = '#0a0c14';
+    ctx.fillRect(0, 0, W, H);
+
+    // Axes
+    ctx.strokeStyle = '#2E3250';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad, pad); ctx.lineTo(pad, pad + ph);
+    ctx.moveTo(pad, pad + ph); ctx.lineTo(pad + pw, pad + ph);
+    ctx.stroke();
+
+    // Labels
+    ctx.fillStyle = '#8892B0';
+    ctx.font = '11px Calibri';
+    ctx.textAlign = 'center';
+    ctx.fillText('模型複雜度 →', pad + pw / 2, H - 8);
+    ctx.save();
+    ctx.translate(14, pad + ph / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('誤差', 0, 0);
+    ctx.restore();
+
+    const n = 100;
+    const x = Array.from({length: n}, (_, i) => i / (n - 1));
+
+    // Bias^2: decreasing curve
+    function bias2(t) { return 0.55 * Math.pow(1 - t, 1.4) + 0.02; }
+    // Variance: increasing curve
+    function variance(t) { return 0.55 * Math.pow(t, 1.6) + 0.02; }
+    // Total error
+    function total(t) { return bias2(t) + variance(t) + 0.04; }
+
+    function toX(t) { return pad + t * pw; }
+    function toY(v) { return pad + ph - v * ph; }
+
+    // Draw curves
+    function drawCurve(fn, color) {
+      ctx.beginPath();
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2.5;
+      x.forEach((t, i) => {
+        const px = toX(t), py = toY(fn(t));
+        i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+      });
+      ctx.stroke();
+    }
+    drawCurve(bias2, '#FF9B42');
+    drawCurve(variance, '#FF6B9D');
+    drawCurve(total, '#00FFB2');
+
+    // Vertical line at current complexity
+    const cx = (v - 1) / 9;
+    const lineX = toX(cx);
+    ctx.strokeStyle = 'rgba(255,255,255,.4)';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([4, 4]);
+    ctx.beginPath();
+    ctx.moveTo(lineX, pad); ctx.lineTo(lineX, pad + ph);
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Dot on each curve
+    function dot(fn, color) {
+      const py = toY(fn(cx));
+      ctx.beginPath();
+      ctx.arc(lineX, py, 5, 0, Math.PI * 2);
+      ctx.fillStyle = color;
+      ctx.fill();
+    }
+    dot(bias2, '#FF9B42');
+    dot(variance, '#FF6B9D');
+    dot(total, '#00FFB2');
+
+    // Min total marker
+    let minT = 0, minV = 999;
+    x.forEach(t => { const tv = total(t); if (tv < minV) { minV = tv; minT = t; } });
+    ctx.strokeStyle = '#FFD166';
+    ctx.lineWidth = 1;
+    ctx.setLineDash([3, 3]);
+    ctx.beginPath();
+    ctx.moveTo(toX(minT), pad); ctx.lineTo(toX(minT), pad + ph);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#FFD166';
+    ctx.font = 'bold 10px Calibri';
+    ctx.textAlign = 'center';
+    ctx.fillText('最優點', toX(minT), pad - 5);
+
+    // Info
+    const b2 = bias2(cx).toFixed(3), vr = variance(cx).toFixed(3), tot = total(cx).toFixed(3);
+    let zone = '';
+    if (cx < 0.3) zone = '⚠️ 欠擬合區（High Bias）';
+    else if (cx > 0.7) zone = '⚠️ 過擬合區（High Variance）';
+    else zone = '✅ 相對均衡區';
+    info.innerHTML = `複雜度: ${v}/10 | Bias²: <span style="color:var(--orange)">${b2}</span> | Variance: <span style="color:var(--pink)">${vr}</span> | Total: <span style="color:var(--accent2)">${tot}</span> | ${zone}`;
+  }
+
+  slider.addEventListener('input', () => draw(parseInt(slider.value)));
+  window.addEventListener('resize', resize);
+  resize();
+})();
+
+// ─── Metrics Canvas 2D ─────────────────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('metricsCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width = canvas.parentElement.offsetWidth;
+    draw();
+  }
+
+  function draw() {
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#0a0c14';
+    ctx.fillRect(0, 0, W, H);
+
+    // Confusion matrix on left
+    const cm = [[120, 30], [20, 130]]; // [[TP,FN],[FP,TN]] (rearranged for display)
+    const cmLabels = [['TP', 'FN'], ['FP', 'TN']];
+    const colors = [['rgba(0,255,178,.7)', 'rgba(255,107,157,.4)'], ['rgba(255,107,157,.4)', 'rgba(0,212,255,.4)']];
+    const cellSize = Math.min(70, (W * 0.4) / 2 - 10);
+    const startX = 60, startY = 50;
+
+    ctx.fillStyle = '#8892B0';
+    ctx.font = '11px Calibri';
+    ctx.textAlign = 'center';
+    ctx.fillText('混淆矩陣', startX + cellSize, 30);
+    ctx.font = '10px Calibri';
+    ctx.fillText('預測正', startX + cellSize / 2, 46);
+    ctx.fillText('預測負', startX + cellSize * 1.5, 46);
+    ctx.save();
+    ctx.translate(30, startY + cellSize);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('實際正', 0, 0);
+    ctx.restore();
+    ctx.save();
+    ctx.translate(30, startY + cellSize * 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.fillText('實際負', 0, 0);
+    ctx.restore();
+
+    for (let r = 0; r < 2; r++) {
+      for (let c = 0; c < 2; c++) {
+        const x = startX + c * cellSize, y = startY + r * cellSize;
+        ctx.fillStyle = colors[r][c];
+        ctx.strokeStyle = '#2E3250';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect ? ctx.roundRect(x, y, cellSize - 2, cellSize - 2, 4) : ctx.rect(x, y, cellSize - 2, cellSize - 2);
+        ctx.fill(); ctx.stroke();
+        ctx.fillStyle = '#E8EAF6';
+        ctx.font = 'bold 13px Calibri';
+        ctx.textAlign = 'center';
+        ctx.fillText(cmLabels[r][c], x + cellSize / 2, y + cellSize / 2 - 5);
+        ctx.font = '11px Calibri';
+        ctx.fillStyle = '#8892B0';
+        ctx.fillText(cm[r][c], x + cellSize / 2, y + cellSize / 2 + 12);
+      }
+    }
+
+    // Metrics on right
+    const TP = 120, FN = 30, FP = 20, TN = 130;
+    const precision = TP / (TP + FP);
+    const recall = TP / (TP + FN);
+    const f1 = 2 * precision * recall / (precision + recall);
+    const accuracy = (TP + TN) / (TP + FN + FP + TN);
+
+    const rightX = startX + cellSize * 2 + 30;
+    const metrics = [
+      { name: 'Accuracy', val: accuracy, color: '#00D4FF', formula: '(TP+TN)/All' },
+      { name: 'Precision', val: precision, color: '#FF9B42', formula: 'TP/(TP+FP)' },
+      { name: 'Recall', val: recall, color: '#FF6B9D', formula: 'TP/(TP+FN)' },
+      { name: 'F1 Score', val: f1, color: '#00FFB2', formula: '2PR/(P+R)' },
+    ];
+
+    metrics.forEach((m, i) => {
+      const y = startY + i * (cellSize / 1.8);
+      const barW = (W - rightX - 30) * m.val;
+      ctx.fillStyle = m.color + '33';
+      ctx.beginPath();
+      if (ctx.roundRect) ctx.roundRect(rightX, y, barW, 22, 4);
+      else ctx.rect(rightX, y, barW, 22);
+      ctx.fill();
+      ctx.fillStyle = m.color;
+      ctx.font = 'bold 11px Calibri';
+      ctx.textAlign = 'left';
+      ctx.fillText(`${m.name}: ${(m.val * 100).toFixed(1)}%`, rightX + 6, y + 15);
+      ctx.fillStyle = '#8892B0';
+      ctx.font = '10px Calibri';
+      ctx.fillText(m.formula, rightX + 6, y + 28);
+    });
+  }
+
+  window.addEventListener('resize', resize);
+  resize();
+})();
+
+// ─── Three.js Ensemble Voting 3D ────────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('c3d');
+  if (!canvas || !window.THREE) return;
+
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, canvas.clientWidth / canvas.clientHeight, 0.1, 100);
+  camera.position.set(0, 3, 10);
+  camera.lookAt(0, 0, 0);
+
+  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+  const dl = new THREE.DirectionalLight(0xffffff, 1);
+  dl.position.set(5, 8, 5);
+  scene.add(dl);
+
+  let mode = 'bagging';
+  let animating = true;
+  let rot = { x: 0.3, y: 0.5 };
+  let isDragging = false, prevMouse = { x: 0, y: 0 };
+
+  // Drag rotation
+  canvas.addEventListener('mousedown', e => { isDragging = true; prevMouse = { x: e.clientX, y: e.clientY }; });
+  window.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    rot.y += (e.clientX - prevMouse.x) * 0.01;
+    rot.x += (e.clientY - prevMouse.y) * 0.01;
+    prevMouse = { x: e.clientX, y: e.clientY };
+  });
+  window.addEventListener('mouseup', () => isDragging = false);
+  canvas.addEventListener('touchstart', e => { isDragging = true; prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }, { passive: true });
+  canvas.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+    rot.y += (e.touches[0].clientX - prevMouse.x) * 0.01;
+    rot.x += (e.touches[0].clientY - prevMouse.y) * 0.01;
+    prevMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }, { passive: true });
+  canvas.addEventListener('touchend', () => isDragging = false);
+
+  function camPos() {
+    const r = 10;
+    camera.position.x = r * Math.sin(rot.y) * Math.cos(rot.x);
+    camera.position.y = r * Math.sin(rot.x);
+    camera.position.z = r * Math.cos(rot.y) * Math.cos(rot.x);
+    camera.lookAt(0, 0, 0);
+  }
+
+  let group = null;
+
+  function buildBagging() {
+    const g = new THREE.Group();
+    const cols = [0xFF9B42, 0x00D4FF, 0xFF6B9D, 0x00FFB2, 0xFFD166];
+    const labels = ['Tree1', 'Tree2', 'Tree3', 'Tree4', 'Tree5'];
+    const votes = [1, 0, 1, 1, 0]; // 3 vote class1, 2 vote class0
+    const radius = 3.2;
+
+    for (let i = 0; i < 5; i++) {
+      const angle = (i / 5) * Math.PI * 2 - Math.PI / 2;
+      const x = Math.cos(angle) * radius, z = Math.sin(angle) * radius;
+
+      const sphere = new THREE.Mesh(
+        new THREE.SphereGeometry(0.6, 32, 32),
+        new THREE.MeshPhongMaterial({ color: cols[i], transparent: true, opacity: 0.85 })
+      );
+      sphere.position.set(x, 1, z);
+      g.add(sphere);
+
+      // Vote arrow towards center
+      const voteColor = votes[i] === 1 ? 0xFF9B42 : 0x8892B0;
+      const arrowDir = new THREE.Vector3(-x, 0, -z).normalize();
+      const arrowHelper = new THREE.ArrowHelper(arrowDir, new THREE.Vector3(x * 0.8, 0.5, z * 0.8), 1.5, voteColor, 0.3, 0.2);
+      g.add(arrowHelper);
+    }
+
+    // Winner sphere at center
+    const winner = new THREE.Mesh(
+      new THREE.SphereGeometry(0.9, 32, 32),
+      new THREE.MeshPhongMaterial({ color: 0x00FFB2, emissive: 0x00FFB2, emissiveIntensity: 0.3 })
+    );
+    winner.position.set(0, 0.5, 0);
+    winner.userData.pulse = true;
+    g.add(winner);
+
+    // Ring around winner
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(1.3, 0.06, 16, 60),
+      new THREE.MeshPhongMaterial({ color: 0x00FFB2, transparent: true, opacity: 0.6 })
+    );
+    ring.rotation.x = Math.PI / 2;
+    ring.position.set(0, 0.5, 0);
+    g.add(ring);
+
+    return g;
+  }
+
+  function buildBoosting() {
+    const g = new THREE.Group();
+    const cols = [0x8892B0, 0xFF9B42, 0xFF9B42, 0xFF9B42, 0xFF9B42];
+    const sizes = [0.3, 0.45, 0.58, 0.7, 0.85]; // growing weight
+
+    for (let i = 0; i < 5; i++) {
+      const x = (i - 2) * 2.2;
+      const sphere = new THREE.Mesh(
+        new THREE.SphereGeometry(sizes[i], 32, 32),
+        new THREE.MeshPhongMaterial({ color: cols[i], transparent: true, opacity: 0.85 })
+      );
+      sphere.position.set(x, 0.5, 0);
+      g.add(sphere);
+
+      if (i < 4) {
+        // Arrow to next
+        const arrowDir = new THREE.Vector3(1, 0, 0);
+        const arr = new THREE.ArrowHelper(arrowDir, new THREE.Vector3(x + sizes[i] + 0.1, 0.5, 0), 2.2 - sizes[i] * 2, 0xFFD166, 0.25, 0.15);
+        g.add(arr);
+      }
+    }
+
+    // Error highlight bar for last model (showing focused samples)
+    const errBar = new THREE.Mesh(
+      new THREE.BoxGeometry(0.1, 1.5, 0.1),
+      new THREE.MeshPhongMaterial({ color: 0xFF6B9D, emissive: 0xFF6B9D, emissiveIntensity: 0.5 })
+    );
+    errBar.position.set(4.4, 1.2, 0);
+    g.add(errBar);
+
+    return g;
+  }
+
+  function buildStacking() {
+    const g = new THREE.Group();
+    // Layer 1: base models
+    const base = [
+      { color: 0xFF9B42, label: 'RF', x: -2.5, z: 1.5 },
+      { color: 0x00D4FF, label: 'SVM', x: 0, z: 2 },
+      { color: 0xFF6B9D, label: 'NN', x: 2.5, z: 1.5 },
+    ];
+    base.forEach(b => {
+      const s = new THREE.Mesh(
+        new THREE.SphereGeometry(0.65, 32, 32),
+        new THREE.MeshPhongMaterial({ color: b.color, transparent: true, opacity: 0.85 })
+      );
+      s.position.set(b.x, 0.5, b.z);
+      g.add(s);
+
+      // Arrow to meta learner
+      const targetX = 0, targetZ = -1.5;
+      const dx = targetX - b.x, dz = targetZ - b.z;
+      const len = Math.sqrt(dx * dx + dz * dz) - 0.8;
+      const dir = new THREE.Vector3(dx, -0.3, dz).normalize();
+      const arr = new THREE.ArrowHelper(dir, new THREE.Vector3(b.x, 0.5, b.z), len, b.color, 0.25, 0.15);
+      g.add(arr);
+    });
+
+    // Meta learner
+    const meta = new THREE.Mesh(
+      new THREE.OctahedronGeometry(0.9),
+      new THREE.MeshPhongMaterial({ color: 0x00FFB2, emissive: 0x00FFB2, emissiveIntensity: 0.3 })
+    );
+    meta.position.set(0, 0.5, -1.8);
+    meta.userData.pulse = true;
+    g.add(meta);
+
+    // Ring around meta
+    const ring = new THREE.Mesh(
+      new THREE.TorusGeometry(1.3, 0.06, 16, 60),
+      new THREE.MeshPhongMaterial({ color: 0x00FFB2, transparent: true, opacity: 0.5 })
+    );
+    ring.rotation.x = Math.PI / 2;
+    ring.position.set(0, 0.5, -1.8);
+    g.add(ring);
+
+    return g;
+  }
+
+  function setMode(m) {
+    mode = m;
+    document.querySelectorAll('.ctrl button[id^="btn"]').forEach(b => b.classList.remove('on'));
+    document.getElementById('btn' + m.charAt(0).toUpperCase() + m.slice(1)).classList.add('on');
+    if (group) scene.remove(group);
+    if (m === 'bagging') group = buildBagging();
+    else if (m === 'boosting') group = buildBoosting();
+    else group = buildStacking();
+    scene.add(group);
+  }
+  window.setMode = setMode;
+
+  function toggleAnim() {
+    animating = !animating;
+    document.getElementById('btnAnim').textContent = animating ? '⏸ 暫停' : '▶ 播放';
+  }
+  window.toggleAnim = toggleAnim;
+
+  setMode('bagging');
+
+  let t = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    t += 0.01;
+    if (animating && !isDragging) rot.y += 0.005;
+    camPos();
+
+    if (group) {
+      group.children.forEach(ch => {
+        if (ch.userData.pulse) {
+          const s = 1 + 0.08 * Math.sin(t * 3);
+          ch.scale.set(s, s, s);
+        }
+      });
+    }
+
+    renderer.render(scene, camera);
+  }
+
+  window.addEventListener('resize', () => {
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  });
+
+  animate();
+})();
+
+// ─── Quiz ───────────────────────────────────────────────────────────────
+const questions = [
+  {
+    stem: '在 Bias-Variance Tradeoff 中，一個模型在訓練集和測試集上的誤差都很高，最可能的原因是？',
+    opts: ['高方差（High Variance）— 模型過度擬合訓練資料', '高偏差（High Bias）— 模型過於簡單，無法捕捉資料規律', '資料不平衡造成的問題', '學習率過高導致梯度爆炸'],
+    ans: 1,
+    exp: '訓練誤差和測試誤差都高 → 欠擬合（Underfitting）→ High Bias。模型太簡單，無法捕捉資料的規律。解法：增加模型複雜度、增加特徵、減少正則化。'
+  },
+  {
+    stem: 'L1 正則化（Lasso）和 L2 正則化（Ridge）的最大差異為何？',
+    opts: ['L1 計算速度更快，L2 更慢', 'L1 產生稀疏解（部分係數為 0），L2 使係數均勻縮小但不為零', 'L2 適合高維稀疏資料，L1 適合低維稠密資料', 'L1 和 L2 的效果完全相同，只是計算公式不同'],
+    ans: 1,
+    exp: 'L1（Lasso）懲罰項為 λΣ|wᵢ|，約束區域為菱形，最優解常落在角點使部分係數=0（稀疏），可做特徵選擇。L2（Ridge）懲罰項為 λΣwᵢ²，約束區域為圓形，使所有係數均勻縮小但不為零。'
+  },
+  {
+    stem: '在 k-fold 交叉驗證中，若 k=5，則訓練的計算成本約為不使用交叉驗證的多少倍？',
+    opts: ['2倍', '3倍', '5倍', '10倍'],
+    ans: 2,
+    exp: 'k-fold 交叉驗證需要訓練 k 次模型，因此計算成本約為不使用 CV 的 k 倍。k=5 → 5倍計算成本。這是 CV 的主要缺點，但換來的是更穩定、更可靠的泛化性能估計。'
+  },
+  {
+    stem: 'XGBoost 相比傳統 Gradient Boosting（GBM）的主要優勢是？',
+    opts: ['XGBoost 使用並行訓練，GBM 只能單核計算', 'XGBoost 加入 L1/L2 正則化項、使用二階泰勒展開近似，且支援並行計算', 'XGBoost 只能做分類問題，GBM 可以做迴歸', 'XGBoost 不需要設定學習率超參數'],
+    ans: 1,
+    exp: 'XGBoost 在 GBM 基礎上增加了：①目標函數的 L1/L2 正則化防止過擬合 ②用二階泰勒展開更精確近似損失函數 ③支援並行計算（特徵分裂點並行搜索）④內建 Early Stopping ⑤處理缺失值。'
+  },
+  {
+    stem: 'Bagging（如隨機森林）和 Boosting（如 XGBoost）分別主要針對哪種誤差？',
+    opts: ['Bagging 減少偏差，Boosting 減少方差', 'Bagging 減少方差，Boosting 減少偏差', '兩者都主要減少偏差', '兩者都主要減少方差'],
+    ans: 1,
+    exp: 'Bagging 通過對多個獨立訓練的模型取平均，減少了模型的方差（Variance），使預測更穩定。Boosting 通過讓新模型聚焦於前一個模型的錯誤（殘差），逐步減少偏差（Bias）。'
+  },
+  {
+    stem: 'Stratified k-fold 交叉驗證相比普通 k-fold 的優勢是？',
+    opts: ['訓練速度比普通 k-fold 更快', '每折都保持與原始資料集相同的類別比例，適合不平衡資料', '可以處理時間序列資料中的時間依賴性', '不需要設定 k 值，自動選擇最佳折數'],
+    ans: 1,
+    exp: 'Stratified k-fold 在劃分每折時，確保各折中的類別比例與原始資料集一致。這對不平衡資料（如正負樣本比例 9:1）特別重要，防止某折中只有多數類樣本或缺少少數類樣本，導致評估失真。'
+  },
+  {
+    stem: '在 Stacking 集成學習中，為何基模型的預測必須使用「out-of-fold」策略？',
+    opts: ['out-of-fold 策略使計算速度更快', '防止基模型的預測作為 meta-learner 的輸入時發生資料洩漏，高估性能', '這只是習慣，對結果沒有實質影響', 'out-of-fold 可以讓 meta-learner 使用更多訓練資料'],
+    ans: 1,
+    exp: '若基模型在完整訓練集上預測後直接作為 meta-learner 的輸入，meta-learner 看到的是「記憶」了訓練資料的預測（過擬合的預測），性能會被高估。out-of-fold 確保每個訓練樣本的預測來自未曾見過該樣本的模型，防止洩漏。'
+  },
+  {
+    stem: '以下關於 Dropout 正則化的描述，哪一項是正確的？',
+    opts: ['Dropout 在訓練和測試時都隨機關閉部分神經元', '測試時使用完整網路，輸出需乘以 (1-p) 或訓練時使用 inverted dropout 縮放', 'Dropout 率 p 越大，模型泛化越好，通常設為 0.9', 'Dropout 只能用於卷積神經網路（CNN）'],
+    ans: 1,
+    exp: 'Dropout 只在訓練時隨機關閉比例 p 的神經元。測試時使用完整網路。為保持期望輸出一致，有兩種策略：①測試時輸出乘以 (1-p) ②訓練時使用 inverted dropout 將保留的神經元輸出除以 (1-p)（PyTorch/Keras 採用此策略）。'
+  }
+];
+
+const quizDiv = document.getElementById('quiz');
+questions.forEach((q, qi) => {
+  const item = document.createElement('div');
+  item.className = 'q-item reveal';
+  item.innerHTML = `
+    <div class="q-num">第 ${qi + 1} 題 / ${TOTAL}</div>
+    <div class="q-stem">${q.stem}</div>
+    <div class="q-opts">
+      ${q.opts.map((o, oi) => `
+        <div class="q-opt" onclick="answerQ(${qi},${oi},this)">
+          <span class="opt-label">${'ABCD'[oi]}</span>
+          <span>${o}</span>
+        </div>`).join('')}
+    </div>
+    <div class="q-explain" id="exp-${qi}">${q.exp}</div>
+  `;
+  quizDiv.appendChild(item);
+  obs.observe(item);
+});
+
+function answerQ(qi, selected, el) {
+  const item = el.closest('.q-item');
+  if (item.dataset.answered) return;
+  item.dataset.answered = '1';
+  const opts = item.querySelectorAll('.q-opt');
+  opts.forEach((o, i) => {
+    o.onclick = null;
+    if (i === questions[qi].ans) o.classList.add('correct');
+    else if (i === selected) o.classList.add('wrong');
+  });
+  document.getElementById('exp-' + qi).classList.add('show');
+  addScore(qi, selected === questions[qi].ans);
+}
+</script>
+</body>
+</html>
