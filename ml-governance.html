@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>機器學習治理與 AI 倫理 — iPAS AI應用規劃師中級考試</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+* { font-family: 'Calibri', 'Microsoft JhengHei', '微軟正黑體', sans-serif; }
+code, .formula { font-family: 'JetBrains Mono', 'Consolas', monospace !important; }
+:root{
+  --bg:#0F1117;--panel:#1A1D27;--panel2:#21253A;
+  --border:#2E3250;--text:#E8EAF6;--muted:#8892B0;
+  --accent:#FF6B9D;--accent2:#00FFB2;--accent3:#7C6FFF;
+  --yellow:#FFD166;--orange:#FF9B42;--pink:#FF6B9D;--blue:#00D4FF;--purple:#9B5DE5;
+  --r:14px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Calibri','Microsoft JhengHei','微軟正黑體',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;line-height:1.7;}
+
+.nav{position:sticky;top:0;z-index:200;background:rgba(15,17,23,.92);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:12px 24px;}
+.nav a{color:var(--accent);text-decoration:none;font-weight:700;font-size:.9rem;padding:5px 14px;border-radius:999px;border:1.5px solid var(--accent);transition:all .18s;}
+.nav a:hover{background:var(--accent);color:#0F1117;}
+.nav-title{font-size:1.05rem;}
+.nav-tag{margin-left:auto;background:linear-gradient(135deg,var(--pink),var(--accent3));padding:4px 14px;border-radius:999px;font-size:.78rem;font-weight:900;color:#fff;}
+
+.hero{padding:60px 20px 40px;background:linear-gradient(160deg,#0F1117,#16000a,#0F1117);text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(255,107,157,.10),transparent);}
+.hero-badge{display:inline-block;margin-bottom:16px;padding:5px 18px;border-radius:999px;background:rgba(255,107,157,.10);border:1px solid var(--accent);font-size:.8rem;font-weight:900;color:var(--accent);letter-spacing:1px;}
+.hero-title{font-size:clamp(1.8rem,5vw,3.2rem);background:linear-gradient(135deg,var(--pink),var(--yellow),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px;}
+.hero-sub{color:var(--muted);font-size:1rem;max-width:640px;margin:0 auto 24px;}
+.tag-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.tag{padding:4px 12px;border-radius:999px;font-size:.75rem;font-weight:900;border:1px solid;}
+
+.wrap{max-width:980px;margin:0 auto;padding:16px 20px 80px;}
+
+.sec-title{font-size:1.5rem;color:var(--text);margin:44px 0 16px;display:flex;align-items:center;gap:10px;}
+.sec-title::before{content:'';display:inline-block;width:4px;height:24px;border-radius:2px;background:linear-gradient(var(--accent),var(--yellow));}
+
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:24px;margin-bottom:20px;}
+.panel-title{font-weight:900;font-size:1rem;color:var(--accent2);margin-bottom:12px;}
+
+.formula{background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:16px 20px;margin:12px 0;font-family:'JetBrains Mono',monospace;font-size:.9rem;color:var(--accent2);line-height:2;overflow-x:auto;}
+.formula .cm{color:var(--muted);font-style:italic;}
+.formula .hl{color:var(--yellow);}
+.formula .fn{color:var(--blue);}
+.formula .vr{color:var(--pink);}
+.formula .kw{color:var(--orange);}
+
+.tbl-wrap{overflow-x:auto;margin:12px 0;}
+table{width:100%;border-collapse:collapse;font-size:.88rem;}
+th{background:var(--panel2);padding:10px 14px;text-align:left;border-bottom:2px solid var(--border);color:var(--accent2);font-weight:900;}
+td{padding:9px 14px;border-bottom:1px solid var(--border);color:var(--muted);}
+td:first-child{color:var(--text);font-weight:700;}
+tr:hover td{background:rgba(255,107,157,.03);}
+
+.kp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:12px 0;}
+.kp-card{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:16px;border-left:3px solid var(--accent);transition:transform .18s,border-color .18s;}
+.kp-card:hover{transform:translateY(-4px);border-left-color:var(--accent2);}
+.kp-card .kp-title{font-weight:900;font-size:.95rem;color:var(--text);margin-bottom:6px;}
+.kp-card .kp-body{font-size:.83rem;color:var(--muted);line-height:1.6;}
+.kp-card .kp-tag{font-size:.7rem;font-weight:900;color:var(--accent);margin-top:8px;}
+
+.warn-box{background:rgba(255,107,157,.06);border:1px solid var(--accent);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--accent);margin:10px 0;}
+.info-box{background:rgba(0,255,178,.07);border:1px solid var(--accent2);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--accent2);margin:10px 0;}
+
+.seg-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.seg-tab{padding:7px 16px;border-radius:999px;border:1.5px solid var(--border);font-size:.83rem;font-weight:900;cursor:pointer;color:var(--muted);background:transparent;transition:all .18s;}
+.seg-tab.active{border-color:var(--accent);color:var(--accent);background:rgba(255,107,157,.09);}
+.seg-box{background:#0a0c14;border:1px solid var(--border);border-radius:10px;padding:16px;font-size:.88rem;line-height:1.8;color:var(--muted);}
+.seg-box .hl{color:var(--accent);}
+.seg-box .hl2{color:var(--yellow);}
+.seg-box .hl3{color:var(--accent2);}
+
+.c3d-wrap{background:#0a0c14;border:1px solid var(--border);border-radius:var(--r);position:relative;overflow:hidden;margin:12px 0;}
+.c3d{display:block;width:100%;height:400px;cursor:grab;}
+.c3d:active{cursor:grabbing;}
+.c3d-lbl{position:absolute;top:10px;left:12px;background:rgba(0,0,0,.65);backdrop-filter:blur(4px);padding:4px 12px;border-radius:999px;font-size:.72rem;font-weight:900;color:var(--accent);border:1px solid rgba(255,107,157,.4);}
+.ctrl{display:flex;gap:8px;flex-wrap:wrap;padding:10px 12px;background:rgba(0,0,0,.3);}
+.ctrl button{padding:5px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.18);font-size:.72rem;font-weight:900;color:rgba(255,255,255,.6);background:transparent;cursor:pointer;transition:all .18s;}
+.ctrl button:hover,.ctrl button.on{border-color:var(--accent);color:var(--accent);background:rgba(255,107,157,.12);}
+
+.canvas2d-wrap{background:#0a0c14;border:1px solid var(--border);border-radius:10px;margin:12px 0;overflow:hidden;}
+.canvas2d-wrap canvas{display:block;width:100%;}
+
+.progress-bar{height:6px;background:var(--border);border-radius:3px;margin-bottom:20px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent3));transition:width .5s;}
+.q-item{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;}
+.q-num{font-size:.75rem;font-weight:900;color:var(--accent);margin-bottom:6px;}
+.q-stem{font-weight:700;color:var(--text);font-size:.95rem;margin-bottom:12px;line-height:1.6;}
+.q-opts{display:flex;flex-direction:column;gap:7px;}
+.q-opt{padding:10px 14px;border-radius:8px;cursor:pointer;border:1px solid var(--border);font-size:.88rem;color:var(--muted);transition:all .18s;display:flex;align-items:flex-start;gap:8px;}
+.q-opt:hover{border-color:var(--accent);color:var(--text);background:rgba(255,107,157,.06);}
+.q-opt.correct{border-color:var(--accent2);background:rgba(0,255,178,.07);color:var(--accent2);}
+.q-opt.wrong{border-color:var(--pink);background:rgba(255,107,157,.07);color:var(--pink);}
+.q-opt .opt-label{font-weight:900;min-width:18px;}
+.q-explain{margin-top:12px;padding:10px 14px;background:rgba(255,107,157,.05);border-left:3px solid var(--accent);border-radius:0 8px 8px 0;font-size:.84rem;color:var(--accent);display:none;line-height:1.65;}
+.q-explain.show{display:block;}
+
+#score-banner{position:fixed;bottom:20px;right:20px;z-index:300;background:var(--panel);border:1px solid var(--accent);border-radius:12px;padding:10px 18px;font-weight:900;font-size:.9rem;color:var(--accent);box-shadow:0 4px 20px rgba(255,107,157,.25);}
+
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .5s ease,transform .5s ease;}
+.reveal.vis{opacity:1;transform:translateY(0);}
+footer{text-align:center;padding:28px;font-size:.75rem;color:rgba(232,234,246,.2);}
+</style>
+</head>
+<body>
+
+<div id="score-banner">⭐ 答題得分：<span id="score">0</span> / <span id="total">0</span></div>
+
+<nav class="nav">
+  <a href="index.html">← 返回</a>
+  <span class="nav-title">機器學習治理與 AI 倫理</span>
+  <span class="nav-tag">iPAS 中級 · 科目三 L234 · 科目一 L21203</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">L234 AI 治理 · L21203 倫理法規</div>
+  <div class="hero-title">機器學習治理與 AI 倫理</div>
+  <div class="hero-sub">差分隱私（ε-DP）、資料匿名化、AI 偏見三類型、公平性指標（Disparate Impact 80%）、SHAP/LIME 可解釋性、GDPR/台灣個資法、AI 倫理框架</div>
+  <div class="tag-row">
+    <span class="tag" style="color:var(--pink);border-color:var(--pink)">公平性 3D</span>
+    <span class="tag" style="color:var(--yellow);border-color:var(--yellow)">差分隱私 ε-DP</span>
+    <span class="tag" style="color:var(--accent2);border-color:var(--accent2)">SHAP / LIME</span>
+    <span class="tag" style="color:var(--blue);border-color:var(--blue)">GDPR 合規</span>
+    <span class="tag" style="color:var(--purple);border-color:var(--purple)">AI 偏見三類型</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- 1. 差分隱私 -->
+<div class="sec-title reveal">🔒 差分隱私（Differential Privacy）</div>
+<div class="panel reveal">
+  <div class="panel-title">ε-差分隱私：加入噪聲保護個別記錄，同時保留統計規律</div>
+  <div class="formula">
+    <span class="cm">// ε-差分隱私正式定義（鄰近資料集 D 與 D'）</span><br>
+    Pr[<span class="fn">M</span>(<span class="vr">D</span>) ∈ S] ≤ e^<span class="hl">ε</span> × Pr[<span class="fn">M</span>(<span class="vr">D'</span>) ∈ S]<br><br>
+    <span class="cm">// ε（隱私預算）越小 → 隱私保護越強，但資料效用越低</span><br>
+    <span class="hl">ε = 0</span>：完美隱私（輸出與輸入完全無關，無效）<br>
+    <span class="hl">ε → ∞</span>：無隱私保護<br>
+    實務常用 <span class="hl">ε = 0.1 ~ 10</span> 的範圍<br><br>
+    <span class="cm">// 拉普拉斯噪聲機制（數值查詢）</span><br>
+    <span class="fn">M_Lap</span>(<span class="vr">f</span>, <span class="vr">D</span>) = f(D) + <span class="fn">Lap</span>(<span class="hl">Δf / ε</span>)<br>
+    <span class="cm">// Δf = 全局敏感度（sensitivity），即改變一筆記錄對 f 的最大影響</span><br><br>
+    <span class="cm">// 高斯噪聲機制（(ε,δ)-差分隱私）</span><br>
+    <span class="fn">M_Gauss</span>(<span class="vr">f</span>, <span class="vr">D</span>) = f(D) + <span class="fn">N</span>(0, σ²)<br>
+    σ ≥ <span class="hl">Δf × √(2ln(1.25/δ)) / ε</span>
+  </div>
+  <div class="seg-tabs">
+    <button class="seg-tab active" onclick="showDP(this,'lap')">🔢 拉普拉斯機制</button>
+    <button class="seg-tab" onclick="showDP(this,'gauss')">🔔 高斯機制</button>
+    <button class="seg-tab" onclick="showDP(this,'rdp')">📊 ε預算管理</button>
+    <button class="seg-tab" onclick="showDP(this,'fedp')">🤝 聯邦學習+DP</button>
+  </div>
+  <div class="seg-box" id="dp-display"></div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--pink)">
+      <div class="kp-title">差分隱私核心概念</div>
+      <div class="kp-body">保護：即使攻擊者知道除某一筆之外的所有資料，也無法判斷該筆是否在資料集中<br>加入噪聲 → 輸出分布幾乎相同<br>ε 越小 → 噪聲越大 → 隱私更強但精度下降</div>
+      <div class="kp-tag">▶ 考點：ε 控制隱私強度，越小越安全</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">拉普拉斯 vs 高斯</div>
+      <div class="kp-body"><strong>拉普拉斯</strong>：純 ε-DP，σ = Δf/ε，尖峰分布<br><strong>高斯</strong>：(ε,δ)-DP，δ 為微小的隱私洩漏機率，鐘型分布<br>高斯噪聲更適合深度學習（DP-SGD）</div>
+      <div class="kp-tag">▶ 考點：Lap 用於計數查詢；Gaussian 用於 DP-SGD</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">全局敏感度（Δf）</div>
+      <div class="kp-body">定義：改變資料集中一筆記錄，查詢結果 f 的最大變化量<br>計數查詢（COUNT）：Δf = 1<br>求和查詢（SUM）：Δf = max value<br>均值查詢（MEAN）：Δf = (max-min)/n</div>
+      <div class="kp-tag">▶ 考點：敏感度決定需加多大噪聲</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 必記：</strong>差分隱私加噪聲保護個別記錄；ε 越小隱私保護越強但資料效用越低；拉普拉斯噪聲用於純 ε-DP；高斯噪聲用於 (ε,δ)-DP；Apple、Google 均有部署本地差分隱私</div>
+</div>
+
+<!-- 2. 資料匿名化技術 -->
+<div class="sec-title reveal">🎭 資料匿名化技術</div>
+<div class="panel reveal">
+  <div class="panel-title">k-匿名、ℓ-多樣性、t-接近性：保護隱私的三道防線</div>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>技術</th><th>定義</th><th>防禦攻擊</th><th>弱點</th><th>考點</th></tr>
+      <tr>
+        <td>k-匿名（k-Anonymity）</td>
+        <td>每筆記錄與至少 k-1 筆其他記錄在準識別符上無法區分</td>
+        <td>連結攻擊（Linkage Attack）</td>
+        <td>同質性攻擊：若 k 個人敏感屬性相同，即可推測</td>
+        <td>k=2 最少需 2 筆相同；k 越大越安全</td>
+      </tr>
+      <tr>
+        <td>ℓ-多樣性（ℓ-Diversity）</td>
+        <td>每個等價類中敏感屬性至少有 ℓ 種不同值</td>
+        <td>同質性攻擊</td>
+        <td>偏斜攻擊：若 ℓ 個值中 1 個佔 99%，仍可推測</td>
+        <td>補強 k-匿名的敏感屬性多樣性</td>
+      </tr>
+      <tr>
+        <td>t-接近性（t-Closeness）</td>
+        <td>等價類中敏感屬性分布與整體資料集分布差距 ≤ t</td>
+        <td>偏斜攻擊、背景知識攻擊</td>
+        <td>資料可用性下降最多</td>
+        <td>最強保護，t 越小越嚴格</td>
+      </tr>
+      <tr>
+        <td>資料概化（Generalization）</td>
+        <td>將精確值替換為範圍（如年齡 32→30-40）</td>
+        <td>直接識別攻擊</td>
+        <td>細粒度資訊損失</td>
+        <td>實作 k-匿名的主要手段</td>
+      </tr>
+      <tr>
+        <td>隨機擾動（Perturbation）</td>
+        <td>對數值加入隨機噪聲或交換值</td>
+        <td>精確推斷攻擊</td>
+        <td>統計性質改變</td>
+        <td>差分隱私的實作基礎</td>
+      </tr>
+    </table>
+  </div>
+  <div class="formula">
+    <span class="cm">// k-匿名範例：年齡與郵遞區號概化</span><br>
+    原始: 年齡=<span class="vr">32</span>, 郵遞區號=<span class="vr">10045</span>, 疾病=<span class="hl">癌症</span><br>
+    k-匿名(k=3): 年齡=<span class="fn">[30-35]</span>, 郵遞區號=<span class="fn">100**</span>, 疾病=<span class="hl">癌症</span><br><br>
+    <span class="cm">// ℓ-多樣性：同一等價類的敏感屬性種類 ≥ ℓ</span><br>
+    等價類 {30-35, 100**}: 疾病 = {<span class="hl">癌症</span>, <span class="hl">糖尿病</span>, <span class="hl">心臟病</span>} → ℓ=3<br><br>
+    <span class="cm">// 準識別符（Quasi-Identifier）：間接識別個人的屬性組合</span><br>
+    例：年齡 + 性別 + 郵遞區號 → 可能唯一識別個人
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent2)">
+      <div class="kp-title">準識別符（QI）概念</div>
+      <div class="kp-body">單一屬性不能識別個人，但組合後可以<br>例：87% 美國人可由{出生日期, 性別, 5碼郵遞區號}唯一識別<br>HIPAA Safe Harbor 方法：移除18種識別符</div>
+      <div class="kp-tag">▶ 考點：QI 組合才導致隱私洩漏</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">k-匿名實作流程</div>
+      <div class="kp-body">1. 找出準識別符（QI）<br>2. 排序資料<br>3. 概化 QI 使每個等價類 ≥ k 筆<br>4. 驗證敏感屬性多樣性（ℓ-Diversity）<br>Mondrian 演算法：貪婪切分多維 QI 空間</div>
+      <div class="kp-tag">▶ 考點：k-匿名 = QI 概化 + 等價類大小</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--purple)">
+      <div class="kp-title">匿名化 vs 去識別化</div>
+      <div class="kp-body"><strong>匿名化</strong>（Anonymization）：無法再次識別，GDPR 視為非個資<br><strong>去識別化</strong>（De-identification）：移除直接識別符，仍可能透過 QI 再識別<br><strong>假名化</strong>（Pseudonymization）：替換識別符，持有映射表可還原，仍屬個資</div>
+      <div class="kp-tag">▶ 考點：真正匿名才脫離 GDPR 管轄</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 必記：</strong>k-匿名每筆記錄至少與 k-1 筆相同；ℓ-多樣性補強敏感屬性種類；k-匿名無法防同質性攻擊；差分隱私是比 k-匿名更強的數學保證</div>
+</div>
+
+<!-- 3. AI 偏見三類型 -->
+<div class="sec-title reveal">⚠️ AI 偏見三類型詳解</div>
+<div class="panel reveal">
+  <div class="panel-title">歷史偏見、標註偏見、演算法偏見：成因、案例與對策</div>
+  <div class="seg-tabs">
+    <button class="seg-tab active" onclick="showBias(this,'hist')">📚 歷史偏見</button>
+    <button class="seg-tab" onclick="showBias(this,'label')">🏷️ 標註偏見</button>
+    <button class="seg-tab" onclick="showBias(this,'algo')">⚙️ 演算法偏見</button>
+    <button class="seg-tab" onclick="showBias(this,'select')">📊 選樣偏見</button>
+  </div>
+  <div class="seg-box" id="bias-display"></div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--pink)">
+      <div class="kp-title">偏見來源鏈</div>
+      <div class="kp-body">歷史現實 → 有偏訓練資料 → 有偏模型 → 歧視性決策 → 強化歷史偏見（回饋迴圈）<br>Amazon 招聘 AI（2018）：訓練資料中男性工程師佔多數，AI 歧視女性履歷</div>
+      <div class="kp-tag">▶ 考點：偏見可從資料或演算法兩端引入</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">偏見偵測方法</div>
+      <div class="kp-body">統計顯著性測試：卡方檢定、t-test 比較群組結果<br>公平性審計（Fairness Audit）：測量各人口群體的預測率<br>對抗性測試：建構最壞案例測試集<br>Disparate Impact 分析：計算 80% 原則</div>
+      <div class="kp-tag">▶ 考點：偏見需先量化才能修正</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">偏見緩解策略</div>
+      <div class="kp-body"><strong>資料層面</strong>：重新採樣、資料增強、去偏資料收集<br><strong>演算法層面</strong>：公平性約束（Fairness Constraints）、對抗訓練去偏<br><strong>後處理層面</strong>：閾值調整（Threshold Adjustment）使各群體 FPR/TPR 均等<br>人工審查高風險決策</div>
+      <div class="kp-tag">▶ 考點：三層緩解：前/中/後處理</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 必記：</strong>歷史偏見=訓練資料反映過去歧視；標註偏見=人工標注者帶入主觀偏見；演算法偏見=模型設計或優化目標導致差異；三種偏見可同時存在</div>
+</div>
+
+<!-- 4. 公平性指標 -->
+<div class="sec-title reveal">⚖️ 公平性指標（Fairness Metrics）</div>
+<div class="panel reveal">
+  <div class="panel-title">Demographic Parity、Equal Opportunity、Disparate Impact 80% 原則</div>
+  <div class="formula">
+    <span class="cm">// 1. 人口統計均等（Demographic Parity）</span><br>
+    Pr[<span class="fn">Ŷ</span>=1 | A=0] = Pr[<span class="fn">Ŷ</span>=1 | A=1]<br>
+    <span class="cm">// 不同保護群體 A 應有相同的正面預測率</span><br><br>
+    <span class="cm">// 2. 機會均等（Equal Opportunity）</span><br>
+    Pr[<span class="fn">Ŷ</span>=1 | <span class="vr">Y</span>=1, A=0] = Pr[<span class="fn">Ŷ</span>=1 | <span class="vr">Y</span>=1, A=1]<br>
+    <span class="cm">// 條件：實際為正（Y=1）的情況下，不同群體的 True Positive Rate 相等</span><br><br>
+    <span class="cm">// 3. 差異影響比（Disparate Impact Ratio）</span><br>
+    <span class="hl">DI</span> = Pr[<span class="fn">Ŷ</span>=1 | A=disadvantaged] / Pr[<span class="fn">Ŷ</span>=1 | A=advantaged]<br>
+    <span class="cm">// EEOC 80% 原則：DI < 0.8 → 構成間接歧視（Adverse Impact）</span><br>
+    例：A群體通過率 40%，B群體通過率 60% → DI = 40/60 = <span class="hl">0.67 < 0.8 ⚠️</span><br><br>
+    <span class="cm">// 4. 校準公平性（Calibration）</span><br>
+    Pr[<span class="vr">Y</span>=1 | <span class="fn">score</span>=s, A=0] = Pr[<span class="vr">Y</span>=1 | <span class="fn">score</span>=s, A=1]<br>
+    <span class="cm">// 相同分數代表相同的實際風險，不因群體不同而異</span>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>公平性指標</th><th>定義</th><th>關注重點</th><th>適用場景</th><th>不可能定理</th></tr>
+      <tr>
+        <td>Demographic Parity</td>
+        <td>各群體正面預測率相等</td>
+        <td>決策分配均等</td>
+        <td>招聘、貸款審批</td>
+        <td>與校準公平性不相容</td>
+      </tr>
+      <tr>
+        <td>Equal Opportunity</td>
+        <td>真正率（TPR）跨群體相等</td>
+        <td>真正合格者不被歧視</td>
+        <td>刑事司法、醫療篩查</td>
+        <td>與 Predictive Parity 不相容</td>
+      </tr>
+      <tr>
+        <td>Equalized Odds</td>
+        <td>TPR 與 FPR 同時跨群體相等</td>
+        <td>錯誤率均等</td>
+        <td>需平衡誤判成本的場景</td>
+        <td>更難同時滿足</td>
+      </tr>
+      <tr>
+        <td>Disparate Impact</td>
+        <td>弱勢群體通過率 ÷ 優勢群體通過率</td>
+        <td>結果比例差異</td>
+        <td>美國 EEOC 法規標準</td>
+        <td>&lt;0.8 構成間接歧視</td>
+      </tr>
+    </table>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">Disparate Impact 80% 原則計算</div>
+      <div class="kp-body">步驟：<br>1. 計算各群體的正面決策率<br>2. 以最低率除以最高率<br>3. 結果 &lt; 0.8（80%）→ 間接歧視<br>例：男性錄用率 50%，女性 35%<br>DI = 35/50 = 0.70 &lt; 0.8 → 違反</div>
+      <div class="kp-tag">▶ 考點：DI &lt; 0.8 = 間接歧視（Adverse Impact）</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">公平性不可能定理</div>
+      <div class="kp-body">Chouldechova (2017) 等証明：<br>在不完美分類器且群體基本率不同時，<strong>Demographic Parity</strong>、<strong>Equal Opportunity</strong>、<strong>Calibration</strong> <strong>無法同時滿足</strong><br>→ 必須根據業務場景選擇最重要的公平性定義</div>
+      <div class="kp-tag">▶ 考點：公平性指標之間存在根本衝突</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">COMPAS 案例研究</div>
+      <div class="kp-body">ProPublica (2016)：COMPAS 刑事再犯風險評估<br>→ 對非裔美國人的假正率（FPR）是白人的兩倍<br>→ Northpointe 反駁：校準公平性（相同分數=相同風險）<br>→ 兩者都成立，但數學上不相容<br>→ 揭示公平性指標選擇的倫理本質</div>
+      <div class="kp-tag">▶ 考點：公平性定義是倫理選擇，非技術問題</div>
+    </div>
+  </div>
+
+  <!-- Interactive Fairness Canvas -->
+  <div style="margin-top:16px;">
+    <div style="font-size:.85rem;color:var(--muted);margin-bottom:8px;">互動圖：拖動滑桿調整各群體通過率，觀察 Disparate Impact 是否低於 80% 門檻</div>
+    <div style="display:flex;gap:16px;margin-bottom:8px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:180px;">
+        <label style="font-size:.8rem;color:var(--text);">A 群體通過率: <span id="rateA-val">60</span>%</label>
+        <input type="range" id="rateA" min="1" max="100" value="60" style="width:100%;accent-color:var(--accent2);">
+      </div>
+      <div style="flex:1;min-width:180px;">
+        <label style="font-size:.8rem;color:var(--text);">B 群體通過率: <span id="rateB-val">40</span>%</label>
+        <input type="range" id="rateB" min="1" max="100" value="40" style="width:100%;accent-color:var(--pink);">
+      </div>
+    </div>
+    <div class="canvas2d-wrap">
+      <canvas id="fairCanvas" height="200"></canvas>
+    </div>
+    <div id="fair-info" style="font-size:.83rem;color:var(--muted);text-align:center;margin-top:8px;"></div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 必記：</strong>Disparate Impact &lt; 0.8 = 間接歧視；Equal Opportunity = 真正率（TPR）跨群體相等；公平性指標彼此矛盾，無法同時滿足所有定義</div>
+</div>
+
+<!-- 5. Three.js 3D 公平性視覺化 -->
+<div class="sec-title reveal">📊 3D 公平性視覺化（跨群體決策比較）</div>
+<div class="panel reveal">
+  <div class="panel-title">Three.js 互動圖：各人口群體的模型輸出差異，高亮 Disparate Impact</div>
+  <div class="c3d-wrap">
+    <canvas id="c3d" class="c3d"></canvas>
+    <div class="c3d-lbl">⚖️ 差異影響 3D 視覺化 — 拖動旋轉</div>
+    <div class="ctrl">
+      <button id="btn-rotate" class="on" onclick="toggleRotate()">⏸ 自動旋轉</button>
+      <button onclick="highlightDisparity()">⚠️ 高亮差異</button>
+      <button onclick="resetView()">🔄 重置視角</button>
+    </div>
+  </div>
+  <div class="info-box">💡 圖中顯示 6 個人口群體（按性別×年齡段劃分）的模型正面預測率（通過率）。紅色條柱代表低於整體平均 80% 門檻，可能存在 Disparate Impact 問題。</div>
+</div>
+
+<!-- 6. 模型可解釋性 -->
+<div class="sec-title reveal">🔍 模型可解釋性（Explainability）</div>
+<div class="panel reveal">
+  <div class="panel-title">SHAP、LIME、PDP：黑盒模型的透明化工具</div>
+  <div class="formula">
+    <span class="cm">// SHAP（SHapley Additive exPlanations）：博弈論 Shapley 值</span><br>
+    <span class="fn">ϕᵢ</span>(<span class="vr">f</span>) = Σ [|S|!(n-|S|-1)!/n!] × [f(<span class="vr">S∪{i}</span>) - f(<span class="vr">S</span>)]<br>
+    <span class="cm">// ϕᵢ：特徵 i 的 SHAP 值 = 該特徵對預測貢獻的平均邊際效果</span><br>
+    輸出 = 基準值 + Σ <span class="hl">ϕᵢ</span>（所有 SHAP 值之和 = 預測 - 基準預測）<br><br>
+    <span class="cm">// LIME（Local Interpretable Model-agnostic Explanations）</span><br>
+    <span class="fn">ξ</span>(x) = argmin [<span class="vr">L</span>(f, g, <span class="fn">π</span>) + <span class="fn">Ω</span>(g)]<br>
+    <span class="cm">// 在樣本 x 附近建立可解釋的線性代理模型 g</span><br>
+    <span class="cm">// L：複雜模型 f 與簡單模型 g 在 x 附近的差距；Ω：g 的複雜度懲罰</span>
+  </div>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>方法</th><th>原理</th><th>範圍</th><th>優點</th><th>缺點</th><th>考點</th></tr>
+      <tr>
+        <td>SHAP</td>
+        <td>Shapley 值（博弈論）計算特徵貢獻</td>
+        <td>全局 + 局部</td>
+        <td>一致性、準確性；有理論保證</td>
+        <td>計算複雜度高（2^n）</td>
+        <td>特徵重要性排名最可靠</td>
+      </tr>
+      <tr>
+        <td>LIME</td>
+        <td>在預測附近建立局部線性代理</td>
+        <td>局部</td>
+        <td>模型無關（任何黑盒）；易理解</td>
+        <td>採樣隨機性→結果不穩定</td>
+        <td>解釋單一預測的首選</td>
+      </tr>
+      <tr>
+        <td>PDP（部分依賴圖）</td>
+        <td>邊際化其他特徵，展示單特徵平均效果</td>
+        <td>全局</td>
+        <td>視覺化特徵-輸出關係</td>
+        <td>忽略特徵交互效應</td>
+        <td>展示特徵的整體趨勢</td>
+      </tr>
+      <tr>
+        <td>ICE 圖（個體條件期望）</td>
+        <td>PDP 的逐樣本版，展示異質性效果</td>
+        <td>局部集合</td>
+        <td>揭示個體差異（PDP 的延伸）</td>
+        <td>圖形複雜難解讀</td>
+        <td>發現交互效應的補充</td>
+      </tr>
+      <tr>
+        <td>Attention Weights</td>
+        <td>Transformer 注意力權重視覺化</td>
+        <td>局部</td>
+        <td>原生於 Transformer 架構</td>
+        <td>不一定代表因果關係</td>
+        <td>NLP/CV 模型解釋入門</td>
+      </tr>
+    </table>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent2)">
+      <div class="kp-title">SHAP 值解讀</div>
+      <div class="kp-body">正 SHAP 值：該特徵推動預測值升高<br>負 SHAP 值：該特徵推動預測值降低<br>|SHAP| 越大 → 特徵對此預測影響越大<br>Waterfall Plot：單一樣本逐特徵貢獻疊加<br>Beeswarm Plot：全資料集特徵重要性概覽</div>
+      <div class="kp-tag">▶ 考點：SHAP 解釋特徵重要性的業界標準</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--pink)">
+      <div class="kp-title">可解釋性 vs 準確性</div>
+      <div class="kp-body">線性模型/決策樹：本質可解釋（Intrinsic）<br>黑盒模型（DNN/XGBoost）：事後解釋（Post-hoc）<br>EU AI Act 要求高風險 AI 必須可解釋<br>GDPR 第22條：自動化決策需提供解釋</div>
+      <div class="kp-tag">▶ 考點：高風險 AI 法規要求可解釋性</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">TreeExplainer vs KernelExplainer</div>
+      <div class="kp-body"><strong>TreeExplainer</strong>：專為樹模型設計（XGBoost/RF），O(TLD²) 精確計算，速度快<br><strong>KernelExplainer</strong>：模型無關，透過 LIME 思路近似 Shapley 值<br><strong>LinearExplainer</strong>：線性模型解析解，最快<br><strong>DeepExplainer</strong>：深度學習，基於 DeepLIFT</div>
+      <div class="kp-tag">▶ 考點：TreeExplainer 最適合 XGBoost</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 必記：</strong>SHAP 基於 Shapley 值，解釋特徵貢獻最可靠；LIME 建立局部線性代理，解釋單一預測；PDP 展示特徵平均效果；GDPR 第22條賦予自動化決策解釋權</div>
+</div>
+
+<!-- 7. GDPR 與台灣個資法 -->
+<div class="sec-title reveal">📜 GDPR 與台灣個資法</div>
+<div class="panel reveal">
+  <div class="panel-title">個人資料保護法規：適用範圍、主要義務與違規罰則</div>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>面向</th><th>EU GDPR（2018）</th><th>台灣個資法（2023修正）</th></tr>
+      <tr>
+        <td>適用範圍</td>
+        <td>處理 EU 居民個人資料的所有組織（含境外）</td>
+        <td>台灣境內蒐集、處理、利用個人資料之公私機構</td>
+      </tr>
+      <tr>
+        <td>個資定義</td>
+        <td>可識別自然人的任何資訊（含 IP、Cookie、位置）</td>
+        <td>足以識別個人之姓名、出生日期、身分證字號等資料</td>
+      </tr>
+      <tr>
+        <td>六大合法基礎</td>
+        <td>同意/契約/法律義務/重要利益/公共任務/正當利益</td>
+        <td>當事人同意/法律明文/公共利益/當事人個人利益</td>
+      </tr>
+      <tr>
+        <td>資料主體權利</td>
+        <td>知情權、存取權、更正權、刪除權（被遺忘權）、可攜權、反對權</td>
+        <td>查詢、閱覽、複製、補充更正、請求停止蒐集/刪除</td>
+      </tr>
+      <tr>
+        <td>資料外洩通知</td>
+        <td>72小時內通知主管機關；高風險需通知當事人</td>
+        <td>查知後在合理時間內通知主管機關及當事人</td>
+      </tr>
+      <tr>
+        <td>最高罰款</td>
+        <td>全球年營收 4% 或 2000萬歐元（取較高者）</td>
+        <td>非公務機關：最高罰款新台幣 1500萬元</td>
+      </tr>
+      <tr>
+        <td>跨境傳輸</td>
+        <td>需確保第三國有充分保護（Adequacy Decision）</td>
+        <td>中央主管機關限制傳輸目的地</td>
+      </tr>
+    </table>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--pink)">
+      <div class="kp-title">GDPR 對 AI 的特別規範</div>
+      <div class="kp-body"><strong>第22條</strong>：禁止完全依賴自動化決策（含剖析）做出重大決定<br><strong>隱私設計（Privacy by Design）</strong>：系統設計時就納入隱私保護<br><strong>資料最小化</strong>：只蒐集必要資料<br><strong>目的限制</strong>：資料只能用於蒐集時的目的<br><strong>DPO（資料保護官）</strong>：大規模處理需指派</div>
+      <div class="kp-tag">▶ 考點：GDPR 第22條=自動化決策解釋權</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">AI 合規最佳實踐</div>
+      <div class="kp-body">資料治理框架（Data Governance Framework）<br>資料血緣（Data Lineage）追蹤<br>模型卡（Model Card）：記錄模型預期用途、局限、評估指標<br>資料表（Datasheet for Datasets）：記錄資料來源、蒐集方式<br>定期偏見審計（Bias Audit）</div>
+      <div class="kp-tag">▶ 考點：Model Card 是負責任 AI 的文件標準</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">EU AI Act（2024）</div>
+      <div class="kp-body"><strong>高風險 AI</strong>：招聘、信用評分、刑事司法 → 需透明度、人工監督、可解釋<br><strong>不可接受風險</strong>：即時生物辨識、社交評分 → 完全禁止<br><strong>有限風險</strong>：聊天機器人 → 需揭露 AI 身份<br>罰款：最高 3000萬歐元或全球年營收 6%</div>
+      <div class="kp-tag">▶ 考點：EU AI Act 按風險分級管制</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 必記：</strong>GDPR 最高罰款全球年營收 4%；被遺忘權=刪除個人資料；第22條=自動化決策需提供解釋；Privacy by Design=設計時就納入隱私；台灣個資法最高罰款 1500萬</div>
+</div>
+
+<!-- 8. AI 倫理框架 -->
+<div class="sec-title reveal">🌐 AI 倫理框架（AI Ethics Framework）</div>
+<div class="panel reveal">
+  <div class="panel-title">透明度、問責性、公平性、無害性：負責任 AI 的四大支柱</div>
+  <div class="tbl-wrap">
+    <table>
+      <tr><th>倫理原則</th><th>定義</th><th>實踐方式</th><th>相關指標/工具</th></tr>
+      <tr>
+        <td>透明度（Transparency）</td>
+        <td>AI 系統的運作方式與決策過程可被理解</td>
+        <td>Model Card、可解釋 AI（XAI）、開源程式碼</td>
+        <td>SHAP、LIME、決策樹代理</td>
+      </tr>
+      <tr>
+        <td>問責性（Accountability）</td>
+        <td>AI 決策的責任歸屬明確，有問責機制</td>
+        <td>稽核日誌、人工審查、責任鏈設計</td>
+        <td>MLflow 追蹤、版本控制</td>
+      </tr>
+      <tr>
+        <td>公平性（Fairness）</td>
+        <td>AI 決策不對特定群體造成歧視或不公平結果</td>
+        <td>偏見審計、公平性約束、多元資料蒐集</td>
+        <td>Demographic Parity、DI Ratio</td>
+      </tr>
+      <tr>
+        <td>無害性（Non-maleficence）</td>
+        <td>AI 系統不對個人或社會造成傷害</td>
+        <td>風險評估、對抗測試（Red Teaming）</td>
+        <td>風險矩陣、AI 安全評估</td>
+      </tr>
+      <tr>
+        <td>隱私（Privacy）</td>
+        <td>保護個人資料，尊重資料主體權利</td>
+        <td>差分隱私、資料最小化、匿名化</td>
+        <td>GDPR 合規工具、隱私影響評估（PIA）</td>
+      </tr>
+      <tr>
+        <td>人類自主性（Human Autonomy）</td>
+        <td>AI 輔助而非取代人類決策；保留人工覆核</td>
+        <td>Human-in-the-Loop、反對自動化決策的權利</td>
+        <td>GDPR 第22條、EU AI Act 人工監督</td>
+      </tr>
+    </table>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent2)">
+      <div class="kp-title">負責任 AI 框架比較</div>
+      <div class="kp-body"><strong>Google AI 原則</strong>（2018）：7大原則，含公平、安全、可問責<br><strong>Microsoft 負責任 AI</strong>：公平、可靠、隱私、包容、透明、問責<br><strong>OECD AI 原則</strong>（2019）：透明、安全、公平、問責、以人為本<br><strong>台灣 AI 倫理指引</strong>：呼應 OECD，加入科技主權概念</div>
+      <div class="kp-tag">▶ 考點：各框架核心原則高度重疊</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">AI 偏見回饋迴圈</div>
+      <div class="kp-body">歧視性歷史 → 有偏訓練資料 → 歧視性模型 → 歧視性決策 → 強化歷史偏見<br>COMPAS 案例：非裔被告再犯風險被高估 → 更嚴刑罰 → 更多非裔坐牢記錄 → 訓練資料更有偏<br>打破迴圈：公平性約束 + 人工審查</div>
+      <div class="kp-tag">▶ 考點：偏見可形成惡性迴圈需主動干預</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--purple)">
+      <div class="kp-title">AI 治理組織架構</div>
+      <div class="kp-body"><strong>AI 倫理委員會</strong>：跨部門（法律/技術/業務/外部）審查高風險 AI<br><strong>AI 治理辦公室（AIGO）</strong>：制定政策、監督合規、協調各部門<br><strong>Red Team</strong>：專門負責找出 AI 系統的偏見與安全漏洞<br><strong>問責矩陣（RACI）</strong>：釐清 AI 決策責任歸屬</div>
+      <div class="kp-tag">▶ 考點：AI 治理需跨部門組織架構</div>
+    </div>
+  </div>
+  <div class="warn-box">📌 <strong>iPAS 必記：</strong>AI 倫理四大支柱：透明度/問責性/公平性/無害性；OECD AI 原則是國際主流標準；Human-in-the-Loop = 關鍵決策保留人工審查；AI 治理需法律+技術+業務協作</div>
+</div>
+
+<!-- 9. 程式碼考點 -->
+<div class="sec-title reveal">💻 程式碼考點（scipy.stats · sklearn · fairlearn）</div>
+
+<div class="panel reveal">
+  <div class="panel-title">統計檢定：偏見與公平性量化</div>
+  <div class="formula">
+    <span class="cm"># scipy.stats 統計假設檢定</span><br>
+    <span class="fn">from</span> <span class="vr">scipy</span> <span class="fn">import</span> stats<br><br>
+    <span class="cm"># 卡方獨立性檢定：測試模型決策是否與敏感屬性獨立</span><br>
+    contingency = [[<span class="hl">90</span>, <span class="hl">10</span>], [<span class="hl">60</span>, <span class="hl">40</span>]]  <span class="cm"># [[群體A通過/拒絕],[群體B通過/拒絕]]</span><br>
+    chi2, p, dof, expected = stats.<span class="fn">chi2_contingency</span>(<span class="vr">contingency</span>)<br>
+    <span class="cm"># p < 0.05 → 拒絕獨立性假設 → 決策與群體相關 → 可能存在偏見</span><br><br>
+    <span class="cm"># 雙樣本 t 檢定：比較兩群體分數是否有顯著差異</span><br>
+    t_stat, p_val = stats.<span class="fn">ttest_ind</span>(<span class="vr">group_a_scores</span>, <span class="vr">group_b_scores</span>)<br><br>
+    <span class="cm"># 單因子 ANOVA：多個群體均值比較（超過 2 群體）</span><br>
+    f_stat, p_val = stats.<span class="fn">f_oneway</span>(<span class="vr">g1</span>, <span class="vr">g2</span>, <span class="vr">g3</span>)  <span class="cm"># H₀: 所有群體均值相等</span>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">chi2_contingency</div>
+      <div class="kp-body">輸入：列聯表（觀察次數矩陣）<br>輸出：chi2統計量、p值、自由度、期望次數<br>用途：測試兩類別變數是否獨立（如決策 vs 群體屬性）<br>p &lt; 0.05 → 兩變數不獨立（可能存在系統性差異）</div>
+      <div class="kp-tag">▶ 考點：卡方檢定測試分類決策公平性</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">ttest_ind</div>
+      <div class="kp-body">用途：比較兩獨立樣本均值是否顯著不同<br>equal_var=False → Welch's t-test（不假設方差相等）<br>alternative='two-sided'（預設）/ 'less' / 'greater'<br>配合 cohen's d 衡量效應量（Effect Size）</div>
+      <div class="kp-tag">▶ 考點：t-test 用於連續分數的群體比較</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">f_oneway（ANOVA）</div>
+      <div class="kp-body">假設：各群體服從常態分佈且方差相同<br>H₀：所有群體均值相等<br>若 p &lt; 0.05，使用 Tukey HSD 做事後兩兩比較<br>Kruskal-Wallis（非參數替代方案，無常態假設）</div>
+      <div class="kp-tag">▶ 考點：ANOVA 同時比較多群體差異</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel reveal">
+  <div class="panel-title">差分隱私實作：NumPy 噪聲添加</div>
+  <div class="formula">
+    <span class="cm"># 拉普拉斯機制：計數查詢差分隱私</span><br>
+    <span class="fn">import</span> <span class="vr">numpy</span> as np<br><br>
+    <span class="kw">def</span> <span class="fn">laplace_mechanism</span>(<span class="vr">true_value</span>, <span class="vr">sensitivity</span>, <span class="vr">epsilon</span>):<br>
+    &nbsp;&nbsp;<span class="cm"># b = sensitivity / epsilon（拉普拉斯分布的尺度參數）</span><br>
+    &nbsp;&nbsp;<span class="vr">b</span> = <span class="vr">sensitivity</span> / <span class="vr">epsilon</span><br>
+    &nbsp;&nbsp;<span class="vr">noise</span> = np.random.<span class="fn">laplace</span>(<span class="hl">0</span>, <span class="vr">b</span>)<br>
+    &nbsp;&nbsp;<span class="kw">return</span> <span class="vr">true_value</span> + <span class="vr">noise</span><br><br>
+    <span class="cm"># 高斯機制：(ε, δ)-差分隱私</span><br>
+    <span class="kw">def</span> <span class="fn">gaussian_mechanism</span>(<span class="vr">true_value</span>, <span class="vr">sensitivity</span>, <span class="vr">epsilon</span>, <span class="vr">delta</span>=<span class="hl">1e-5</span>):<br>
+    &nbsp;&nbsp;<span class="vr">sigma</span> = <span class="vr">sensitivity</span> * np.<span class="fn">sqrt</span>(<span class="hl">2</span> * np.<span class="fn">log</span>(<span class="hl">1.25</span> / <span class="vr">delta</span>)) / <span class="vr">epsilon</span><br>
+    &nbsp;&nbsp;<span class="kw">return</span> <span class="vr">true_value</span> + np.random.<span class="fn">normal</span>(<span class="hl">0</span>, <span class="vr">sigma</span>)<br><br>
+    <span class="cm"># 使用範例：計數查詢（Δf=1）</span><br>
+    true_count = <span class="hl">1500</span><br>
+    private_count = <span class="fn">laplace_mechanism</span>(<span class="vr">true_count</span>, sensitivity=<span class="hl">1</span>, epsilon=<span class="hl">0.5</span>)
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">隱私預算 ε 選擇</div>
+      <div class="kp-body">ε = 0.1：強隱私，噪聲極大（Apple 設備統計）<br>ε = 1.0：中等隱私，常見研究設定<br>ε = 10：弱隱私，適合低敏感查詢<br>組合定理：多個查詢的 ε 會累加（隱私預算消耗）</div>
+      <div class="kp-tag">▶ 考點：ε 越小越安全，但效用越低</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">np.random.laplace / normal</div>
+      <div class="kp-body">laplace(loc, scale)：loc=均值，scale=b=Δf/ε<br>normal(mean, std)：mean=0，std=σ<br>噪聲量：ε↓ → b↑ → 更大噪聲<br>計數查詢敏感度 Δf=1（增刪一筆記錄最多改變計數1）</div>
+      <div class="kp-tag">▶ 考點：計數查詢 sensitivity=1</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">DP-SGD（差分隱私梯度下降）</div>
+      <div class="kp-body">訓練深度學習時每步梯度加噪聲：<br>1. 裁剪梯度（梯度裁剪上限 C）<br>2. 加高斯噪聲 N(0, σ²C²)<br>工具：TensorFlow Privacy、Opacus（PyTorch）<br>Accountant 追蹤累計隱私損耗</div>
+      <div class="kp-tag">▶ 考點：DP-SGD = 梯度裁剪 + 高斯噪聲</div>
+    </div>
+  </div>
+</div>
+
+<div class="panel reveal">
+  <div class="panel-title">公平性度量：sklearn + fairlearn 概念程式碼</div>
+  <div class="formula">
+    <span class="cm"># 計算 Disparate Impact Ratio</span><br>
+    <span class="fn">import</span> <span class="vr">pandas</span> as pd<br>
+    <span class="fn">from</span> <span class="vr">sklearn.metrics</span> <span class="fn">import</span> confusion_matrix<br><br>
+    <span class="kw">def</span> <span class="fn">disparate_impact</span>(<span class="vr">y_pred</span>, <span class="vr">sensitive_attr</span>):<br>
+    &nbsp;&nbsp;<span class="vr">groups</span> = pd.<span class="fn">Series</span>(<span class="vr">sensitive_attr</span>).<span class="fn">unique</span>()<br>
+    &nbsp;&nbsp;<span class="vr">rates</span> = {}<span class="cm">; </span><br>
+    &nbsp;&nbsp;<span class="kw">for</span> g <span class="fn">in</span> <span class="vr">groups</span>:<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="vr">mask</span> = (<span class="vr">sensitive_attr</span> == g)<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;<span class="vr">rates</span>[g] = <span class="vr">y_pred</span>[<span class="vr">mask</span>].<span class="fn">mean</span>()  <span class="cm"># 正面預測率</span><br>
+    &nbsp;&nbsp;<span class="kw">return</span> <span class="fn">min</span>(<span class="vr">rates</span>.values()) / <span class="fn">max</span>(<span class="vr">rates</span>.values())<br><br>
+    di = <span class="fn">disparate_impact</span>(<span class="vr">y_pred</span>, <span class="vr">sensitive_attr</span>)<br>
+    <span class="fn">print</span>(<span class="hl">f"DI = {di:.3f}, {'✅ 通過' if di >= 0.8 else '❌ 可能歧視'}"</span>)<br><br>
+    <span class="cm"># SHAP 值計算（TreeExplainer 範例）</span><br>
+    <span class="fn">import</span> <span class="vr">shap</span><br>
+    explainer = shap.<span class="fn">TreeExplainer</span>(<span class="vr">model</span>)  <span class="cm"># 適用 XGBoost/RandomForest</span><br>
+    shap_values = explainer.<span class="fn">shap_values</span>(<span class="vr">X_test</span>)<br>
+    shap.<span class="fn">summary_plot</span>(<span class="vr">shap_values</span>, <span class="vr">X_test</span>)  <span class="cm"># Beeswarm 特徵重要性圖</span>
+  </div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--accent)">
+      <div class="kp-title">Disparate Impact 計算邏輯</div>
+      <div class="kp-body">關鍵步驟：<br>1. 分群（依敏感屬性）<br>2. 計算各群正面預測率 = sum(y_pred==1) / n_group<br>3. DI = 最低率 / 最高率<br>DI &lt; 0.8 → 觸發進一步調查</div>
+      <div class="kp-tag">▶ 考點：DI 計算是公平性審計核心步驟</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">shap.summary_plot 圖形解讀</div>
+      <div class="kp-body">X 軸：SHAP 值（對預測的貢獻量，正=推升預測）<br>Y 軸：特徵（按平均|SHAP|排序，越靠上越重要）<br>顏色：特徵值高低（紅=高，藍=低）<br>每個點代表一個樣本的特定特徵之 SHAP 值</div>
+      <div class="kp-tag">▶ 考點：Beeswarm 同時顯示重要性與方向</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--blue)">
+      <div class="kp-title">常見公平性工具</div>
+      <div class="kp-body"><strong>fairlearn</strong>：Microsoft 開源，GridSearch 公平性約束<br><strong>AI Fairness 360 (AIF360)</strong>：IBM，含前/中/後處理算法<br><strong>What-If Tool</strong>：Google，視覺化公平性分析<br><strong>Themis-ml</strong>：公平性感知學習算法</div>
+      <div class="kp-tag">▶ 考點：fairlearn 是 sklearn 兼容的公平性工具</div>
+    </div>
+  </div>
+</div>
+
+<!-- 歷屆考題程式題型 -->
+<div class="panel reveal" style="border-left:3px solid var(--yellow)">
+  <div class="panel-title" style="color:var(--yellow)">🧪 歷屆考題程式題型</div>
+  <p style="font-size:.88rem;color:var(--muted);margin-bottom:14px;">以下為仿照 iPAS 考試的程式理解題，測試對關鍵函數的掌握：</p>
+
+  <div style="margin-bottom:16px;">
+    <div style="font-size:.9rem;color:var(--text);font-weight:700;margin-bottom:8px;">Q1. 以下程式碼計算差分隱私時，若將 epsilon 從 0.5 改為 0.1，噪聲量會如何變化？</div>
+    <div class="formula" style="margin:8px 0;font-size:.85rem;">
+      noise = np.random.<span class="fn">laplace</span>(0, <span class="hl">sensitivity / epsilon</span>)
+    </div>
+    <div style="font-size:.88rem;color:var(--muted);">
+      A. 噪聲量減少（b 變小）<br>
+      <span style="color:var(--accent2)">B. ✓ 噪聲量增加（b = Δf/ε 變大，ε 越小 b 越大）</span><br>
+      C. 噪聲量不變<br>
+      D. 噪聲量減少一半
+    </div>
+  </div>
+
+  <div>
+    <div style="font-size:.9rem;color:var(--text);font-weight:700;margin-bottom:8px;">Q2. 下列哪個 scipy 函數用於測試兩群體在「通過率（類別資料）」上是否有顯著差異？</div>
+    <div style="font-size:.88rem;color:var(--muted);">
+      A. ttest_ind（用於連續型均值比較）<br>
+      <span style="color:var(--accent2)">B. ✓ chi2_contingency（卡方獨立性檢定，適合類別資料列聯表）</span><br>
+      C. f_oneway（多組連續型均值比較 ANOVA）<br>
+      D. pearsonr（連續型相關係數）
+    </div>
+  </div>
+</div>
+
+<!-- 仿真考題 -->
+<div class="sec-title reveal">🎯 仿真考題（8 題）</div>
+<div class="progress-bar"><div class="progress-fill" id="pbar" style="width:0%"></div></div>
+<div id="quiz"></div>
+
+<footer>iPAS AI 應用規劃師中級考試 · 機器學習治理與 AI 倫理 · 科目三 L234 + 科目一 L21203</footer>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+// ─── Reveal ────────────────────────────────────────────────────────────
+const obs = new IntersectionObserver(e => e.forEach(x => x.isIntersecting && x.target.classList.add('vis')), {threshold: .08});
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+
+// ─── Score ─────────────────────────────────────────────────────────────
+let score = 0;
+const answered = new Set();
+const TOTAL = 8;
+document.getElementById('total').textContent = TOTAL;
+function addScore(qIdx, correct) {
+  if (answered.has(qIdx)) return;
+  answered.add(qIdx);
+  if (correct) score++;
+  document.getElementById('score').textContent = score;
+  document.getElementById('pbar').style.width = (answered.size / TOTAL * 100) + '%';
+}
+
+// ─── Seg Tab Helpers ────────────────────────────────────────────────────
+const dpData = {
+  lap: `<strong class="hl">拉普拉斯機制（Laplace Mechanism）</strong><br>
+        → 加入 Laplace(0, Δf/ε) 分布的隨機噪聲<br>
+        → 滿足純 <strong>ε-差分隱私</strong>（最嚴格定義）<br>
+        → 適用：計數查詢（Δf=1）、直方圖發布<br>
+        → ε 越小 → b=Δf/ε 越大 → 噪聲越大 → 隱私更強<br>
+        → 特性：雙指數分布（尖峰，長尾），絕對值敏感度`,
+  gauss: `<strong class="hl">高斯機制（Gaussian Mechanism）</strong><br>
+        → 加入 N(0, σ²) 正態分布噪聲，σ ≥ Δf√(2ln(1.25/δ))/ε<br>
+        → 滿足 <strong>(ε,δ)-差分隱私</strong>（放寬版，δ=洩漏機率）<br>
+        → 適用：深度學習（DP-SGD）、向量查詢（ℓ₂ 敏感度）<br>
+        → 優點：ℓ₂ 敏感度通常小於 ℓ₁，適合高維資料<br>
+        → 工具：TensorFlow Privacy、PyTorch Opacus`,
+  rdp: `<strong class="hl">Rényi 差分隱私（RDP）與隱私預算管理</strong><br>
+        → 多個查詢消耗隱私預算：簡單組合 ε_total = Σεᵢ（過於保守）<br>
+        → 高級組合定理（Advanced Composition）：k 個 ε-DP → O(ε√k·ln(1/δ))-DP<br>
+        → Moments Accountant：精確追蹤 DP-SGD 的累計隱私消耗<br>
+        → 一旦 ε 耗盡就不能再查詢（隱私預算管理是 DP 系統核心挑戰）<br>
+        → 實務：Apple iOS 設定 ε ≈ 4-8；Google RAPPOR 設定 ε ≈ 2`,
+  fedp: `<strong class="hl">聯邦學習 + 差分隱私</strong><br>
+        → <strong>聯邦學習</strong>：資料不離開本地設備，只上傳模型梯度（更新）<br>
+        → 問題：梯度可能洩漏訓練資料（Gradient Inversion Attack）<br>
+        → 解法：本地差分隱私（Local DP）：每個設備對自己梯度加噪聲後上傳<br>
+        → 中央差分隱私：伺服器聚合後加噪（中央對所有人負責）<br>
+        → 典型部署：Google Gboard 鍵盤預測、Apple 差分隱私收集`
+};
+function showDP(btn, key) {
+  document.querySelectorAll('.seg-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('dp-display').innerHTML = dpData[key];
+}
+showDP(document.querySelectorAll('.seg-tab')[0], 'lap');
+
+const biasData = {
+  hist: `<strong class="hl">歷史偏見（Historical Bias）</strong><br>
+        → 訓練資料反映了現實世界的歷史歧視結構<br>
+        → 即使資料採集方式完全中立，偏見也已存在於資料中<br>
+        → 案例：Amazon 招聘 AI（2018）—男性工程師佔訓練資料多數 → AI 歧視女性<br>
+        → 案例：美國刑事司法 COMPAS → 非裔歷史犯罪率高（源於系統歧視）→ AI 預測偏高<br>
+        → <strong>解法</strong>：多元代表性資料蒐集；重新採樣；公平性約束`,
+  label: `<strong class="hl">標註偏見（Annotation/Labeling Bias）</strong><br>
+        → 人工標注過程中，標注者將個人主觀偏見帶入標籤<br>
+        → 群眾外包標注（如 MTurk）的人口多樣性不足<br>
+        → 案例：情感分析訓練資料—不同文化背景標注者對「憤怒」詞彙判斷不同<br>
+        → 案例：醫療影像標注—不同地區放射科醫師的判斷標準不一<br>
+        → <strong>解法</strong>：多人標注+共識機制；標注指南標準化；標注者多元性`,
+  algo: `<strong class="hl">演算法偏見（Algorithmic Bias）</strong><br>
+        → 由模型設計、目標函數、優化過程本身引入的偏見<br>
+        → 即使訓練資料無偏，演算法的優化目標仍可能放大差異<br>
+        → 案例：最大化整體準確率的模型 → 忽視少數族裔（因為少數群體樣本少）<br>
+        → 代理變數（Proxy Variables）：看似中性的特徵（如郵遞區號）與種族高度相關<br>
+        → <strong>解法</strong>：公平性感知學習；移除代理特徵；後處理閾值調整`,
+  select: `<strong class="hl">選樣偏見（Selection / Sampling Bias）</strong><br>
+        → 訓練資料的採集方式導致樣本無法代表目標母體<br>
+        → 倖存者偏差（Survivorship Bias）：只有成功案例才進入資料庫<br>
+        → 確認偏差（Confirmation Bias）：系統只記錄符合既有觀點的案例<br>
+        → 案例：醫療 AI 只用大型醫院資料訓練 → 對偏遠地區患者泛化性差<br>
+        → <strong>解法</strong>：隨機採樣設計；多源資料整合；定期重新評估代表性`
+};
+function showBias(btn, key) {
+  document.querySelectorAll('#bias-display').forEach(el => {});
+  document.querySelectorAll('.seg-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('bias-display').innerHTML = biasData[key];
+}
+// init - handle seg tabs per panel
+document.querySelectorAll('.panel').forEach(panel => {
+  const tabs = panel.querySelectorAll('.seg-tab');
+  if (!tabs.length) return;
+  tabs.forEach(t => {
+    const orig = t.getAttribute('onclick');
+    t.addEventListener('click', function() {
+      tabs.forEach(b => b.classList.remove('active'));
+      this.classList.add('active');
+    });
+  });
+});
+// init dp display
+document.getElementById('dp-display').innerHTML = dpData['lap'];
+// init bias display
+document.getElementById('bias-display').innerHTML = biasData['hist'];
+
+// ─── Fairness Interactive Canvas 2D ────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('fairCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const sliderA = document.getElementById('rateA');
+  const sliderB = document.getElementById('rateB');
+  const valA = document.getElementById('rateA-val');
+  const valB = document.getElementById('rateB-val');
+  const info = document.getElementById('fair-info');
+
+  function resize() {
+    canvas.width = canvas.parentElement.offsetWidth;
+    draw();
+  }
+
+  function draw() {
+    const rA = parseInt(sliderA.value);
+    const rB = parseInt(sliderB.value);
+    const W = canvas.width, H = canvas.height;
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#0a0c14';
+    ctx.fillRect(0, 0, W, H);
+
+    const pad = { left: 60, right: 30, top: 30, bottom: 40 };
+    const pw = W - pad.left - pad.right;
+    const ph = H - pad.top - pad.bottom;
+
+    // Axes
+    ctx.strokeStyle = '#2E3250';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(pad.left, pad.top); ctx.lineTo(pad.left, pad.top + ph);
+    ctx.moveTo(pad.left, pad.top + ph); ctx.lineTo(pad.left + pw, pad.top + ph);
+    ctx.stroke();
+
+    // Y axis labels
+    ctx.fillStyle = '#8892B0';
+    ctx.font = '11px Calibri';
+    ctx.textAlign = 'right';
+    [0, 20, 40, 60, 80, 100].forEach(v => {
+      const y = pad.top + ph - (v / 100) * ph;
+      ctx.fillText(v + '%', pad.left - 6, y + 4);
+      ctx.strokeStyle = '#1a1d27';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(pad.left, y); ctx.lineTo(pad.left + pw, y);
+      ctx.stroke();
+    });
+
+    // 80% threshold line
+    const thresh80y = pad.top + ph - 0.8 * ph;
+    ctx.strokeStyle = 'rgba(255,209,102,.5)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    ctx.moveTo(pad.left, thresh80y); ctx.lineTo(pad.left + pw, thresh80y);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle = '#FFD166';
+    ctx.font = 'bold 10px Calibri';
+    ctx.textAlign = 'left';
+    ctx.fillText('80% 門檻', pad.left + 4, thresh80y - 4);
+
+    // Bars
+    const maxRate = Math.max(rA, rB);
+    const minRate = Math.min(rA, rB);
+    const di = minRate / maxRate;
+
+    const barW = Math.min(80, pw / 4);
+    const groups = [
+      { label: 'A 群體', rate: rA, color: '#00FFB2' },
+      { label: 'B 群體', rate: rB, color: '#FF6B9D' }
+    ];
+    const spacing = pw / (groups.length + 1);
+
+    groups.forEach((g, i) => {
+      const bx = pad.left + spacing * (i + 1) - barW / 2;
+      const bh = (g.rate / 100) * ph;
+      const by = pad.top + ph - bh;
+
+      // Determine if bar is below threshold
+      const isLow = (di < 0.8 && g.rate === minRate);
+      const fillColor = isLow ? '#FF6B9D' : g.color;
+
+      ctx.fillStyle = fillColor + '33';
+      ctx.strokeStyle = fillColor;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.roundRect ? ctx.roundRect(bx, by, barW, bh, [4, 4, 0, 0]) : ctx.rect(bx, by, barW, bh);
+      ctx.fill(); ctx.stroke();
+
+      if (isLow) {
+        ctx.fillStyle = '#FF6B9D';
+        ctx.font = 'bold 11px Calibri';
+        ctx.textAlign = 'center';
+        ctx.fillText('⚠️', bx + barW / 2, by - 16);
+      }
+
+      ctx.fillStyle = fillColor;
+      ctx.font = 'bold 13px Calibri';
+      ctx.textAlign = 'center';
+      ctx.fillText(g.rate + '%', bx + barW / 2, by - 4);
+
+      ctx.fillStyle = '#E8EAF6';
+      ctx.font = '11px Calibri';
+      ctx.fillText(g.label, bx + barW / 2, pad.top + ph + 20);
+    });
+
+    // DI indicator
+    const diColor = di >= 0.8 ? '#00FFB2' : '#FF6B9D';
+    const diStatus = di >= 0.8 ? '✅ 通過 80% 原則' : '❌ 可能間接歧視';
+    info.innerHTML = `Disparate Impact = ${(minRate)}% ÷ ${(maxRate)}% = <strong style="color:${diColor}">${di.toFixed(3)}</strong> | ${diStatus} | DI ${di >= 0.8 ? '≥' : '<'} 0.8`;
+  }
+
+  sliderA.addEventListener('input', () => { valA.textContent = sliderA.value; draw(); });
+  sliderB.addEventListener('input', () => { valB.textContent = sliderB.value; draw(); });
+  window.addEventListener('resize', resize);
+  resize();
+})();
+
+// ─── Three.js Fairness 3D Bar Chart ────────────────────────────────────
+(function() {
+  const canvas = document.getElementById('c3d');
+  if (!canvas || typeof THREE === 'undefined') return;
+
+  const W = canvas.clientWidth || 800, H = 400;
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setSize(canvas.clientWidth, H);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setClearColor(0x0a0c14, 1);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(50, canvas.clientWidth / H, 0.1, 200);
+  camera.position.set(0, 5, 16);
+  camera.lookAt(0, 0, 0);
+
+  // Lighting
+  scene.add(new THREE.AmbientLight(0xffffff, 0.5));
+  const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  dirLight.position.set(5, 10, 5);
+  scene.add(dirLight);
+
+  // Data: 6 groups (gender x age bracket) with positive prediction rates
+  const groups = [
+    { label: '男·青年', rate: 0.72, color: 0x00FFB2 },
+    { label: '女·青年', rate: 0.51, color: 0xFF6B9D },
+    { label: '男·中年', rate: 0.68, color: 0x00D4FF },
+    { label: '女·中年', rate: 0.43, color: 0xFF9B42 },
+    { label: '男·老年', rate: 0.60, color: 0x9B5DE5 },
+    { label: '女·老年', rate: 0.38, color: 0xFFD166 }
+  ];
+
+  const maxRate = Math.max(...groups.map(g => g.rate));
+  const minRate = Math.min(...groups.map(g => g.rate));
+  const di = minRate / maxRate;
+  const threshold = 0.8 * maxRate;
+
+  const bars = [];
+  const N = groups.length;
+  const spacing = 2.5;
+  const startX = -(N - 1) * spacing / 2;
+
+  groups.forEach((g, i) => {
+    const h = g.rate * 8;
+    const geo = new THREE.BoxGeometry(1.6, h, 1.6);
+    const isDisparity = g.rate < threshold;
+    const matColor = isDisparity ? 0xFF6B9D : g.color;
+    const mat = new THREE.MeshPhongMaterial({
+      color: matColor,
+      transparent: true,
+      opacity: 0.85,
+      shininess: 60
+    });
+    const bar = new THREE.Mesh(geo, mat);
+    bar.position.set(startX + i * spacing, h / 2 - 0.5, 0);
+    bar.userData = { targetH: h, isDisparity, origColor: matColor, origOpacity: 0.85 };
+    scene.add(bar);
+    bars.push(bar);
+
+    // Top edge glow
+    const edgeGeo = new THREE.EdgesGeometry(new THREE.BoxGeometry(1.65, h + 0.05, 1.65));
+    const edgeMat = new THREE.LineBasicMaterial({ color: isDisparity ? 0xFF3366 : g.color, transparent: true, opacity: 0.4 });
+    const edges = new THREE.LineSegments(edgeGeo, edgeMat);
+    edges.position.copy(bar.position);
+    scene.add(edges);
+  });
+
+  // Threshold plane
+  const thY = threshold * 8 - 0.5;
+  const planeGeo = new THREE.PlaneGeometry((N - 1) * spacing + 4, 0.03);
+  const planeMat = new THREE.MeshBasicMaterial({ color: 0xFFD166, transparent: true, opacity: 0.6, side: THREE.DoubleSide });
+  const plane = new THREE.Mesh(planeGeo, planeMat);
+  plane.position.set(0, thY, 0);
+  plane.rotation.x = Math.PI / 2;
+  scene.add(plane);
+
+  // Grid floor
+  const gridHelper = new THREE.GridHelper(20, 10, 0x2E3250, 0x1a1d27);
+  gridHelper.position.y = -0.5;
+  scene.add(gridHelper);
+
+  // Drag rotation
+  const rot = { x: 0.3, y: 0.3 };
+  let isDragging = false, lastMouse = { x: 0, y: 0 };
+  let autoRotate = true;
+
+  canvas.addEventListener('mousedown', e => { isDragging = true; lastMouse = { x: e.clientX, y: e.clientY }; });
+  window.addEventListener('mouseup', () => isDragging = false);
+  window.addEventListener('mousemove', e => {
+    if (!isDragging) return;
+    rot.y += (e.clientX - lastMouse.x) * 0.01;
+    rot.x += (e.clientY - lastMouse.y) * 0.005;
+    rot.x = Math.max(-0.8, Math.min(0.8, rot.x));
+    lastMouse = { x: e.clientX, y: e.clientY };
+  });
+  canvas.addEventListener('touchstart', e => { isDragging = true; lastMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY }; }, { passive: true });
+  window.addEventListener('touchend', () => isDragging = false);
+  window.addEventListener('touchmove', e => {
+    if (!isDragging) return;
+    rot.y += (e.touches[0].clientX - lastMouse.x) * 0.01;
+    rot.x += (e.touches[0].clientY - lastMouse.y) * 0.005;
+    lastMouse = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+  }, { passive: true });
+
+  function camPos() {
+    const r = 16;
+    camera.position.x = r * Math.sin(rot.y) * Math.cos(rot.x);
+    camera.position.y = r * Math.sin(rot.x) + 3;
+    camera.position.z = r * Math.cos(rot.y) * Math.cos(rot.x);
+    camera.lookAt(0, 2, 0);
+  }
+
+  window.toggleRotate = function() {
+    autoRotate = !autoRotate;
+    document.getElementById('btn-rotate').textContent = autoRotate ? '⏸ 自動旋轉' : '▶ 自動旋轉';
+    document.getElementById('btn-rotate').classList.toggle('on', autoRotate);
+  };
+
+  window.highlightDisparity = function() {
+    bars.forEach(bar => {
+      if (bar.userData.isDisparity) {
+        bar.material.color.setHex(0xFF3366);
+        bar.material.opacity = 1.0;
+      }
+    });
+  };
+
+  window.resetView = function() {
+    rot.x = 0.3; rot.y = 0.3;
+  };
+
+  let t = 0;
+  function animate() {
+    requestAnimationFrame(animate);
+    t += 0.01;
+    if (autoRotate && !isDragging) rot.y += 0.008;
+    camPos();
+
+    // Pulse disparity bars
+    bars.forEach(bar => {
+      if (bar.userData.isDisparity) {
+        const pulse = 0.7 + 0.3 * Math.sin(t * 2);
+        bar.material.opacity = pulse;
+      }
+    });
+
+    renderer.render(scene, camera);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    renderer.setSize(canvas.clientWidth, H);
+    camera.aspect = canvas.clientWidth / H;
+    camera.updateProjectionMatrix();
+  });
+})();
+
+// ─── Quiz ───────────────────────────────────────────────────────────────
+const questions = [
+  {
+    stem: '差分隱私中，隱私預算 ε 的意義是什麼？',
+    opts: ['ε 越大代表隱私保護越強，加入的噪聲越多', 'ε 越小代表隱私保護越強，相鄰資料集的輸出分布越接近', 'ε 是模型準確率的上限值', 'ε 代表資料集中敏感屬性的比例'],
+    ans: 1,
+    exp: 'ε 是隱私預算（隱私損失上界）。ε 越小，相鄰資料集在任何輸出上的機率比值越接近 1（e^ε ≈ 1），代表隱私保護越強，但需要加入更大的噪聲，資料效用降低。'
+  },
+  {
+    stem: 'k-匿名（k-Anonymity）主要保護資料免於哪種攻擊？',
+    opts: ['差分攻擊（Differential Attack）', '模型反演攻擊（Model Inversion）', '連結攻擊（Linkage Attack）：結合外部資料識別個人', '彩虹表攻擊（Rainbow Table Attack）'],
+    ans: 2,
+    exp: 'k-匿名確保每筆記錄與至少 k-1 筆其他記錄在準識別符（QI）上無法區分，防止攻擊者將匿名資料集與外部資料連結來識別個人（連結攻擊）。但 k-匿名無法防止同質性攻擊（等價類內敏感屬性相同）。'
+  },
+  {
+    stem: '根據 EEOC 的「80% 原則」，若 A 群體的錄用率為 35%，B 群體為 50%，Disparate Impact Ratio 為多少？是否構成間接歧視？',
+    opts: ['DI = 1.43，不構成間接歧視', 'DI = 0.50，構成間接歧視', 'DI = 0.70，構成間接歧視（< 0.8）', 'DI = 0.85，不構成間接歧視'],
+    ans: 2,
+    exp: 'DI = 弱勢群體率 ÷ 優勢群體率 = 35% ÷ 50% = 0.70。因為 0.70 < 0.80，低於 EEOC 的 80% 原則門檻，構成間接歧視（Adverse Impact）。此結果應觸發進一步調查和補救措施。'
+  },
+  {
+    stem: 'SHAP（SHapley Additive exPlanations）的理論基礎來自於哪個領域？',
+    opts: ['資訊理論（Shannon Entropy）', '博弈論（Shapley Values，多玩家合作賽局）', '貝氏推論（Bayesian Inference）', '最優化理論（Convex Optimization）'],
+    ans: 1,
+    exp: 'SHAP 值基於博弈論中的 Shapley 值，計算每個「玩家」（特徵）對「合作收益」（模型預測）的平均邊際貢獻。Shapley 值滿足效率性、對稱性、虛擬性、加法性四個公理，是唯一滿足這些公理的分配方式。'
+  },
+  {
+    stem: 'AI 歷史偏見（Historical Bias）的特點是：',
+    opts: ['由模型訓練算法的數學性質引入，與資料無關', '即使資料採集過程完全中立，訓練資料仍可能反映過去的歧視結構', '主要來自人工標注過程中標注者的主觀判斷', '只在深度學習模型中出現，傳統機器學習不受影響'],
+    ans: 1,
+    exp: '歷史偏見源自現實世界的歷史歧視。即使資料採集過程完全透明中立（如如實記錄歷史事實），訓練資料仍然包含了歷史上對特定群體的不公平對待。Amazon 2018年的招聘 AI 案例就是典型：因男性工程師在歷史上佔多數，導致 AI 學習偏好男性候選人。'
+  },
+  {
+    stem: 'GDPR 第22條賦予個人哪項與 AI 相關的特定權利？',
+    opts: ['獲得 AI 模型原始碼的權利', '拒絕個人資料被用於訓練 AI 的絕對權利', '針對完全依賴自動化決策（剖析）的決定，要求人工審查及解釋的權利', '要求 AI 系統達到特定準確率標準的權利'],
+    ans: 2,
+    exp: 'GDPR 第22條規定，個人有權不受完全依賴自動化處理（包括剖析）所做出、對其產生重大影響的決定之約束。除非有例外情形，組織必須提供人工審查的機會，並在要求時提供決策邏輯解釋。這是 AI 可解釋性的法律依據。'
+  },
+  {
+    stem: '以下哪種差分隱私機制最適合用於保護深度學習模型訓練過程（DP-SGD）？',
+    opts: ['拉普拉斯機制（Laplace Mechanism）', '指數機制（Exponential Mechanism）', '高斯機制（Gaussian Mechanism）', '隨機迴應（Randomized Response）'],
+    ans: 2,
+    exp: 'DP-SGD（差分隱私隨機梯度下降）使用高斯機制，因為梯度是向量（高維），高斯機制使用 ℓ₂ 敏感度（通常較小），而拉普拉斯機制使用 ℓ₁ 敏感度（在高維時更大）。高斯噪聲也更適合與 Moments Accountant 配合追蹤累計隱私消耗（(ε,δ)-DP）。'
+  },
+  {
+    stem: 'LIME（Local Interpretable Model-agnostic Explanations）的工作原理是？',
+    opts: ['計算每個特徵的 Shapley 值以量化全局重要性', '在目標樣本的鄰近區域建立局部線性代理模型來解釋該預測', '通過梯度回傳計算輸入特徵對輸出的敏感度', '在全部訓練資料上計算特徵的偏依關係（Partial Dependence）'],
+    ans: 1,
+    exp: 'LIME 在被解釋樣本 x 的附近對原始黑盒模型 f 進行多次預測（對擾動樣本），然後用這些預測訓練一個加權的、可解釋的線性代理模型 g。這個線性模型的係數即代表各特徵在此局部的重要性。LIME 是模型無關的（可用於任何黑盒模型），但結果可能因採樣隨機性而不穩定。'
+  }
+];
+
+const quizEl = document.getElementById('quiz');
+questions.forEach((q, qi) => {
+  const div = document.createElement('div');
+  div.className = 'q-item';
+  div.innerHTML = `
+    <div class="q-num">第 ${qi + 1} 題</div>
+    <div class="q-stem">${q.stem}</div>
+    <div class="q-opts">
+      ${q.opts.map((o, oi) => `
+        <div class="q-opt" onclick="answerQ(${qi},${oi},this)">
+          <span class="opt-label">${['A','B','C','D'][oi]}</span>${o}
+        </div>
+      `).join('')}
+    </div>
+    <div class="q-explain" id="exp${qi}">${q.exp}</div>
+  `;
+  quizEl.appendChild(div);
+});
+
+function answerQ(qi, selected, el) {
+  if (answered.has(qi)) return;
+  const correct = questions[qi].ans;
+  const opts = el.closest('.q-opts').querySelectorAll('.q-opt');
+  opts.forEach((o, i) => {
+    if (i === correct) o.classList.add('correct');
+    else if (i === selected) o.classList.add('wrong');
+    o.onclick = null;
+  });
+  document.getElementById('exp' + qi).classList.add('show');
+  addScore(qi, selected === correct);
+}
+</script>
+</body>
+</html>
