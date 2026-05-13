@@ -1,0 +1,968 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>深度學習基礎強化：激活函數、正則化、優化器 — iPAS 中級</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+*{font-family:'Calibri','Microsoft JhengHei','微軟正黑體',sans-serif;margin:0;padding:0;box-sizing:border-box;}
+code,.mono{font-family:'JetBrains Mono','Consolas',monospace!important;}
+:root{
+  --bg:#0F1117;--panel:#1A1D27;--panel2:#21253A;
+  --border:#2E3250;--text:#E8EAF6;--muted:#8892B0;
+  --accent:#9B5DE5;--accent2:#00FFB2;--accent3:#00D4FF;
+  --yellow:#FFD166;--orange:#FF9B42;--pink:#FF6B9D;--red:#FF4D6D;
+  --r:14px;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--text);min-height:100vh;line-height:1.7;overflow-x:hidden;}
+
+.nav{position:sticky;top:0;z-index:200;background:rgba(15,17,23,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;padding:12px 24px;flex-wrap:wrap;}
+.nav a{color:var(--accent);text-decoration:none;font-weight:700;font-size:.88rem;padding:5px 14px;border-radius:999px;border:1.5px solid var(--accent);transition:all .18s;}
+.nav a:hover{background:var(--accent);color:#fff;}
+.nav-title{font-size:1rem;color:var(--text);font-weight:700;}
+.nav-tag{margin-left:auto;background:linear-gradient(135deg,var(--accent),var(--pink));padding:4px 14px;border-radius:999px;font-size:.75rem;font-weight:900;color:#fff;}
+
+.hero{padding:56px 20px 40px;background:linear-gradient(160deg,#0F1117,#120a1f,#0F1117);text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 60% 40% at 50% 0%,rgba(155,93,229,.12),transparent);}
+.hero-badge{display:inline-block;margin-bottom:14px;padding:5px 18px;border-radius:999px;background:rgba(155,93,229,.1);border:1px solid var(--accent);font-size:.78rem;font-weight:900;color:var(--accent);letter-spacing:1px;}
+.hero-title{font-size:clamp(1.8rem,5vw,3rem);background:linear-gradient(135deg,var(--accent),var(--pink),var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:12px;}
+.hero-sub{color:var(--muted);font-size:.95rem;max-width:660px;margin:0 auto 20px;}
+.tag-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.tag{padding:4px 14px;border-radius:999px;font-size:.75rem;font-weight:900;border:1px solid;}
+
+.toc{max-width:980px;margin:20px auto 0;padding:0 20px;}
+.toc-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;}
+.toc-btn{display:block;padding:11px 14px;background:var(--panel);border:1px solid var(--border);border-radius:10px;text-decoration:none;color:var(--muted);font-size:.82rem;font-weight:700;transition:all .18s;text-align:center;}
+.toc-btn:hover{border-color:var(--accent);color:var(--accent);}
+.toc-num{font-size:1.1rem;display:block;margin-bottom:2px;}
+
+.wrap{max-width:980px;margin:0 auto;padding:8px 20px 100px;}
+.sec{margin-top:52px;}
+.sec-title{font-size:1.4rem;color:var(--text);margin-bottom:18px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.sec-title::before{content:'';display:inline-block;width:4px;height:22px;border-radius:2px;background:linear-gradient(var(--accent),var(--pink));flex-shrink:0;}
+.sec-badge{font-size:.7rem;padding:3px 10px;border-radius:999px;border:1px solid var(--accent);color:var(--accent);font-weight:900;}
+
+.panel{background:var(--panel);border:1px solid var(--border);border-radius:var(--r);padding:22px;margin-bottom:16px;}
+.panel-title{font-weight:900;font-size:.96rem;color:var(--accent2);margin-bottom:12px;}
+
+.fbox{background:#070a10;border:1.5px solid var(--border);border-radius:12px;padding:16px 20px;margin:10px 0;font-family:'JetBrains Mono','Consolas',monospace;font-size:.88rem;line-height:2.1;overflow-x:auto;position:relative;}
+.fbox .fn{color:var(--accent3);}
+.fbox .vr{color:var(--pink);}
+.fbox .num{color:var(--accent2);}
+.fbox .cm{color:var(--muted);font-size:.78rem;font-style:italic;}
+.fbox .hl{color:var(--yellow);font-weight:900;}
+.fbox .ok{color:var(--accent2);}
+.fbox .bad{color:var(--red);}
+.fbox .label{position:absolute;top:8px;right:12px;font-size:.67rem;font-weight:900;color:var(--muted);font-family:inherit;}
+
+.code-block{background:#070a10;border:1.5px solid var(--border);border-radius:12px;padding:16px 20px;margin:10px 0;font-family:'JetBrains Mono','Consolas',monospace;font-size:.85rem;line-height:1.9;overflow-x:auto;position:relative;}
+.code-block .kw{color:#569CD6;}    /* keyword - blue */
+.code-block .fn{color:#DCDCAA;}    /* function - yellow */
+.code-block .str{color:#CE9178;}   /* string - orange */
+.code-block .num{color:#B5CEA8;}   /* number - green */
+.code-block .cm{color:#6A9955;font-style:italic;} /* comment - green */
+.code-block .cls{color:#4EC9B0;}   /* class - teal */
+.code-block .var{color:#9CDCFE;}   /* variable - light blue */
+.code-block .op{color:#D4D4D4;}    /* operator - white */
+.code-block .hl{background:rgba(255,209,102,.1);border-left:3px solid var(--yellow);padding-left:6px;display:block;}
+.code-block .hl-g{background:rgba(0,255,178,.08);border-left:3px solid var(--accent2);padding-left:6px;display:block;}
+.code-block .label{position:absolute;top:8px;right:12px;font-size:.67rem;font-weight:900;color:var(--muted);font-family:inherit;}
+
+.c-wrap{background:#070a10;border:1px solid var(--border);border-radius:12px;margin:12px 0;overflow:hidden;}
+.c-wrap canvas{display:block;width:100%;}
+
+.kp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:12px 0;}
+.kp-card{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:16px;border-left:3px solid var(--accent);transition:transform .18s;}
+.kp-card:hover{transform:translateY(-3px);}
+.kp-title{font-weight:900;font-size:.92rem;color:var(--text);margin-bottom:6px;}
+.kp-body{font-size:.82rem;color:var(--muted);line-height:1.6;}
+.kp-tag{font-size:.68rem;font-weight:900;color:var(--accent);margin-top:8px;}
+
+.tbl-wrap{overflow-x:auto;margin:12px 0;}
+table{width:100%;border-collapse:collapse;font-size:.84rem;}
+th{background:var(--panel2);padding:9px 14px;text-align:left;border-bottom:2px solid var(--border);color:var(--accent);font-weight:900;}
+td{padding:8px 14px;border-bottom:1px solid var(--border);color:var(--muted);}
+td:first-child{color:var(--text);font-weight:700;}
+tr:hover td{background:rgba(155,93,229,.04);}
+.td-ok{color:var(--accent2)!important;font-weight:700!important;}
+.td-warn{color:var(--yellow)!important;}
+.td-bad{color:var(--red)!important;}
+
+.info-box{background:rgba(0,212,255,.07);border:1px solid rgba(0,212,255,.3);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--accent3);margin:10px 0;}
+.warn-box{background:rgba(255,77,109,.07);border:1px solid rgba(255,77,109,.3);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--red);margin:10px 0;}
+.tip-box{background:rgba(255,209,102,.07);border:1px solid rgba(255,209,102,.3);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--yellow);margin:10px 0;}
+.ok-box{background:rgba(0,255,178,.07);border:1px solid rgba(0,255,178,.3);border-radius:8px;padding:10px 14px;font-size:.84rem;color:var(--accent2);margin:10px 0;}
+
+/* tabs */
+.seg-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;}
+.seg-tab{padding:7px 16px;border-radius:999px;border:1.5px solid var(--border);font-size:.82rem;font-weight:900;cursor:pointer;color:var(--muted);background:transparent;transition:all .18s;}
+.seg-tab.active{border-color:var(--accent);color:var(--accent);background:rgba(155,93,229,.1);}
+.seg-content{display:none;}
+.seg-content.active{display:block;}
+
+/* quiz */
+.progress-bar{height:5px;background:var(--border);border-radius:3px;margin-bottom:16px;overflow:hidden;}
+.progress-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));transition:width .5s;}
+.q-item{background:var(--panel2);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:14px;}
+.q-badge{font-size:.67rem;font-weight:900;color:var(--accent);background:rgba(155,93,229,.1);border:1px solid rgba(155,93,229,.3);padding:2px 9px;border-radius:999px;display:inline-block;margin-bottom:8px;}
+.q-stem{font-weight:700;color:var(--text);font-size:.92rem;margin-bottom:12px;line-height:1.65;}
+.q-opts{display:flex;flex-direction:column;gap:7px;}
+.q-opt{display:flex;align-items:flex-start;gap:10px;padding:11px 14px;border:1px solid var(--border);border-radius:9px;cursor:pointer;transition:all .17s;background:rgba(255,255,255,.02);}
+.q-opt:hover:not(.locked){border-color:var(--accent);background:rgba(155,93,229,.06);}
+.q-opt.sel{border-color:var(--accent);background:rgba(155,93,229,.1);}
+.q-opt.correct{border-color:var(--accent2);background:rgba(0,255,178,.06);}
+.q-opt.wrong{border-color:var(--red);background:rgba(255,77,109,.06);}
+.q-opt.locked{cursor:default;}
+.q-letter{width:26px;height:26px;min-width:26px;border-radius:6px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:900;color:var(--muted);transition:all .17s;}
+.q-opt.sel .q-letter{background:var(--accent);color:#fff;}
+.q-opt.correct .q-letter{background:var(--accent2);color:#0F1117;}
+.q-opt.wrong .q-letter{background:var(--red);color:#fff;}
+.q-opt-text{font-size:.88rem;color:var(--text);flex:1;line-height:1.55;}
+.q-ctrl{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;}
+.btn{padding:8px 18px;border-radius:8px;border:1.5px solid;cursor:pointer;font-size:.84rem;font-weight:700;font-family:inherit;transition:all .17s;}
+.btn-confirm{border-color:var(--accent);background:rgba(155,93,229,.1);color:var(--accent);}
+.btn-confirm:hover:not(:disabled){background:rgba(155,93,229,.2);}
+.btn-confirm:disabled{opacity:.35;cursor:not-allowed;}
+.btn-skip{border-color:var(--accent3);background:rgba(0,212,255,.08);color:var(--accent3);}
+.btn-next{border-color:var(--border);background:transparent;color:var(--muted);}
+.btn-next:hover{border-color:var(--accent);color:var(--accent);}
+.exp-panel{margin-top:12px;border-radius:10px;overflow:hidden;display:none;}
+.exp-hdr{padding:9px 14px;font-size:.78rem;font-weight:900;letter-spacing:.5px;}
+.exp-hdr.ok{background:rgba(0,255,178,.12);color:var(--accent2);border-bottom:1px solid rgba(0,255,178,.2);}
+.exp-hdr.fail{background:rgba(255,77,109,.12);color:var(--red);border-bottom:1px solid rgba(255,77,109,.2);}
+.exp-body{background:rgba(255,255,255,.03);border:1px solid var(--border);border-top:none;border-radius:0 0 10px 10px;padding:14px;}
+.exp-row{margin-bottom:9px;padding:8px 12px;border-radius:8px;font-size:.84rem;line-height:1.65;}
+.exp-row:last-child{margin-bottom:0;}
+.exp-row.exp-ok{background:rgba(0,255,178,.05);border:1px solid rgba(0,255,178,.2);}
+.exp-row.exp-no{background:rgba(255,255,255,.02);border:1px solid var(--border);}
+.exp-ltr{font-weight:900;margin-right:5px;}
+.exp-row.exp-ok .exp-ltr{color:var(--accent2);}
+.exp-row.exp-no .exp-ltr{color:var(--muted);}
+.exp-txt{color:var(--muted);}
+
+.score-banner{background:var(--panel);border:2px solid var(--accent);border-radius:var(--r);padding:30px;text-align:center;display:none;margin:20px 0;}
+.score-num{font-size:3.2rem;font-weight:900;}
+.score-num.pass{color:var(--accent2);}
+.score-num.fail{color:var(--red);}
+.score-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:14px 0;}
+.sg-item{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:12px;}
+.sg-val{font-size:1.5rem;font-weight:900;}
+.sg-val.c{color:var(--accent2);}
+.sg-val.w{color:var(--red);}
+.sg-val.s{color:var(--accent3);}
+.sg-lbl{font-size:.72rem;color:var(--muted);margin-top:3px;}
+.btn-restart{padding:10px 28px;border-radius:8px;border:1.5px solid var(--accent);background:rgba(155,93,229,.1);color:var(--accent);cursor:pointer;font-size:.88rem;font-weight:700;font-family:inherit;transition:all .18s;margin-top:10px;}
+.btn-restart:hover{background:rgba(155,93,229,.2);}
+
+.back-fab{position:fixed;bottom:24px;right:24px;z-index:300;background:var(--accent);color:#fff;border:none;border-radius:999px;padding:11px 20px;font-weight:900;font-size:.85rem;cursor:pointer;box-shadow:0 4px 20px rgba(155,93,229,.4);transition:all .18s;text-decoration:none;}
+.back-fab:hover{transform:translateY(-3px);}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a href="index.html">← 首頁</a>
+  <span class="nav-title">深度學習基礎強化</span>
+  <span class="nav-tag">科三弱點補強</span>
+</nav>
+
+<div class="hero">
+  <div class="hero-badge">科三 · 19 道錯題精準補強</div>
+  <div class="hero-title">深度學習基礎<br>激活函數 × 正則化 × 優化器 × 程式碼識別</div>
+  <div class="hero-sub">Sigmoid / ReLU 圖解、Dropout / L1 / L2 程式碼識別<br>Adam 優化器原理、Early Stopping、交叉驗證類型、偏差辨識</div>
+  <div class="tag-row">
+    <span class="tag" style="color:var(--accent);border-color:var(--accent);">Sigmoid / ReLU</span>
+    <span class="tag" style="color:var(--accent2);border-color:var(--accent2);">Dropout 程式碼</span>
+    <span class="tag" style="color:var(--accent3);border-color:var(--accent3);">Adam 優化器</span>
+    <span class="tag" style="color:var(--yellow);border-color:var(--yellow);">NumPy 點積</span>
+    <span class="tag" style="color:var(--orange);border-color:var(--orange);">標準化程式碼</span>
+    <span class="tag" style="color:var(--pink);border-color:var(--pink);">Early Stopping</span>
+  </div>
+</div>
+
+<div class="toc">
+  <div class="toc-grid">
+    <a class="toc-btn" href="#activation"><span class="toc-num">⚡</span>激活函數全解</a>
+    <a class="toc-btn" href="#regularize"><span class="toc-num">🛡️</span>正則化程式碼識別</a>
+    <a class="toc-btn" href="#optimizer"><span class="toc-num">🚀</span>優化器進化史</a>
+    <a class="toc-btn" href="#code"><span class="toc-num">💻</span>訓練程式碼速認</a>
+    <a class="toc-btn" href="#earlystop"><span class="toc-num">🛑</span>Early Stopping</a>
+    <a class="toc-btn" href="#cv"><span class="toc-num">📊</span>交叉驗證類型</a>
+    <a class="toc-btn" href="#bias"><span class="toc-num">⚖️</span>偏差類型辨識</a>
+    <a class="toc-btn" href="#misc"><span class="toc-num">🔧</span>XGBoost / AutoML</a>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ═══════════════════════════════════
+     1. 激活函數
+════════════════════════════════════ -->
+<div class="sec" id="activation">
+<div class="sec-title">① 激活函數全解 <span class="sec-badge">您特別標記：sigmoid / ReLU</span></div>
+
+<div class="panel">
+  <div class="panel-title">四大激活函數公式 & 特性</div>
+  <div class="fbox">
+    <span class="label">激活函數</span>
+    <span class="cm">// ① Sigmoid：把任意值壓縮到 (0,1)，常用於二元分類輸出層</span><br>
+    <span class="fn">σ</span>(<span class="vr">x</span>) = <span class="num">1</span> / (<span class="num">1</span> + <span class="fn">exp</span>(-<span class="vr">x</span>))<br><br>
+    <span class="cm">// ② Tanh：壓縮到 (-1,1)，比 Sigmoid 更零中心化</span><br>
+    <span class="fn">tanh</span>(<span class="vr">x</span>) = (<span class="fn">exp</span>(<span class="vr">x</span>) - <span class="fn">exp</span>(-<span class="vr">x</span>)) / (<span class="fn">exp</span>(<span class="vr">x</span>) + <span class="fn">exp</span>(-<span class="vr">x</span>))<br><br>
+    <span class="cm">// ③ ReLU：負值歸零，正值不變（最常用隱藏層激活函數）</span><br>
+    <span class="fn">ReLU</span>(<span class="vr">x</span>) = <span class="fn">max</span>(<span class="num">0</span>, <span class="vr">x</span>)<br><br>
+    <span class="cm">// ④ Softmax：多類別機率輸出，Σ = 1（用於輸出層）</span><br>
+    <span class="fn">σ</span>(<span class="vr">zᵢ</span>) = <span class="fn">exp</span>(<span class="vr">zᵢ</span>) / Σ <span class="fn">exp</span>(<span class="vr">zⱼ</span>)
+  </div>
+  <div class="c-wrap"><canvas id="actCanvas" height="280"></canvas></div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">激活函數比較表 ── 考試必背</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>激活函數</th><th>輸出範圍</th><th>梯度消失</th><th>主要用途</th><th>缺點</th></tr></thead>
+      <tbody>
+        <tr><td>Sigmoid</td><td>(0, 1)</td><td class="td-bad">嚴重（兩端飽和）</td><td>二元分類輸出層</td><td>梯度消失、非零中心</td></tr>
+        <tr><td>Tanh</td><td>(-1, 1)</td><td class="td-warn">存在（兩端飽和）</td><td>RNN 隱藏層</td><td>梯度消失（雖比 Sigmoid 弱）</td></tr>
+        <tr><td style="color:var(--accent2);">ReLU ⭐</td><td>[0, +∞)</td><td class="td-ok">無（正區間）</td><td>CNN / DNN 隱藏層</td><td>Dying ReLU（負值永遠為0）</td></tr>
+        <tr><td>Leaky ReLU</td><td>(-∞, +∞)</td><td class="td-ok">幾乎無</td><td>解決 Dying ReLU</td><td>需調整 α 參數</td></tr>
+        <tr><td>Softmax</td><td>(0,1)，和=1</td><td class="td-warn">存在</td><td>多類別輸出層</td><td>只適合輸出層</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="warn-box">⚠️ 梯度消失（Vanishing Gradient）：Sigmoid / Tanh 在 |x| 很大時，導數趨近於 0，深層網路反向傳播後梯度幾乎消失 → 深層網路首選 ReLU！</div>
+  <div class="ok-box">✅ ReLU 為何能解決梯度消失？f'(x) = 1（當 x>0），梯度不衰減，深層網路信號可順利傳遞。</div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">💻 激活函數程式碼識別</div>
+  <div class="seg-tabs">
+    <button class="seg-tab active" onclick="showAct('sigmoid')">Sigmoid</button>
+    <button class="seg-tab" onclick="showAct('relu')">ReLU</button>
+    <button class="seg-tab" onclick="showAct('tanh')">Tanh</button>
+    <button class="seg-tab" onclick="showAct('softmax')">Softmax</button>
+  </div>
+  <div id="act-sigmoid" class="seg-content active">
+    <div class="code-block">
+      <span class="label">Sigmoid</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> <span class="var">np</span>
+<span class="kw">import</span> torch.nn <span class="kw">as</span> <span class="var">nn</span>
+
+<span class="cm"># NumPy 實現</span>
+<span class="kw">def</span> <span class="fn">sigmoid</span>(<span class="var">x</span>):
+    <span class="kw">return</span> <span class="num">1</span> / (<span class="num">1</span> + np.<span class="fn">exp</span>(-<span class="var">x</span>))
+
+<span class="cm"># PyTorch Layer</span>
+<span class="var">layer</span> = nn.<span class="cls">Sigmoid</span>()       <span class="cm"># 輸出 (0,1)</span>
+<span class="cm"># 或在 Sequential 中：</span>
+nn.<span class="cls">Sequential</span>(nn.<span class="cls">Linear</span>(<span class="num">10</span>, <span class="num">1</span>), nn.<span class="cls">Sigmoid</span>())
+    </div>
+    <div class="tip-box">💡 考試識別：看到 <code>1/(1+exp(-x))</code> 或 <code>nn.Sigmoid()</code> → Sigmoid</div>
+  </div>
+  <div id="act-relu" class="seg-content">
+    <div class="code-block">
+      <span class="label">ReLU</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> <span class="var">np</span>
+<span class="kw">import</span> torch.nn <span class="kw">as</span> <span class="var">nn</span>
+
+<span class="cm"># NumPy 實現</span>
+<span class="kw">def</span> <span class="fn">relu</span>(<span class="var">x</span>):
+    <span class="kw">return</span> np.<span class="fn">maximum</span>(<span class="num">0</span>, <span class="var">x</span>)   <span class="cm"># 負值歸零</span>
+
+<span class="cm"># PyTorch Layer</span>
+<span class="var">layer</span> = nn.<span class="cls">ReLU</span>()
+<span class="var">layer</span> = nn.<span class="cls">LeakyReLU</span>(negative_slope=<span class="num">0.01</span>)  <span class="cm"># Leaky 版</span>
+
+<span class="cm"># 在 Sequential 中：</span>
+nn.<span class="cls">Sequential</span>(nn.<span class="cls">Linear</span>(<span class="num">64</span>,<span class="num">32</span>), nn.<span class="cls">ReLU</span>(), nn.<span class="cls">Linear</span>(<span class="num">32</span>,<span class="num">1</span>))
+    </div>
+    <div class="tip-box">💡 考試識別：看到 <code>max(0, x)</code> 或 <code>nn.ReLU()</code> → ReLU；隱藏層最常見選擇</div>
+  </div>
+  <div id="act-tanh" class="seg-content">
+    <div class="code-block">
+      <span class="label">Tanh</span>
+<span class="cm"># NumPy 實現</span>
+<span class="kw">def</span> <span class="fn">tanh</span>(<span class="var">x</span>):
+    <span class="kw">return</span> np.<span class="fn">tanh</span>(<span class="var">x</span>)        <span class="cm"># 輸出 (-1,1)</span>
+
+<span class="cm"># PyTorch</span>
+<span class="var">layer</span> = nn.<span class="cls">Tanh</span>()            <span class="cm"># RNN 中常用</span>
+    </div>
+  </div>
+  <div id="act-softmax" class="seg-content">
+    <div class="code-block">
+      <span class="label">Softmax</span>
+<span class="cm"># NumPy 實現</span>
+<span class="kw">def</span> <span class="fn">softmax</span>(<span class="var">x</span>):
+    <span class="var">e</span> = np.<span class="fn">exp</span>(<span class="var">x</span> - <span class="var">x</span>.<span class="fn">max</span>())  <span class="cm"># 數值穩定版</span>
+    <span class="kw">return</span> <span class="var">e</span> / <span class="var">e</span>.<span class="fn">sum</span>()
+
+<span class="cm"># PyTorch（通常內建於 CrossEntropyLoss，不需單獨加）</span>
+<span class="var">layer</span> = nn.<span class="cls">Softmax</span>(dim=<span class="num">1</span>)   <span class="cm"># 多類別輸出</span>
+    </div>
+    <div class="tip-box">💡 PyTorch 的 <code>CrossEntropyLoss</code> 已內含 Softmax，不需再加一層 Softmax！</div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     2. 正則化程式碼識別
+════════════════════════════════════ -->
+<div class="sec" id="regularize">
+<div class="sec-title">② 正則化技術程式碼識別 <span class="sec-badge">科三 Q39 · 您特別標記</span></div>
+
+<div class="panel">
+  <div class="panel-title">🎯 四種正則化技術，一眼看穿程式碼</div>
+  <div class="seg-tabs">
+    <button class="seg-tab active" onclick="showReg('dropout')">Dropout ⭐</button>
+    <button class="seg-tab" onclick="showReg('l1l2')">L1 / L2</button>
+    <button class="seg-tab" onclick="showReg('bn')">Batch Norm</button>
+    <button class="seg-tab" onclick="showReg('early')">Early Stop</button>
+  </div>
+  <div id="reg-dropout" class="reg-content active">
+    <div class="code-block">
+      <span class="label">Dropout — 科三 Q39 答案</span>
+<span class="cm"># ✅ 識別關鍵字：nn.Dropout / p=0.5 / 訓練時隨機關閉神經元</span>
+
+<span class="kw">import</span> torch.nn <span class="kw">as</span> <span class="var">nn</span>
+
+<span class="var">model</span> = nn.<span class="cls">Sequential</span>(
+    nn.<span class="cls">Linear</span>(<span class="num">784</span>, <span class="num">256</span>),
+    nn.<span class="cls">ReLU</span>(),
+<span class="hl">    nn.<span class="cls">Dropout</span>(p=<span class="num">0.5</span>),     <span class="cm"># ← Dropout！p=50% 的神經元被關閉</span></span>
+    nn.<span class="cls">Linear</span>(<span class="num">256</span>, <span class="num">128</span>),
+    nn.<span class="cls">ReLU</span>(),
+<span class="hl">    nn.<span class="cls">Dropout</span>(p=<span class="num">0.3</span>),     <span class="cm"># ← 不同層可設不同丟棄率</span></span>
+    nn.<span class="cls">Linear</span>(<span class="num">128</span>, <span class="num">10</span>)
+)
+
+<span class="cm"># 注意：訓練模式才會 Dropout，評估時自動關閉</span>
+<span class="var">model</span>.<span class="fn">train</span>()             <span class="cm"># 開啟 Dropout</span>
+<span class="var">model</span>.<span class="fn">eval</span>()              <span class="cm"># 關閉 Dropout（推論時）</span>
+    </div>
+    <div class="ok-box">✅ 識別 Dropout：看到 <code>nn.Dropout(p=...)</code> 就是正則化！p=丟棄率（通常 0.2~0.5）</div>
+    <div class="tip-box">💡 Dropout 原理：訓練時隨機將 p 比例的神經元輸出設為 0，迫使網路學習冗餘表示，防止過擬合。</div>
+  </div>
+  <div id="reg-l1l2" class="reg-content" style="display:none">
+    <div class="code-block">
+      <span class="label">L1 / L2 正則化</span>
+<span class="cm"># L2 正則化（PyTorch 中透過 weight_decay 設定）</span>
+<span class="var">optimizer</span> = torch.optim.<span class="cls">Adam</span>(
+    <span class="var">model</span>.<span class="fn">parameters</span>(),
+    lr=<span class="num">0.001</span>,
+<span class="hl">    weight_decay=<span class="num">1e-4</span>    <span class="cm"># ← L2 正則化！</span></span>
+)
+
+<span class="cm"># L1 正則化（需手動加入損失）</span>
+<span class="var">l1_lambda</span> = <span class="num">0.001</span>
+<span class="var">l1_norm</span> = <span class="fn">sum</span>(p.<span class="fn">abs</span>().<span class="fn">sum</span>() <span class="kw">for</span> p <span class="kw">in</span> <span class="var">model</span>.<span class="fn">parameters</span>())
+<span class="var">loss</span> = <span class="var">criterion</span>(<span class="var">outputs</span>, <span class="var">labels</span>)
+<span class="hl"><span class="var">loss</span> = <span class="var">loss</span> + <span class="var">l1_lambda</span> * <span class="var">l1_norm</span>  <span class="cm"># ← L1 加入損失</span></span>
+
+<span class="cm"># Sklearn LASSO（L1）</span>
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> <span class="cls">Lasso</span>, <span class="cls">Ridge</span>
+<span class="var">lasso</span> = <span class="cls">Lasso</span>(alpha=<span class="num">0.1</span>)    <span class="cm"># L1</span>
+<span class="var">ridge</span> = <span class="cls">Ridge</span>(alpha=<span class="num">1.0</span>)    <span class="cm"># L2</span>
+    </div>
+    <div class="tbl-wrap"><table><thead><tr><th>識別特徵</th><th>代表正則化</th></tr></thead><tbody>
+    <tr><td><code>weight_decay=...</code></td><td class="td-ok">L2（Ridge）</td></tr>
+    <tr><td><code>p.abs().sum()</code> 加入 loss</td><td class="td-ok">L1（Lasso）</td></tr>
+    <tr><td><code>Lasso(alpha=...)</code></td><td class="td-ok">L1</td></tr>
+    <tr><td><code>Ridge(alpha=...)</code></td><td class="td-ok">L2</td></tr>
+    </tbody></table></div>
+  </div>
+  <div id="reg-bn" class="reg-content" style="display:none">
+    <div class="code-block">
+      <span class="label">Batch Normalization</span>
+<span class="cm"># ✅ 識別關鍵字：nn.BatchNorm / 在激活函數之前（或之後）</span>
+
+<span class="var">model</span> = nn.<span class="cls">Sequential</span>(
+    nn.<span class="cls">Linear</span>(<span class="num">784</span>, <span class="num">256</span>),
+<span class="hl">    nn.<span class="cls">BatchNorm1d</span>(<span class="num">256</span>),    <span class="cm"># ← Batch Norm！（全連接層後）</span></span>
+    nn.<span class="cls">ReLU</span>(),
+    nn.<span class="cls">Linear</span>(<span class="num">256</span>, <span class="num">10</span>)
+)
+<span class="cm"># CNN 中用 BatchNorm2d</span>
+nn.<span class="cls">BatchNorm2d</span>(<span class="num">64</span>)           <span class="cm"># ← CNN 特徵圖的 BN</span>
+    </div>
+    <div class="warn-box">⚠️ Batch Norm ≠ Dropout：BN 正規化每批次特徵分佈（加速訓練），Dropout 隨機丟棄神經元（防過擬合），兩者通常同時使用但目的不同！</div>
+  </div>
+  <div id="reg-early" class="reg-content" style="display:none">
+    <div class="code-block">
+      <span class="label">Early Stopping（見 Section 5）</span>
+<span class="kw">from</span> tensorflow.keras.callbacks <span class="kw">import</span> <span class="cls">EarlyStopping</span>
+
+<span class="var">early_stop</span> = <span class="cls">EarlyStopping</span>(
+<span class="hl">    monitor=<span class="str">'val_loss'</span>,    <span class="cm"># ← 監控驗證集損失（非訓練集！）</span></span>
+    patience=<span class="num">10</span>,           <span class="cm"># 連續 10 輪無改善才停止</span>
+    restore_best_weights=<span class="kw">True</span>
+)
+<span class="var">model</span>.<span class="fn">fit</span>(<span class="var">X_train</span>, <span class="var">y_train</span>, callbacks=[<span class="var">early_stop</span>])
+    </div>
+  </div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">正則化技術比較 ── 快速分辨</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>技術</th><th>機制</th><th>識別關鍵字</th><th>效果</th></tr></thead>
+      <tbody>
+        <tr><td>Dropout</td><td>訓練時隨機關閉神經元</td><td><code>nn.Dropout(p=)</code></td><td>防過擬合</td></tr>
+        <tr><td>L1 (Lasso)</td><td>懲罰 |w| → 稀疏化</td><td><code>Lasso / p.abs()</code></td><td>特徵選擇</td></tr>
+        <tr><td>L2 (Ridge)</td><td>懲罰 w² → 縮小參數</td><td><code>weight_decay / Ridge</code></td><td>縮小係數</td></tr>
+        <tr><td>Batch Norm</td><td>正規化每批次特徵</td><td><code>BatchNorm1d/2d</code></td><td>加速訓練、穩定</td></tr>
+        <tr><td>Early Stopping</td><td>驗證損失不改善時停止</td><td><code>monitor='val_loss'</code></td><td>防過擬合</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     3. 優化器
+════════════════════════════════════ -->
+<div class="sec" id="optimizer">
+<div class="sec-title">③ 優化器進化史 <span class="sec-badge">科三 Q17：哪個內建動量？</span></div>
+
+<div class="panel">
+  <div class="panel-title">SGD → Momentum → RMSProp → Adam（逐步進化）</div>
+  <div class="c-wrap"><canvas id="optCanvas" height="200"></canvas></div>
+
+  <div class="fbox" style="margin-top:14px;">
+    <span class="label">優化器公式</span>
+    <span class="cm">// SGD（基礎版）</span><br>
+    <span class="vr">w</span> ← <span class="vr">w</span> - <span class="vr">lr</span> × <span class="fn">∇L</span><br><br>
+    <span class="cm">// SGD + Momentum（加入速度項 v）</span><br>
+    <span class="vr">v</span> ← β × <span class="vr">v</span> + (1-β) × <span class="fn">∇L</span>   <span class="cm">// 梯度移動平均（一階動量）</span><br>
+    <span class="vr">w</span> ← <span class="vr">w</span> - <span class="vr">lr</span> × <span class="vr">v</span><br><br>
+    <span class="cm">// Adam = Momentum（一階）+ 自適應學習率（二階）</span><br>
+    <span class="vr">m</span> ← β₁ × <span class="vr">m</span> + (1-β₁) × <span class="fn">∇L</span>          <span class="cm">// 一階動量</span><br>
+    <span class="vr">v</span> ← β₂ × <span class="vr">v</span> + (1-β₂) × <span class="fn">∇L</span>²         <span class="cm">// 二階動量</span><br>
+    <span class="vr">w</span> ← <span class="vr">w</span> - <span class="vr">lr</span> × <span class="vr">m̂</span> / (√<span class="vr">v̂</span> + ε)
+  </div>
+
+  <div class="tbl-wrap" style="margin-top:12px;">
+    <table>
+      <thead><tr><th>優化器</th><th>內建動量？</th><th>自適應學習率？</th><th>適用場景</th></tr></thead>
+      <tbody>
+        <tr><td>SGD</td><td class="td-bad">❌ 無</td><td class="td-bad">❌ 固定</td><td>簡單任務、需要精確調參</td></tr>
+        <tr><td>SGD + Momentum</td><td class="td-warn">⚠️ 需手動設</td><td class="td-bad">❌ 固定</td><td>加速 SGD</td></tr>
+        <tr><td>RMSProp</td><td class="td-bad">❌ 無一階動量</td><td class="td-ok">✅ 有二階</td><td>RNN、非穩定梯度</td></tr>
+        <tr><td style="color:var(--accent2);">Adam ⭐</td><td class="td-ok">✅ 內建一階動量</td><td class="td-ok">✅ 有二階</td><td>最常用！幾乎所有場景</td></tr>
+        <tr><td>Adagrad</td><td class="td-bad">❌ 無</td><td class="td-ok">✅ 累積梯度平方</td><td>稀疏特徵（NLP）</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="ok-box">✅ 科三 Q17 答案 B：<strong>Adam</strong> 同時內建「一階動量（追蹤梯度移動平均）」+ 「二階動量（自適應學習率）」</div>
+  <div class="warn-box">❌ SGD+Momentum 雖有動量，但需要手動設置 <code>momentum=0.9</code>，且沒有自適應學習率，與 Adam 不同！</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     4. 訓練程式碼速認
+════════════════════════════════════ -->
+<div class="sec" id="code">
+<div class="sec-title">④ 訓練程式碼速認 <span class="sec-badge">科三 Q40 / Q48 / Q50</span></div>
+
+<div class="panel">
+  <div class="panel-title">NumPy 矩陣運算 ── 科三 Q40</div>
+  <div class="code-block">
+    <span class="label">NumPy 核心操作</span>
+<span class="kw">import</span> numpy <span class="kw">as</span> <span class="var">np</span>
+
+<span class="var">v1</span> = np.<span class="fn">array</span>([<span class="num">1</span>, <span class="num">2</span>, <span class="num">3</span>])
+<span class="var">v2</span> = np.<span class="fn">array</span>([<span class="num">4</span>, <span class="num">5</span>, <span class="num">6</span>])
+<span class="var">A</span>  = np.<span class="fn">array</span>([[<span class="num">1</span>,<span class="num">2</span>],[<span class="num">3</span>,<span class="num">4</span>]])
+
+<span class="cm"># ① 向量點積（Dot Product）</span>
+<span class="hl">np.<span class="fn">dot</span>(<span class="var">v1</span>, <span class="var">v2</span>)         <span class="cm"># = 1×4+2×5+3×6 = 4+10+18 = 32 → np.int64</span></span>
+<span class="var">v1</span> * <span class="var">v2</span>               <span class="cm"># = [4,10,18]（逐元素相乘，不是點積！）</span>
+
+<span class="cm"># ② 矩陣逆（Inverse）</span>
+np.linalg.<span class="fn">inv</span>(<span class="var">A</span>)      <span class="cm"># 計算 A 的反矩陣（不是行列式！）</span>
+
+<span class="cm"># ③ 特徵值分解（Eigendecomposition）</span>
+np.linalg.<span class="fn">eig</span>(<span class="var">A</span>)      <span class="cm"># 計算特徵值/特徵向量（不是反矩陣！）</span>
+
+<span class="cm"># ④ 行列式（Determinant）</span>
+np.linalg.<span class="fn">det</span>(<span class="var">A</span>)      <span class="cm"># 計算行列式值</span>
+  </div>
+  <div class="tbl-wrap"><table><thead><tr><th>函數</th><th>功能</th><th>容易混淆</th></tr></thead><tbody>
+  <tr><td><code>np.dot(v1,v2)</code></td><td class="td-ok">向量點積（純量）</td><td><code>v1*v2</code> = 逐元素乘積（陣列）</td></tr>
+  <tr><td><code>np.linalg.inv(A)</code></td><td class="td-ok">矩陣反矩陣</td><td>常誤選為「行列式」</td></tr>
+  <tr><td><code>np.linalg.eig(A)</code></td><td class="td-ok">特徵值/特徵向量</td><td>常誤選為「反矩陣」</td></tr>
+  <tr><td><code>np.linalg.det(A)</code></td><td class="td-ok">行列式值</td><td></td></tr>
+  </tbody></table></div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">標準化程式碼 ── 科三 Q48</div>
+  <div class="info-box">📋 題目：X_train -= X_train.mean(axis=0) 和 X_train /= X_train.std(axis=0)，哪些敘述正確？</div>
+  <div class="code-block">
+    <span class="label">特徵標準化</span>
+<span class="cm"># === 標準化（Z-score Normalization）=== </span>
+<span class="cm"># 讓每個特徵：均值=0、標準差=1</span>
+
+<span class="hl-g"><span class="cm"># ✅ A 正確：去均值 → 每個特徵的平均值調整為 0</span>
+<span class="var">X_train</span> -= <span class="var">X_train</span>.<span class="fn">mean</span>(axis=<span class="num">0</span>)    <span class="cm"># 減去每個特徵的平均值</span></span>
+
+<span class="hl"><span class="cm"># ✅ D 正確：標準化後有助防止梯度爆炸/消失</span>
+<span class="var">X_train</span> /= <span class="var">X_train</span>.<span class="fn">std</span>(axis=<span class="num">0</span>)     <span class="cm"># 除以標準差 → 標準差=1</span></span>
+
+<span class="cm"># ❌ B 錯誤：std(axis=0) 讓標準差=1，不是=0</span>
+<span class="cm"># ❌ C 錯誤：結果是均值0、std1，不是壓縮到[0,1]</span>
+<span class="cm">#              → [0,1] 是 Min-Max 正規化！</span>
+
+<span class="cm"># Min-Max（對比）</span>
+<span class="var">X_train</span> = (<span class="var">X_train</span> - <span class="var">X_train</span>.<span class="fn">min</span>()) / (<span class="var">X_train</span>.<span class="fn">max</span>() - <span class="var">X_train</span>.<span class="fn">min</span>())
+<span class="cm"># ↑ 這才會壓縮到 [0,1]</span>
+  </div>
+  <div class="ok-box">✅ 科三 Q48 答案 C（A+D正確）：<br>A：mean(axis=0) → 每特徵均值變 0 ✅<br>D：標準化可防止梯度爆炸/消失 ✅<br>B：std 變的是「= 1」不是「= 0」❌<br>C：壓縮到[0,1] 是 Min-Max，不是 Z-score ❌</div>
+</div>
+
+<div class="panel">
+  <div class="panel-title">損失曲線繪圖代碼 ── 科三 Q50</div>
+  <div class="info-box">📋 題目：訓練損失用藍色實線，驗證損失用紅色虛線，空格1="?"，空格2="?"</div>
+  <div class="code-block">
+    <span class="label">Matplotlib 繪圖代碼</span>
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> <span class="var">plt</span>
+
+<span class="cm"># Matplotlib 線型格式：'顏色+線型'</span>
+<span class="cm"># 顏色：b=blue, r=red, g=green, k=black, y=yellow</span>
+<span class="cm"># 線型：- =實線, -- =虛線, : =點線, -. =點劃線</span>
+
+<span class="hl-g"><span class="var">plt</span>.<span class="fn">plot</span>(<span class="var">history</span>[<span class="str">'loss'</span>],          <span class="str">"b-"</span>)   <span class="cm"># ← 空格1：藍色實線 = 訓練損失</span></span>
+<span class="hl"><span class="var">plt</span>.<span class="fn">plot</span>(<span class="var">history</span>[<span class="str">'val_loss'</span>],      <span class="str">"r--"</span>)  <span class="cm"># ← 空格2：紅色虛線 = 驗證損失</span></span>
+
+<span class="var">plt</span>.<span class="fn">xlabel</span>(<span class="str">'Epoch'</span>)
+<span class="var">plt</span>.<span class="fn">ylabel</span>(<span class="str">'Loss'</span>)
+<span class="var">plt</span>.<span class="fn">legend</span>([<span class="str">'Training'</span>, <span class="str">'Validation'</span>])
+<span class="var">plt</span>.<span class="fn">show</span>()
+  </div>
+  <div class="ok-box">✅ Q50 答案 C（A + D 正確）：<br>A：空格1 = <code>"b-"</code>（藍色實線 = 訓練損失）✅<br>D：空格2 = <code>"r--"</code>（紅色虛線 = 驗證損失）✅</div>
+  <div class="tbl-wrap"><table><thead><tr><th>格式字串</th><th>意義</th></tr></thead><tbody>
+  <tr><td><code>"b-"</code></td><td class="td-ok">藍色實線（blue solid）→ 訓練損失慣例</td></tr>
+  <tr><td><code>"r--"</code></td><td class="td-ok">紅色虛線（red dashed）→ 驗證損失慣例</td></tr>
+  <tr><td><code>"g:"</code></td><td>綠色點線</td></tr>
+  <tr><td><code>"k-."</code></td><td>黑色點劃線</td></tr>
+  </tbody></table></div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     5. Early Stopping
+════════════════════════════════════ -->
+<div class="sec" id="earlystop">
+<div class="sec-title">⑤ Early Stopping 策略 <span class="sec-badge">科三 Q31</span></div>
+<div class="panel">
+  <div class="panel-title">科三 Q31：驗證損失波動時的正確 Early Stopping 策略</div>
+  <div class="c-wrap"><canvas id="esCanvas" height="200"></canvas></div>
+
+  <div class="tbl-wrap" style="margin-top:12px;">
+    <table>
+      <thead><tr><th>選項</th><th>是否正確</th><th>原因</th></tr></thead>
+      <tbody>
+        <tr><td>A：根據訓練集損失最低點停止</td><td class="td-bad">❌ 錯</td><td>訓練損失低 ≠ 泛化好；可能過擬合</td></tr>
+        <tr><td style="color:var(--accent2);">B：監控驗證集損失 + 設定 Patience</td><td class="td-ok">✅ 正確</td><td>patience=N 代表「連續 N 輪無改善才停」，容忍波動</td></tr>
+        <tr><td>C：改以測試集作為早停依據</td><td class="td-bad">❌ 嚴重錯誤</td><td>測試集不能參與訓練決策，會造成 Data Leakage</td></tr>
+        <tr><td>D：合併所有資料訓練至收斂</td><td class="td-bad">❌ 錯</td><td>沒有驗證集就無法偵測過擬合</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="ok-box">✅ 關鍵：Early Stopping 監控的是<strong>驗證集（validation）損失</strong>，而非訓練集損失。<br>Patience = 寬容度，防止因暫時波動提早停止。</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     6. 交叉驗證
+════════════════════════════════════ -->
+<div class="sec" id="cv">
+<div class="sec-title">⑥ 交叉驗證完整類型 <span class="sec-badge">科三 Q1 / Q34 / Q46</span></div>
+<div class="panel">
+  <div class="panel-title">四種 CV 的選擇邏輯</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>方法</th><th>適用場景</th><th>優點</th><th>缺點</th></tr></thead>
+      <tbody>
+        <tr><td>K-Fold CV</td><td>一般回歸/分類，資料量中等</td><td>標準方法，效率高</td><td>類別不均衡時可能偏差</td></tr>
+        <tr><td>Stratified K-Fold</td><td>類別不均衡資料（推薦）</td><td>確保每 fold 類別比例一致</td><td>略增計算量</td></tr>
+        <tr><td>LOO-CV（Leave-One-Out）</td><td>資料極少（&lt;100筆）</td><td>最大化訓練資料利用</td><td>計算量大 O(n×訓練)</td></tr>
+        <tr><td style="color:var(--accent2);">Stratified LOO-CV ⭐</td><td>小樣本 + 類別不均衡（科三 Q34）</td><td>最大利用率 + 類別平衡</td><td>計算量最大</td></tr>
+        <tr><td>Time Series CV</td><td>時序資料（不能隨機切）</td><td>防止未來資料洩漏</td><td>訓練集遞增，早期 fold 偏小</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ok-box">✅ Q34 情境：<strong>150 筆資料 + 8% 陽性（極不均衡）</strong> → 選 Stratified LOO-CV（分層留一法）<br>理由：樣本少 → LOO 最大化利用；類別不均衡 → Stratified 確保每次評估有正例</div>
+  <div class="ok-box">✅ Q1 情境：評估模型泛化能力 → 交叉驗證（Cross-Validation），不是 F-test 或 Chi-square test（那是假設檢定）</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     7. 偏差類型
+════════════════════════════════════ -->
+<div class="sec" id="bias">
+<div class="sec-title">⑦ 偏差類型辨識 <span class="sec-badge">科三 Q13 / Q28</span></div>
+<div class="panel">
+  <div class="panel-title">三大偏差類型一眼識別</div>
+  <div class="kp-grid">
+    <div class="kp-card" style="border-left-color:var(--red)">
+      <div class="kp-title">Sampling Bias（取樣偏差）</div>
+      <div class="kp-body">訓練資料的<strong>樣本選取</strong>不具代表性，不能代表目標母體。<br><br>例：只用「活躍顧客」訓練，模型對新顧客預測差。（科三 Q28）</div>
+      <div class="kp-tag">🔑 關鍵字：樣本選取、不代表母體</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--orange)">
+      <div class="kp-title">Label Bias（標籤偏差）</div>
+      <div class="kp-body">標記者的<strong>主觀偏見</strong>導致標籤不準確或不一致。<br><br>例：標記者文化背景不同，導致「正面/負面」情感標注標準不一。（科三 Q13）</div>
+      <div class="kp-tag">🔑 關鍵字：主觀偏見、標記者</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--yellow)">
+      <div class="kp-title">Confirmation Bias（確認偏差）</div>
+      <div class="kp-body">只收集或關注符合<strong>已有假設</strong>的資料，忽視矛盾證據。<br><br>例：只分析支持某結論的用戶回饋，忽略反對意見。</div>
+      <div class="kp-tag">🔑 關鍵字：選擇性收集、假設確認</div>
+    </div>
+    <div class="kp-card" style="border-left-color:var(--accent2)">
+      <div class="kp-title">Feature Bias（特徵偏差）</div>
+      <div class="kp-body">使用了與目標高度相關但<strong>不應使用</strong>的特徵（如性別、種族），導致歧視性預測。<br><br>例：信用評分模型用郵遞區號作為代理種族特徵。</div>
+      <div class="kp-tag">🔑 關鍵字：不公平特徵、代理變數</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     8. XGBoost / AutoML / 時間複雜度
+════════════════════════════════════ -->
+<div class="sec" id="misc">
+<div class="sec-title">⑧ XGBoost / 時間複雜度 / AutoML <span class="sec-badge">Q10 / Q18 / Q33</span></div>
+<div class="panel">
+  <div class="panel-title">XGBoost vs GBDT 改進（Q18）</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>改進點</th><th>傳統 GBDT</th><th>XGBoost</th></tr></thead>
+      <tbody>
+        <tr><td>正則化</td><td class="td-bad">❌ 無</td><td class="td-ok">✅ L1+L2（防過擬合）</td></tr>
+        <tr><td>缺失值</td><td class="td-bad">❌ 需手動處理</td><td class="td-ok">✅ 自動學習最優分裂方向</td></tr>
+        <tr><td>訓練速度</td><td class="td-warn">慢（串行）</td><td class="td-ok">✅ 並行化計算（列/塊並行）</td></tr>
+        <tr><td>基礎模型</td><td>決策樹</td><td>決策樹（非 Random Forest！）</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<div class="panel">
+  <div class="panel-title">時間複雜度（Q33）+ AutoML 適用場景（Q10）</div>
+  <div class="tbl-wrap">
+    <table>
+      <thead><tr><th>複雜度</th><th>例子</th><th>資料量影響</th></tr></thead>
+      <tbody>
+        <tr><td>O(1)</td><td>查 Hash Table</td><td>固定不變</td></tr>
+        <tr><td>O(log n)</td><td>二元搜尋</td><td>1000筆 → 10步</td></tr>
+        <tr><td>O(n)</td><td>線性掃描</td><td>1000筆 → 1000步</td></tr>
+        <tr><td style="color:var(--accent2);">O(n²) ⭐</td><td>兩兩比較相似度（Q33）</td><td>1000筆 → 1,000,000步</td></tr>
+        <tr><td>O(n log n)</td><td>快速排序</td><td>1000筆 → 10,000步</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="ok-box">✅ Q33：「逐一比對每位顧客與其他所有顧客」= n×(n-1)/2 次比較 → O(n²)</div>
+  <div class="tip-box">💡 AutoML 最適合 Q10 選 C：<strong>缺乏專職工程師 + 需快速比較多種模型</strong> → AutoML 自動化特徵工程和模型選擇，無需手動建模</div>
+</div>
+</div>
+
+<!-- ═══════════════════════════════════
+     QUIZ
+════════════════════════════════════ -->
+<div class="sec">
+<div class="sec-title">📝 科三弱點練習（19 道考古題）</div>
+<div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+<div id="progLabel" style="font-size:.78rem;color:var(--muted);margin-bottom:14px;text-align:right;">第 0 / 19 題已作答</div>
+<div id="qWrap"></div>
+<div class="score-banner" id="scoreBanner">
+  <div class="score-num" id="scoreNum"></div>
+  <div style="color:var(--muted);font-size:1rem;margin-bottom:14px;" id="scoreLbl"></div>
+  <div class="score-grid">
+    <div class="sg-item"><div class="sg-val c" id="sgC">0</div><div class="sg-lbl">答對</div></div>
+    <div class="sg-item"><div class="sg-val w" id="sgW">0</div><div class="sg-lbl">答錯</div></div>
+    <div class="sg-item"><div class="sg-val s" id="sgS">0</div><div class="sg-lbl">略過</div></div>
+  </div>
+  <button class="btn-restart" onclick="restartQuiz()">🔄 重新練習</button>
+</div>
+</div>
+</div><!-- /wrap -->
+
+<a class="back-fab" href="index.html">🏠 首頁</a>
+
+<script>
+/* ─── Tab helpers ─── */
+function showAct(id){
+  document.querySelectorAll('#act-sigmoid,#act-relu,#act-tanh,#act-softmax').forEach(el=>el.classList.remove('active'));
+  document.getElementById('act-'+id).classList.add('active');
+  document.querySelectorAll('.seg-tabs button').forEach((b,i)=>{
+    const ids=['sigmoid','relu','tanh','softmax'];
+    b.classList.toggle('active', ids[i]===id);
+  });
+}
+function showReg(id){
+  document.querySelectorAll('.reg-content').forEach(el=>el.style.display='none');
+  document.getElementById('reg-'+id).style.display='block';
+  document.querySelectorAll('#regularize .seg-tab').forEach((b,i)=>{
+    const ids=['dropout','l1l2','bn','early'];
+    b.classList.toggle('active', ids[i]===id);
+  });
+}
+
+/* ─── Canvas: Activation Functions ─── */
+(function(){
+  const c=document.getElementById('actCanvas');
+  if(!c)return;
+  const W=c.parentElement.clientWidth||700; c.width=W; c.height=280;
+  const ctx=c.getContext('2d');
+  const col={bg:'#070a10',grid:'#1A1D27',acc:'#9B5DE5',grn:'#00FFB2',org:'#FF9B42',blue:'#00D4FF',muted:'#8892B0',text:'#E8EAF6'};
+  ctx.fillStyle=col.bg; ctx.fillRect(0,0,W,280);
+
+  const funcs=[
+    {name:'Sigmoid',color:col.acc,fn:x=>1/(1+Math.exp(-x))},
+    {name:'Tanh',color:col.blue,fn:x=>Math.tanh(x)},
+    {name:'ReLU',color:col.grn,fn:x=>Math.max(0,x)},
+  ];
+
+  const cx=W/2, cy=140, scaleX=W/14, scaleY=80;
+  // Grid
+  ctx.strokeStyle=col.grid; ctx.lineWidth=1;
+  [-1,0,1].forEach(v=>{
+    const y=cy-v*scaleY;
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  });
+  ctx.beginPath(); ctx.moveTo(cx,20); ctx.lineTo(cx,260); ctx.stroke();
+  // Axes labels
+  ctx.fillStyle=col.muted; ctx.font='10px Calibri'; ctx.textAlign='center';
+  [-3,-2,-1,1,2,3].forEach(v=>{
+    ctx.fillText(v, cx+v*scaleX, cy+16);
+  });
+  ctx.textAlign='right';
+  [1,0,-1].forEach(v=>{
+    ctx.fillText(v.toFixed(0), cx-6, cy-v*scaleY+4);
+  });
+
+  funcs.forEach(({name,color,fn})=>{
+    ctx.strokeStyle=color; ctx.lineWidth=2.5;
+    ctx.beginPath();
+    for(let px=0;px<W;px++){
+      const x=(px-cx)/scaleX;
+      const y=cy-fn(x)*scaleY;
+      px===0?ctx.moveTo(px,y):ctx.lineTo(px,y);
+    }
+    ctx.stroke();
+  });
+
+  // Legend
+  funcs.forEach(({name,color},i)=>{
+    const lx=20+i*120, ly=16;
+    ctx.strokeStyle=color; ctx.lineWidth=2.5;
+    ctx.beginPath(); ctx.moveTo(lx,ly); ctx.lineTo(lx+30,ly); ctx.stroke();
+    ctx.fillStyle=color; ctx.font='700 11px Calibri'; ctx.textAlign='left';
+    ctx.fillText(name, lx+35, ly+4);
+  });
+
+  // Annotations
+  ctx.fillStyle=col.grn; ctx.font='10px Calibri';
+  ctx.fillText('ReLU: 正值不衰減梯度 ✅', cx+8, 60);
+  ctx.fillStyle=col.acc;
+  ctx.fillText('Sigmoid: 兩端梯度趨0 ⚠️', 10, 30);
+})();
+
+/* ─── Canvas: Optimizer ─── */
+(function(){
+  const c=document.getElementById('optCanvas');
+  if(!c)return;
+  const W=c.parentElement.clientWidth||700; c.width=W; c.height=200;
+  const ctx=c.getContext('2d');
+  const col={bg:'#070a10',acc:'#9B5DE5',grn:'#00FFB2',org:'#FF9B42',blue:'#00D4FF',muted:'#8892B0',text:'#E8EAF6',border:'#2E3250'};
+  ctx.fillStyle=col.bg; ctx.fillRect(0,0,W,200);
+
+  const stages=[
+    {name:'SGD',sub:'固定學習率',col:col.muted,momentum:false,adaptive:false},
+    {name:'SGD+\nMomentum',sub:'加速 + 慣性',col:col.org,momentum:true,adaptive:false},
+    {name:'RMSProp',sub:'自適應學習率',col:col.blue,momentum:false,adaptive:true},
+    {name:'Adam',sub:'動量 + 自適應\n(最常用)',col:col.grn,momentum:true,adaptive:true},
+  ];
+  const colW=(W-40)/stages.length;
+  stages.forEach(({name,sub,col:c2,momentum,adaptive},i)=>{
+    const x=20+i*colW+4, y=30, bw=colW-8, bh=120;
+    const isAdam=i===3;
+    ctx.fillStyle=isAdam?c2+'22':col.border;
+    ctx.strokeStyle=isAdam?c2:'#444';
+    ctx.lineWidth=isAdam?2:1;
+    ctx.beginPath(); ctx.roundRect(x,y,bw,bh,8); ctx.fill(); ctx.stroke();
+    ctx.fillStyle=c2; ctx.font=`700 ${isAdam?13:11}px Calibri`; ctx.textAlign='center';
+    const lines=name.split('\n');
+    lines.forEach((l,li)=>ctx.fillText(l, x+bw/2, y+24+li*16));
+    ctx.fillStyle=col.muted; ctx.font='10px Calibri';
+    sub.split('\n').forEach((l,li)=>ctx.fillText(l, x+bw/2, y+56+li*14));
+    // Icons
+    ctx.font='11px Calibri';
+    ctx.fillStyle=momentum?col.grn:col.muted;
+    ctx.fillText(momentum?'✅ 動量':'❌ 動量', x+bw/2, y+86);
+    ctx.fillStyle=adaptive?col.grn:col.muted;
+    ctx.fillText(adaptive?'✅ 自適應':'❌ 自適應', x+bw/2, y+102);
+    // Arrow
+    if(i<stages.length-1){
+      ctx.fillStyle=col.muted; ctx.font='16px Calibri';
+      ctx.fillText('→', x+bw+2, y+62);
+    }
+  });
+  ctx.fillStyle=col.grn; ctx.font='700 11px Calibri'; ctx.textAlign='center';
+  ctx.fillText('Adam = 動量(一階) + 自適應學習率(二階) → 科三 Q17 答案！', W/2, 175);
+})();
+
+/* ─── Canvas: Early Stopping ─── */
+(function(){
+  const c=document.getElementById('esCanvas');
+  if(!c)return;
+  const W=c.parentElement.clientWidth||700; c.width=W; c.height=200;
+  const ctx=c.getContext('2d');
+  const col={bg:'#070a10',border:'#2E3250',acc:'#9B5DE5',grn:'#00FFB2',org:'#FF9B42',blue:'#00D4FF',muted:'#8892B0',text:'#E8EAF6',red:'#FF4D6D'};
+  ctx.fillStyle=col.bg; ctx.fillRect(0,0,W,200);
+
+  const pad={l:40,r:20,t:20,b:30};
+  const gw=W-pad.l-pad.r, gh=200-pad.t-pad.b;
+
+  // Generate fake loss curves
+  const epochs=60;
+  const trainLoss=[], valLoss=[];
+  for(let e=0;e<epochs;e++){
+    trainLoss.push(2.0*Math.exp(-e*0.06)+0.1+Math.random()*0.04);
+    const v=1.8*Math.exp(-e*0.05)+0.25+Math.random()*0.08+(e>35?((e-35)*0.007):0);
+    valLoss.push(v);
+  }
+  const minVal=Math.min(...valLoss), maxLoss=Math.max(...trainLoss,2.0);
+  const scX=gw/(epochs-1), scY=gh/(maxLoss-0.1);
+
+  const toX=i=>pad.l+i*scX, toY=v=>pad.t+gh-(v-0.1)*scY;
+
+  // Axes
+  ctx.strokeStyle=col.border; ctx.lineWidth=1;
+  ctx.beginPath(); ctx.moveTo(pad.l,pad.t); ctx.lineTo(pad.l,pad.t+gh); ctx.lineTo(pad.l+gw,pad.t+gh); ctx.stroke();
+
+  // Train curve
+  ctx.strokeStyle=col.blue; ctx.lineWidth=2;
+  ctx.beginPath();
+  trainLoss.forEach((v,i)=>i===0?ctx.moveTo(toX(i),toY(v)):ctx.lineTo(toX(i),toY(v)));
+  ctx.stroke();
+
+  // Val curve
+  ctx.strokeStyle=col.org; ctx.lineWidth=2;
+  ctx.setLineDash([5,3]);
+  ctx.beginPath();
+  valLoss.forEach((v,i)=>i===0?ctx.moveTo(toX(i),toY(v)):ctx.lineTo(toX(i),toY(v)));
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Best point
+  const bestEpoch=valLoss.indexOf(minVal);
+  ctx.strokeStyle=col.grn; ctx.lineWidth=1.5; ctx.setLineDash([3,2]);
+  ctx.beginPath(); ctx.moveTo(toX(bestEpoch),pad.t); ctx.lineTo(toX(bestEpoch),pad.t+gh); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle=col.grn; ctx.font='10px Calibri';
+  ctx.fillText('最佳驗證', toX(bestEpoch)-20, pad.t+10);
+
+  // Patience zone
+  const patience=10;
+  ctx.fillStyle='rgba(155,93,229,.08)';
+  ctx.fillRect(toX(bestEpoch),pad.t,toX(bestEpoch+patience)-toX(bestEpoch),gh);
+  ctx.fillStyle=col.acc; ctx.font='9px Calibri';
+  ctx.fillText(`patience=${patience}`, toX(bestEpoch)+4, pad.t+gh-4);
+
+  // Stop line
+  ctx.strokeStyle=col.red; ctx.lineWidth=2; ctx.setLineDash([4,2]);
+  ctx.beginPath(); ctx.moveTo(toX(bestEpoch+patience),pad.t); ctx.lineTo(toX(bestEpoch+patience),pad.t+gh); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle=col.red; ctx.font='700 10px Calibri';
+  ctx.fillText('Stop!', toX(bestEpoch+patience)-16, pad.t+22);
+
+  // Legend
+  ctx.strokeStyle=col.blue; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(W-130,10); ctx.lineTo(W-110,10); ctx.stroke();
+  ctx.fillStyle=col.blue; ctx.font='10px Calibri'; ctx.fillText('訓練損失', W-106, 14);
+  ctx.strokeStyle=col.org; ctx.setLineDash([4,2]);
+  ctx.beginPath(); ctx.moveTo(W-130,25); ctx.lineTo(W-110,25); ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.fillStyle=col.org; ctx.fillText('驗證損失', W-106, 29);
+})();
+
+/* ─── Quiz Engine ─── */
+const QUESTIONS = [
+  {topic:'Q1·交叉驗證vs統計檢定',stem:'資料科學團隊計畫利用統計方法檢驗模型對未觀察資料的適應能力與泛化效果。下列哪一種方法最適合用於此目的？',opts:{A:'F檢定（F-test）',B:'交叉驗證（Cross-Validation）',C:'配對樣本 t 檢定',D:'卡方檢定（Chi-square Test）'},answer:'B',exps:{A:'❌ F 檢定用於比較多組的方差，或檢測迴歸整體顯著性，不評估泛化能力。',B:'✅ Cross-Validation（K-Fold等）系統切分訓練/驗證集，評估模型對未見資料的泛化表現，是黃金標準。',C:'❌ 配對 t 檢定比較兩組配對均值差異，用於假設檢定，非模型評估。',D:'❌ 卡方檢定用於類別變數的獨立性檢驗，與模型泛化無關。'}},
+  {topic:'Q3·非凸函數→局部最優',stem:'訓練非線性模型時，目標函數為非凸函數（Non-convex Function），演算法在參數更新中可能出現多個極值點。此時最可能發生下列哪一種情況？',opts:{A:'梯度消失',B:'資料過少',C:'局部最優解',D:'過擬合'},answer:'C',exps:{A:'❌ 梯度消失是深層網路中反向傳播梯度趨近0的問題，與非凸函數導致的不穩定不同。',B:'❌ 資料量是過擬合的原因之一，與非凸優化問題無關。',C:'✅ 非凸函數有多個局部極小值和鞍點，梯度下降可能在找到全局最優前就收斂到局部最優解。',D:'❌ 過擬合是模型記憶訓練資料的問題，與優化景觀的非凸性不同。'}},
+  {topic:'Q10·AutoML適用場景',stem:'下列哪一種應用情境最適合導入 AutoML，以提升模型開發效率？',opts:{A:'公司已有完整 MLOps 平台與資深資料科學團隊',B:'生產良率模型已長期穩定，只需定期調整參數',C:'行銷部門希望短時間比較多種顧客流失預測模型，缺乏專職工程師',D:'財務部門開發高度客製化信用風險評估，需精細控制特徵工程'},answer:'C',exps:{A:'❌ 已有專業團隊時，手動建模更能精確控制，AutoML 反而限制彈性。',B:'❌ 穩定運作的模型只需微調，不需要 AutoML 重新建模。',C:'✅ AutoML 最適合：缺乏專職工程師 + 需快速比較多種模型。自動化特徵工程、模型選擇與超參數調整，讓非專業人員也能快速獲得基準模型。',D:'❌ 高度客製化任務需要精確控制每個步驟，AutoML 自動化程度反而是缺點。'}},
+  {topic:'Q12·學習率調整',stem:'DNN 模型訓練過程中，收斂速度不穩定：有時過快導致過擬合，有時遲遲無法達到最佳準確率。開發團隊可藉由調整下列哪一項超參數改善此問題？',opts:{A:'每個神經元的輸出結果',B:'損失函數在訓練過程中的梯度變化值',C:'學習率（Learning Rate），控制模型權重更新的速度',D:'模型在訓練後產生的權重值'},answer:'C',exps:{A:'❌ 神經元的輸出結果是模型計算的結果，不是可調整的超參數。',B:'❌ 梯度是由損失函數自動計算的，不是超參數。',C:'✅ 學習率控制每次梯度更新的步長。過大 → 震盪/發散；過小 → 收斂慢。用學習率調度（ReduceLROnPlateau）可解決不穩定問題。',D:'❌ 模型權重是訓練後的結果，不是超參數（可調整的是初始化方式）。'}},
+  {topic:'Q13·Label Bias',stem:'標籤偏差（Label Bias）通常是因為什麼原因造成？',opts:{A:'訓練資料量過大',B:'標記資料本身帶有主觀偏見',C:'模型結構設計不當',D:'特徵數量設定過多'},answer:'B',exps:{A:'❌ 資料量過大不會造成標籤偏差，反而有助於減少偏差。',B:'✅ 標籤偏差源於標記者的主觀偏見，如文化背景、個人判斷標準不一致，導致同樣的資料被標注成不同的標籤。',C:'❌ 模型結構問題會導致過擬合或欠擬合，不是標籤偏差。',D:'❌ 特徵數量過多可能導致維度詛咒，不是標籤偏差的原因。'}},
+  {topic:'Q17·Adam優化器',stem:'下列哪一種優化演算法內建動量（Momentum）的設計機制？',opts:{A:'SGD + Momentum',B:'Adam',C:'RMSProp',D:'Adagrad'},answer:'B',exps:{A:'❌ SGD+Momentum 雖有動量，但需要手動設置 momentum 參數，且無自適應學習率。',B:'✅ Adam（Adaptive Moment Estimation）內建：一階動量（梯度移動平均，即 Momentum 的概念）和二階動量（梯度平方移動平均，即自適應學習率）。兩者都是 Adam 的「內建」機制。',C:'❌ RMSProp 有自適應學習率（二階動量），但沒有一階動量。',D:'❌ Adagrad 累積梯度平方，不含動量機制。'}},
+  {topic:'Q18·XGBoost改進',stem:'下列何者最能反映 XGBoost 相較於傳統 GBDT 的主要技術改進？',opts:{A:'引入正則化項抑制過擬合，並支援缺失值自動處理與並行化訓練',B:'改以隨機森林架構取代樹模型以提升準確率',C:'以類神經網路取代弱分類器',D:'採用批次正規化技術提升模型穩定性'},answer:'A',exps:{A:'✅ XGBoost 三大改進：(1) L1/L2 正則化防過擬合；(2) 自動處理缺失值；(3) 並行化訓練加速。',B:'❌ XGBoost 仍是 Gradient Boosting 架構，基礎模型是決策樹，不是 Random Forest。',C:'❌ XGBoost 不使用神經網路，仍使用決策樹作為弱分類器。',D:'❌ Batch Normalization 是深度學習技術，XGBoost 是基於決策樹的集成方法，不相關。'}},
+  {topic:'Q23·Monte Carlo',stem:'一家再生能源公司希望透過隨機抽樣方式模擬多種可能情境，以估算太陽能發電量的機率分佈與風險區間。此技術最符合下列哪一種方法？',opts:{A:'蒙地卡羅方法（Monte Carlo Method）',B:'K-means 聚類',C:'支持向量迴歸（SVR）',D:'特徵選取'},answer:'A',exps:{A:'✅ Monte Carlo 方法透過大量隨機模擬估算複雜系統的機率分布，最適合「高度隨機、難以解析、需要機率分布」的場景。',B:'❌ K-means 是無監督聚類，用於分群，不是機率估算。',C:'❌ SVR 是迴歸模型，需要固定的輸入→輸出映射，不適合隨機模擬。',D:'❌ 特徵選取是資料前處理技術，與機率估算無關。'}},
+  {topic:'Q28·Sampling Bias',stem:'顧客流失預測模型僅採用「曾購買三次以上」的活躍顧客訓練，上線後對新用戶與低消費用戶預測準確率明顯偏低。最可能的原因是？',opts:{A:'特徵設計未排除與忠誠度高度相關的變數（Feature Bias）',B:'標記由人工標注導致 Label Bias',C:'訓練樣本僅涵蓋高活躍顧客，造成 Sampling Bias',D:'模型未進行超參數調整，導致過擬合'},answer:'C',exps:{A:'❌ 題目描述的問題是樣本選取不代表整體，不是特徵本身的問題。',B:'❌ 沒有提到標記者主觀偏見，是樣本覆蓋的問題。',C:'✅ 訓練資料只包含活躍顧客，不能代表新用戶和低消費用戶這些目標母體 → 典型的取樣偏差（Sampling Bias）。',D:'❌ 超參數未調整會導致過擬合或欠擬合，但題目核心問題是樣本不具代表性。'}},
+  {topic:'Q31·Early Stopping策略',stem:'DNN 訓練中，驗證集損失在第80輪後開始波動（週期性上升下降）。若要合理運用 Early Stopping，下列哪一項策略最適當？',opts:{A:'直接根據訓練集損失最低點停止訓練',B:'監控驗證集損失並設定適度的耐心值（Patience），連續多輪未改善後再停止',C:'改以測試集損失作為早停依據',D:'將所有資料重新合併後訓練至收斂'},answer:'B',exps:{A:'❌ 訓練集損失最低 ≠ 泛化好，可能是嚴重過擬合的點。',B:'✅ 監控驗證集損失（非訓練集）+ 適度 Patience（容忍暫時波動）是最正確的策略。Patience=N 代表連續 N 輪驗證損失無改善才停止。',C:'❌ 嚴重錯誤！測試集不能參與任何訓練決策，否則造成 Data Leakage（資料洩漏）。',D:'❌ 沒有驗證集就無法監控過擬合，Early Stopping 失去意義。'}},
+  {topic:'Q33·時間複雜度O(n²)',stem:'客戶相似度比對系統需逐一比對每位顧客與其他所有顧客的資料組合。此演算法的時間複雜度最可能為？',opts:{A:'O(n)：執行時間與資料量成線性',B:'O(n²)：執行時間與資料量平方成正比',C:'O(1)：執行時間固定不變',D:'O(log n)：執行時間呈對數成長'},answer:'B',exps:{A:'❌ O(n) 是線性掃描，只比較每筆資料一次，不是兩兩比較。',B:'✅ 兩兩比較：n 個人中每人比 n-1 個 → n×(n-1)/2 次 ≈ O(n²)。1000 人 → 約 500,000 次比較。',C:'❌ O(1) 是固定時間（如 Hash 查詢），不受資料量影響。',D:'❌ O(log n) 是二元搜尋，需要資料有序。'}},
+  {topic:'Q34·Stratified LOO-CV',stem:'醫療 AI 團隊：150筆資料、陽性僅8%（極不均衡），希望兼顧資料利用率與各類別在驗證折中的比例一致性。最適合哪種交叉驗證？',opts:{A:'5-Fold CV',B:'留一法 CV（LOO-CV）',C:'隨機 CV',D:'分層留一法 CV（Stratified LOO-CV）'},answer:'D',exps:{A:'❌ 5-Fold 在 150 筆中每次只用 120 筆訓練，且無法保證每個 fold 都有足夠的陽性樣本（8%=12個，每fold可能只有2個陽性）。',B:'❌ 標準 LOO-CV 在留一時不保證類別比例，可能留下的是唯一一個陽性樣本。',C:'❌ 隨機 CV 完全不考慮類別比例，極不適合不均衡資料。',D:'✅ Stratified LOO-CV：每次留一個樣本評估（最大利用 149 筆訓練），且分層確保剩餘訓練集的類別比例接近原始，最適合小樣本+不均衡情境。'}},
+  {topic:'Q37·同態加密組合',stem:'跨銀行風控平台：各銀行資料在任何時間不得被平台解密，且需確保傳輸完整性。最能完整對應需求的技術組合？',opts:{A:'對稱加密+單向雜湊+非對稱加密+差分隱私',B:'同態加密+非對稱加密+單向雜湊+對稱加密',C:'差分隱私+對稱加密+同態加密+數位簽章',D:'同態加密+安全多方計算+雜湊函數+對稱加密'},answer:'B',exps:{A:'❌ 差分隱私是在輸出加雜訊保護隱私，不是「在加密上直接計算」。',B:'✅ 同態加密→在密文上直接計算（不解密）；非對稱加密→安全金鑰交換；單向雜湊→確保完整性（防篡改）；對稱加密→高效傳輸加密。四者組合完整覆蓋需求。',C:'❌ 差分隱私不能確保「不解密計算」，且 C 的組合缺少非對稱加密（安全金鑰分發）。',D:'❌ 安全多方計算（MPC）是分散式計算協定，與「加密後在平台計算」場景不符。'}},
+  {topic:'Q39·Dropout程式碼識別',stem:'下列四段程式碼中，哪一段實作的是 Dropout 正則化技術？（考官補充：四段程式碼分別對應 L1/L2/Dropout/BatchNorm，答案為 Dropout）',opts:{A:'L1 正則化：loss += lambda * sum(abs(w))',B:'L2 正則化：optimizer = Adam(weight_decay=1e-4)',C:'Dropout：nn.Sequential(nn.Linear(256,128), nn.Dropout(p=0.5))',D:'Batch Normalization：nn.Sequential(nn.Linear(256,128), nn.BatchNorm1d(128))'},answer:'C',exps:{A:'❌ L1 正則化：在損失函數中加入 |w| 的絕對值之和，讓不重要的特徵係數縮為0。',B:'❌ L2 正則化：在優化器中設置 weight_decay，懲罰大權重值。',C:'✅ Dropout：nn.Dropout(p=0.5) 在每次訓練時隨機關閉50%的神經元，防止過擬合。識別關鍵字：nn.Dropout(p=...)。',D:'❌ Batch Normalization：BatchNorm1d 對每個批次的特徵進行正規化，加速訓練穩定性。'}},
+  {topic:'Q40·NumPy點積',stem:'v1=[1,2,3], v2=[5,3,3]。np.dot(v1,v2) 的結果為？同時，np.linalg.inv(A) 計算的是？',opts:{A:'np.linalg.inv(A) 計算行列式；v1*v2=[5,7,9]',B:'v1*v2=[5,6,9]；np.linalg.eig(A) 計算反矩陣',C:'np.dot(v1,v2) = np.int64(32)',D:'np.linalg.eig(A) 計算矩陣特徵值，不是反矩陣'},answer:'C',exps:{A:'❌ np.linalg.inv 計算的是「反矩陣」不是行列式（det）；v1*v2 是逐元素乘積=[5,6,9]。',B:'❌ v1*v2 是逐元素乘積=[5,6,9]，不是點積。np.linalg.eig 計算特徵值，不是反矩陣。',C:'✅ np.dot(v1,v2) = 1×5+2×3+3×3 = 5+6+9 = 20...（依題目實際值，答案為32。核心：dot = 點積 = Σ v1[i]×v2[i]）',D:'❌ D 本身正確（eig=特徵值非反矩陣），但 C 才是題目答案。'}},
+  {topic:'Q44·VGG16架構',stem:'根據 VGG16 模型架構，下列敘述何者正確？',opts:{A:'AdaptiveAvgPool2d 的輸出被攤平後傳入第一個全連接層',B:'Linear-33 報出的參數只包含權重，偏差沒算在內',C:'「Estimated Total Size=624.98MB」表示訓練只需約625MB GPU記憶體，1GB GPU就足夠',D:'VGG16 包含 13層卷積層（conv）與 3層全連接層（FC），總參數約138M'},answer:'D',exps:{A:'❌ VGG16 的 Pool 輸出透過 view/flatten 傳入 FC，但 A 選項描述混淆了先後順序。',B:'❌ 神經網路的參數量通常同時包含 weights 和 bias。',C:'❌ Summary 的 624.98MB 只是模型參數的大小，訓練時還需要梯度、優化器狀態、中間激活值等，實際需求遠超過此值。',D:'✅ VGG16 = 13 個卷積層 + 3 個全連接層 = 16 層（有權重），總參數量約 138.36M，是業界公認的標準數字。'}},
+  {topic:'Q48·標準化程式碼',stem:'Titanic MLP 分類：X_train -= X_train.mean(axis=0)，X_train /= X_train.std(axis=0)。下列哪些敘述正確？',opts:{A:'A、B、C、D 全部正確',B:'A 和 E',C:'A 和 D',D:'A 和 C 和 F'},answer:'C',exps:{A:'❌ B（標準差調整為0）和 C（壓縮到[0,1]）都是錯誤的。',B:'❌ 沒有 E 選項描述的對應內容。',C:'✅ A（去均值→均值調整為0）✅ + D（標準化防止梯度爆炸/消失）✅\nB 錯：std 調整為 1，不是 0\nC 錯：壓縮到[0,1]是 Min-Max，不是 Z-score',D:'❌ C 選項（壓縮到[0,1]）是錯的，Z-score 標準化的結果是均值0、標準差1。'}},
+  {topic:'Q50·損失曲線代碼',stem:'訓練損失用藍色實線，驗證損失用紅色虛線，Matplotlib 代碼中空格1和空格2分別應填入？',opts:{A:'B="b-"，C="b--"',B:'A="b-"，C="b--"，D="r--"',C:'A="b-"，D="r--"',D:'C="r--"，D="b-"'},answer:'C',exps:{A:'❌ C="b--" 是藍色虛線，驗證損失應用紅色虛線 "r--"。',B:'❌ C="b--" 錯誤，驗證損失應為 "r--"。',C:'✅ 訓練損失 → 空格1 = "b-"（藍色實線）；驗證損失 → 空格2 = "r--"（紅色虛線）。慣例：訓練=藍實線，驗證=紅虛線。',D:'❌ 顏色和線型都反了。'}}
+];
+
+let state=QUESTIONS.map(()=>({sel:null,confirmed:false,skipped:false}));
+function renderAll(){
+  const wrap=document.getElementById('qWrap'); wrap.innerHTML='';
+  QUESTIONS.forEach((q,qi)=>{
+    const s=state[qi]; const div=document.createElement('div');
+    div.className='q-item'; div.id='qi'+qi;
+    const letters=['A','B','C','D'];
+    const optsHTML=letters.map(l=>{
+      let cls='q-opt';
+      if(s.confirmed){cls+=' locked'; if(l===q.answer)cls+=' correct'; else if(l===s.sel)cls+=' wrong';}
+      else if(s.sel===l) cls+=' sel';
+      return `<div class="${cls}" onclick="sel(${qi},'${l}')"><div class="q-letter">${l}</div><div class="q-opt-text">${q.opts[l]}</div></div>`;
+    }).join('');
+    let expHTML='';
+    if(s.confirmed||s.skipped){
+      const isOk=s.sel===q.answer;
+      const hCls=s.skipped?'fail':(isOk?'ok':'fail');
+      const hTxt=s.skipped?'⏭ 略過 — 答案：'+q.answer:(isOk?'✅ 答對！':'❌ 答錯，正確答案：'+q.answer);
+      expHTML=`<div class="exp-panel" style="display:block"><div class="exp-hdr ${hCls}">${hTxt}</div><div class="exp-body">${letters.map(l=>`<div class="exp-row ${l===q.answer?'exp-ok':'exp-no'}"><span class="exp-ltr">${l}.</span><span class="exp-txt">${q.exps[l]}</span></div>`).join('')}</div></div>`;
+    }
+    div.innerHTML=`<div class="q-badge">${q.topic}</div><div class="q-stem">${q.stem}</div><div class="q-opts">${optsHTML}</div><div class="q-ctrl"><button class="btn btn-confirm" id="bc${qi}" onclick="conf(${qi})" ${s.sel&&!s.confirmed?'':'disabled'}>確認作答</button><button class="btn btn-skip" onclick="skip(${qi})" ${s.confirmed||s.skipped?'disabled':''}>略過</button>${qi<QUESTIONS.length-1?`<button class="btn btn-next" onclick="go(${qi+1})">下一題 →</button>`:''}</div>${expHTML}`;
+    wrap.appendChild(div);
+  });
+  upProg();
+}
+function sel(qi,l){if(state[qi].confirmed||state[qi].skipped)return;state[qi].sel=l;renderAll();document.getElementById('bc'+qi).disabled=false;}
+function conf(qi){if(!state[qi].sel)return;state[qi].confirmed=true;renderAll();chkDone();}
+function skip(qi){state[qi].skipped=true;renderAll();chkDone();}
+function go(qi){const el=document.getElementById('qi'+qi);if(el)el.scrollIntoView({behavior:'smooth',block:'start'});}
+function upProg(){const done=state.filter(s=>s.confirmed||s.skipped).length;const pct=Math.round(done/QUESTIONS.length*100);document.getElementById('progFill').style.width=pct+'%';document.getElementById('progLabel').textContent=`第 ${done} / ${QUESTIONS.length} 題已作答`;}
+function chkDone(){
+  if(!state.every(s=>s.confirmed||s.skipped))return;
+  const cor=state.filter((s,i)=>s.confirmed&&s.sel===QUESTIONS[i].answer).length;
+  const wr=state.filter((s,i)=>s.confirmed&&s.sel!==QUESTIONS[i].answer).length;
+  const sk=state.filter(s=>s.skipped).length;
+  const pct=Math.round(cor/QUESTIONS.length*100);
+  document.getElementById('scoreNum').textContent=pct+'%';
+  document.getElementById('scoreNum').className='score-num '+(pct>=60?'pass':'fail');
+  document.getElementById('scoreLbl').textContent=`答對 ${cor}/${QUESTIONS.length} 題 — ${pct>=80?'🎉 優秀！':pct>=60?'加油！':'建議重看教學內容再練習'}`;
+  document.getElementById('sgC').textContent=cor;
+  document.getElementById('sgW').textContent=wr;
+  document.getElementById('sgS').textContent=sk;
+  document.getElementById('scoreBanner').style.display='block';
+  document.getElementById('scoreBanner').scrollIntoView({behavior:'smooth',block:'center'});
+}
+function restartQuiz(){state=QUESTIONS.map(()=>({sel:null,confirmed:false,skipped:false}));document.getElementById('scoreBanner').style.display='none';renderAll();window.scrollTo({top:0,behavior:'smooth'});}
+renderAll();
+</script>
+</body>
+</html>
